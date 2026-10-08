@@ -198,3 +198,5 @@ dialog.ask .actions { justify-content: flex-end; }
 @media (max-width: 600px) {
   .doc { padding: 20px; }
 }
+
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; }

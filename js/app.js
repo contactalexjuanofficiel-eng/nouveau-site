@@ -58,14 +58,14 @@ function newId() {
 }
 
 // Fenêtre de confirmation intégrée à la page.
-function ask(message, okLabel = 'Confirmer') {
+function ask(message, okLabel = 'Confirmer', withCancel = true) {
   return new Promise((resolve) => {
     const dialog = document.createElement('dialog');
     dialog.className = 'ask';
     dialog.innerHTML = `
       <p>${esc(message)}</p>
       <div class="actions">
-        <button class="btn" value="non">Annuler</button>
+        ${withCancel ? '<button class="btn" value="non">Annuler</button>' : ''}
         <button class="btn btn-primary" value="oui">${esc(okLabel)}</button>
       </div>`;
     dialog.addEventListener('click', (e) => {
@@ -220,7 +220,7 @@ function documentsTable(docs) {
   }
   return `
     <div class="table-wrap"><table>
-      <thead><tr><th>Numéro</th><th>Client</th><th>Date</th><th>Statut</th><th class="num">Total TTC</th></tr></thead>
+      <thead><tr><th>Numéro</th><th>Client</th><th>Date</th><th>Statut</th><th class="num">Total TTC</th><th class="num">Actions</th></tr></thead>
       <tbody>
         ${docs.map((d) => `
           <tr>
@@ -229,6 +229,11 @@ function documentsTable(docs) {
             <td>${dateFr(d.date)}</td>
             <td>${badge(d)}</td>
             <td class="num">${euro(computeTotals(d).ttc)}</td>
+            <td><div class="row-actions">
+              <a class="btn btn-sm" href="#/modifier/${esc(d.id)}">Modifier</a>
+              <button class="btn btn-sm" data-duplicate="${esc(d.id)}">Dupliquer</button>
+              <button class="btn btn-sm btn-danger" data-delete="${esc(d.id)}">Supprimer</button>
+            </div></td>
           </tr>`).join('')}
       </tbody>
     </table></div>`;
@@ -346,7 +351,8 @@ function pageEdit(id) {
     <div class="actions">
       <a class="btn btn-primary" href="#/voir/${esc(doc.id)}">Terminer</a>
       ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
-      ${!isFacture ? `<button class="btn btn-danger" id="delete">Supprimer</button>` : ''}
+      <button class="btn" id="duplicate">Dupliquer</button>
+      <button class="btn btn-danger" id="delete">Supprimer</button>
     </div>
   `;
 
@@ -412,12 +418,9 @@ function pageEdit(id) {
   form.addEventListener('submit', (e) => e.preventDefault());
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
-  document.getElementById('delete')?.addEventListener('click', async () => {
-    if (await ask(`Supprimer le devis ${doc.numero} ?`, 'Supprimer')) {
-      data.documents = data.documents.filter((d) => d.id !== doc.id);
-      saveData();
-      go('#/documents');
-    }
+  document.getElementById('duplicate').addEventListener('click', () => duplicateDocument(doc));
+  document.getElementById('delete').addEventListener('click', async () => {
+    if (await deleteDocument(doc)) go('#/documents');
   });
 
   renderLines();
@@ -432,6 +435,53 @@ function totalsHtml(t) {
     ${Object.entries(t.tvaParTaux).filter(([, v]) => v).map(([taux, v]) =>
       `<div><span>TVA ${String(taux).replace('.', ',')} %</span><span>${euro(v)}</span></div>`).join('')}
     <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>`;
+}
+
+// Crée une copie du document avec un nouveau numéro, puis l'ouvre.
+function duplicateDocument(doc) {
+  const copie = {
+    ...structuredClone(doc),
+    id: newId(),
+    numero: nextNumber(doc.type),
+    date: today(),
+    echeance: addDays(today(), 30),
+    statut: doc.type === 'facture' ? 'a-payer' : 'brouillon',
+    creeLe: Date.now(),
+  };
+  delete copie.devisOrigine;
+  data.documents.push(copie);
+  saveData();
+  go('#/modifier/' + copie.id);
+}
+
+// Supprime un document après confirmation. Renvoie true si supprimé.
+async function deleteDocument(doc) {
+  if (doc.type === 'facture') {
+    // La numérotation des factures doit rester continue : on ne peut
+    // supprimer que la dernière facture de sa série.
+    const derniere = nextNumber('facture') === incrementNumber(doc.numero);
+    if (!derniere) {
+      await ask(
+        `Pour respecter la numérotation obligatoire des factures (sans trou), seule la dernière facture peut être supprimée. ` +
+        `Si la facture ${doc.numero} est erronée, modifiez-la ou faites un avoir.`,
+        "D'accord", false);
+      return false;
+    }
+    const ok = await ask(
+      `Supprimer la facture ${doc.numero} ? Ne supprimez une facture que si elle n'a pas encore été envoyée au client.`,
+      'Supprimer');
+    if (!ok) return false;
+  } else if (!(await ask(`Supprimer le devis ${doc.numero} ?`, 'Supprimer'))) {
+    return false;
+  }
+  data.documents = data.documents.filter((d) => d.id !== doc.id);
+  saveData();
+  return true;
+}
+
+// F-2026-007 -> F-2026-008
+function incrementNumber(numero) {
+  return numero.replace(/(\d+)$/, (n) => String(Number(n) + 1).padStart(n.length, '0'));
 }
 
 async function convertToInvoice(devis) {
@@ -489,6 +539,8 @@ function pageView(id) {
           : `<button class="btn btn-primary" onclick="window.print()">Télécharger / Imprimer (PDF)</button>`}
         ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut !== 'payee' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
+        <button class="btn" id="duplicate">Dupliquer</button>
+        <button class="btn btn-danger" id="delete">Supprimer</button>
       </div>
     </div>
 
@@ -556,6 +608,10 @@ function pageView(id) {
     doc.statut = 'payee';
     saveData();
     render();
+  });
+  document.getElementById('duplicate').addEventListener('click', () => duplicateDocument(doc));
+  document.getElementById('delete').addEventListener('click', async () => {
+    if (await deleteDocument(doc)) go('#/documents');
   });
 }
 
@@ -696,9 +752,11 @@ function render() {
   }
 }
 
-document.addEventListener('click', (e) => {
-  const type = e.target.dataset?.new;
+document.addEventListener('click', async (e) => {
+  const { new: type, duplicate, delete: del } = e.target.dataset || {};
   if (type) createDocument(type);
+  if (duplicate) duplicateDocument(getDocument(duplicate));
+  if (del && (await deleteDocument(getDocument(del)))) render();
 });
 
 window.addEventListener('hashchange', () => {
