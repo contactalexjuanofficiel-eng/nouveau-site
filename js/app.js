@@ -48,6 +48,8 @@ const DEFAULT_DATA = {
     numeroContrat: '',
     zoneCouverture: 'France métropolitaine',
     mediateur: '',
+    nonDecennale: false, // activité non soumise à la garantie décennale
+    clientsProUniquement: false, // pas de particuliers : médiateur non obligatoire
     mentions: '',
     // Numérotation
     prefixeDevis: 'D',
@@ -208,6 +210,55 @@ function checkTva(value) {
   return /^\d{2}$/.test(v.slice(2, 4)) ? tvaFromSiret(v.slice(4)) === v : true;
 }
 
+// Informations obligatoires avant de pouvoir créer un devis ou une facture.
+// Renvoie la liste de ce qui manque : [{ champ, texte }].
+function profilManquant(e = data.entreprise) {
+  const manque = [];
+  const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(e.formeJuridique);
+  if (!String(e.nom || '').trim()) manque.push({ champ: 'nom', texte: "Nom ou raison sociale de l'entreprise" });
+  if (!String(e.adresse || '').trim()) manque.push({ champ: 'adresse', texte: "Adresse de l'entreprise" });
+  if (!checkSiret(e.siret || '')) manque.push({ champ: 'siret', texte: 'SIRET valide (14 chiffres)' });
+  if (societe && !String(e.capital || '').trim()) manque.push({ champ: 'capital', texte: 'Capital social (obligatoire pour une société)' });
+  if (societe && !String(e.immatriculation || '').trim()) manque.push({ champ: 'immatriculation', texte: 'Immatriculation RCS (obligatoire pour une société)' });
+  if (!e.franchiseTva && !checkTva(e.numeroTva || '')) manque.push({ champ: 'numeroTva', texte: 'N° de TVA intracommunautaire valide' });
+  if (!e.nonDecennale && (!String(e.assureur || '').trim() || !String(e.numeroContrat || '').trim())) {
+    manque.push({ champ: 'assureur', texte: 'Assurance décennale : assureur et n° de contrat' });
+  }
+  if (!e.clientsProUniquement && !String(e.mediateur || '').trim()) {
+    manque.push({ champ: 'mediateur', texte: 'Médiateur de la consommation (obligatoire avec des particuliers)' });
+  }
+  return manque;
+}
+
+function listeManquante(manque) {
+  return `<ul class="todo">${manque.map((m) =>
+    `<li><a href="#/parametres?champ=${esc(m.champ)}">${esc(m.texte)}</a></li>`).join('')}</ul>`;
+}
+
+// Bloque l'action si le profil n'est pas complet. Renvoie true si on peut continuer.
+async function profilPret() {
+  const manque = profilManquant();
+  if (!manque.length) return true;
+  const ok = await ask(
+    `Avant de faire un devis ou une facture, complétez « Mon entreprise » : vos documents doivent comporter les mentions obligatoires. ` +
+    `Il manque : ${manque.map((m) => m.texte).join(' ; ')}.`,
+    'Compléter mon entreprise');
+  if (ok) go('#/parametres?champ=' + manque[0].champ);
+  return false;
+}
+
+function pageBloquee() {
+  const manque = profilManquant();
+  view.innerHTML = `
+    ${backLink()}
+    <div class="card gate">
+      <h1>Complétez d'abord votre entreprise</h1>
+      <p>Pour être valables, vos devis et factures doivent comporter les mentions obligatoires. Il manque encore :</p>
+      ${listeManquante(manque)}
+      <a class="btn btn-primary" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
+    </div>`;
+}
+
 function echeanceDefaut(type) {
   const e = data.entreprise;
   return addDays(today(), Number(type === 'facture' ? e.delaiPaiement : e.validiteDevis) || 0);
@@ -322,7 +373,7 @@ function pageDashboard() {
     .filter((d) => d.statut === 'payee' && d.date.startsWith(year))
     .reduce((s, d) => s + computeTotals(d).ttc, 0);
 
-  const profilIncomplet = !data.entreprise.nom || !data.entreprise.siret;
+  const manque = profilManquant();
 
   view.innerHTML = `
     <div class="page-head">
@@ -333,7 +384,12 @@ function pageDashboard() {
       </div>
     </div>
 
-    ${profilIncomplet ? `<div class="alert">👋 Bienvenue ! Commencez par renseigner <a href="#/parametres">les informations de votre entreprise</a> : elles apparaîtront sur vos devis et factures.</div>` : ''}
+    ${manque.length ? `<div class="card gate">
+      <h2>Étape 1 : complétez votre entreprise</h2>
+      <p>Vous pourrez créer vos devis et factures dès que les mentions obligatoires seront renseignées. Il manque :</p>
+      ${listeManquante(manque)}
+      <a class="btn btn-primary" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
+    </div>` : ''}
 
     <div class="stats">
       <div class="stat"><div class="label">Encaissé en ${year}</div><div class="value">${euro(caAnnee)}</div></div>
@@ -400,7 +456,8 @@ function pageDocuments(filtre) {
   `;
 }
 
-function createDocument(type) {
+async function createDocument(type) {
+  if (!(await profilPret())) return;
   const doc = {
     id: newId(),
     type,
@@ -598,7 +655,8 @@ function totalsHtml(t, doc) {
 }
 
 // Crée une copie du document avec un nouveau numéro, puis l'ouvre.
-function duplicateDocument(doc) {
+async function duplicateDocument(doc) {
+  if (!(await profilPret())) return;
   const copie = {
     ...structuredClone(doc),
     id: newId(),
@@ -645,6 +703,7 @@ function incrementNumber(numero) {
 }
 
 async function convertToInvoice(devis) {
+  if (!(await profilPret())) return;
   const deja = data.documents.find((d) => d.devisOrigine === devis.id);
   if (deja) {
     if (await ask(`Ce devis a déjà été transformé en facture (${deja.numero}). L'ouvrir ?`, 'Ouvrir la facture')) {
@@ -876,7 +935,7 @@ function pageClientForm(id, retour) {
   });
 }
 
-function pageSettings() {
+function pageSettings(champ) {
   const e = data.entreprise;
   let logo = e.logo || '';
 
@@ -885,7 +944,8 @@ function pageSettings() {
 
   view.innerHTML = `
     <div class="page-head"><h1>Mon entreprise</h1></div>
-    <p class="intro">Ces informations apparaissent sur tous vos devis et factures. Les champs marqués * sont obligatoires sur une facture.</p>
+    <p class="intro">Ces informations apparaissent sur tous vos devis et factures. Les champs marqués * sont obligatoires : sans eux, vous ne pouvez pas créer de devis.</p>
+    <div class="card checklist" id="checklist"></div>
 
     <form id="settings-form" novalidate>
       <section class="card">
@@ -903,7 +963,7 @@ function pageSettings() {
             <small class="hint" id="hint-forme"></small>
           </div>
           <div id="field-capital">
-            <label for="capital">Capital social (€)</label>
+            <label for="capital">Capital social (€) *</label>
             <input id="capital" name="capital" inputmode="decimal" value="${esc(e.capital)}" placeholder="Ex : 5000">
           </div>
           <div>
@@ -912,7 +972,7 @@ function pageSettings() {
             <small class="hint" id="hint-siret"></small>
           </div>
           <div>
-            <label for="immatriculation">Immatriculation (RCS ou RM)</label>
+            <label for="immatriculation">Immatriculation (RCS ou RM) <span id="star-immat">*</span></label>
             <input id="immatriculation" name="immatriculation" value="${esc(e.immatriculation)}" placeholder="Ex : RM 123 456 789 ou RCS Paris 123 456 789">
           </div>
           <div>
@@ -957,7 +1017,7 @@ function pageSettings() {
         <div id="tva-options" ${e.franchiseTva ? 'hidden' : ''}>
           <div class="grid-2">
             <div>
-              <label for="numeroTva">N° de TVA intracommunautaire</label>
+              <label for="numeroTva">N° de TVA intracommunautaire *</label>
               <div class="input-row">
                 <input id="numeroTva" name="numeroTva" value="${esc(e.numeroTva)}" placeholder="FR12 345678901">
                 <button type="button" class="btn btn-sm" id="tva-calc">Calculer depuis le SIRET</button>
@@ -1040,15 +1100,17 @@ function pageSettings() {
       <section class="card">
         <h2>Assurance et mentions légales</h2>
         <div class="grid-2">
-          <div><label for="assureur">Assureur (garantie décennale)</label><input id="assureur" name="assureur" value="${esc(e.assureur)}" placeholder="Ex : MAAF Pro"></div>
-          <div><label for="numeroContrat">N° de contrat</label><input id="numeroContrat" name="numeroContrat" value="${esc(e.numeroContrat)}"></div>
+          <div><label for="assureur">Assureur (garantie décennale) <span class="star-decennale">*</span></label><input id="assureur" name="assureur" value="${esc(e.assureur)}" placeholder="Ex : MAAF Pro"></div>
+          <div><label for="numeroContrat">N° de contrat <span class="star-decennale">*</span></label><input id="numeroContrat" name="numeroContrat" value="${esc(e.numeroContrat)}"></div>
           <div><label for="zoneCouverture">Zone couverte</label><input id="zoneCouverture" name="zoneCouverture" value="${esc(e.zoneCouverture)}"></div>
           <div>
-            <label for="mediateur">Médiateur de la consommation</label>
+            <label for="mediateur">Médiateur de la consommation <span id="star-mediateur">*</span></label>
             <input id="mediateur" name="mediateur" value="${esc(e.mediateur)}" placeholder="Nom et site internet du médiateur">
-            <small class="hint">Obligatoire si vous travaillez pour des particuliers.</small>
+            <small class="hint">Obligatoire si vous travaillez pour des particuliers. Exemple : CM2C, Médiateur de la consommation CNPM…</small>
           </div>
         </div>
+        <label class="checkbox field"><input type="checkbox" name="nonDecennale" ${checked(e.nonDecennale)}> Mon activité n'est pas soumise à la garantie décennale (par exemple : dépannage seul, sans travaux de construction)</label>
+        <label class="checkbox field"><input type="checkbox" name="clientsProUniquement" ${checked(e.clientsProUniquement)}> Je travaille uniquement pour des professionnels (pas de particuliers)</label>
         <div class="field"><label for="mentions">Autres mentions (ajoutées en bas de chaque document)</label>
           <textarea id="mentions" name="mentions" rows="2">${esc(e.mentions)}</textarea></div>
       </section>
@@ -1089,8 +1151,37 @@ function pageSettings() {
     el.textContent = value ? (ok ? okText : koText) : '';
   }
 
+  // Va au premier champ obligatoire encore vide.
+  function champSuivant(manque) {
+    const el = $(manque[0].champ);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus({ preventScroll: true });
+    el.classList.add('missing');
+  }
+
   function refresh() {
     const forme = $('formeJuridique').value;
+    const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(forme);
+    $('star-immat').hidden = !societe;
+    document.querySelectorAll('.star-decennale').forEach((el) => { el.hidden = form.nonDecennale.checked; });
+    $('star-mediateur').hidden = form.clientsProUniquement.checked;
+
+    // Liste de contrôle en direct
+    const actuel = collect();
+    const manque = profilManquant(actuel);
+    // Nombre d'informations obligatoires selon la situation de l'entreprise.
+    const total = 3 + (societe ? 2 : 0) + (actuel.franchiseTva ? 0 : 1) +
+      (actuel.nonDecennale ? 0 : 1) + (actuel.clientsProUniquement ? 0 : 1);
+    $('checklist').className = 'card checklist ' + (manque.length ? '' : 'done');
+    $('checklist').innerHTML = manque.length
+      ? `<div class="checklist-head"><strong>Encore ${manque.length} information${manque.length > 1 ? 's' : ''} obligatoire${manque.length > 1 ? 's' : ''} avant votre premier devis</strong>
+           <div class="progress"><span style="width:${Math.round(((total - manque.length) / total) * 100)}%"></span></div></div>
+         <ul class="todo">${manque.map((m) => `<li><button type="button" class="link" data-champ="${esc(m.champ)}">${esc(m.texte)}</button></li>`).join('')}</ul>`
+      : `<strong>✓ Toutes les mentions obligatoires sont renseignées.</strong> Vous pouvez créer vos devis et factures.`;
+    form.querySelectorAll('.missing').forEach((el) => {
+      if (!manque.some((m) => m.champ === el.id)) el.classList.remove('missing');
+    });
     $('field-capital').hidden = forme === 'micro' || forme === 'ei' || forme === 'autre';
     $('hint-forme').textContent = forme === 'micro' || forme === 'ei'
       ? 'La mention « EI » sera ajoutée après votre nom, comme la loi l’exige.'
@@ -1156,15 +1247,15 @@ function pageSettings() {
     form.dispatchEvent(new Event('input'));
   });
 
-  form.addEventListener('submit', (ev) => {
-    ev.preventDefault();
+  // Valeurs actuelles du formulaire, au même format que data.entreprise.
+  function collect() {
     const fd = new FormData(form);
     const values = Object.fromEntries(fd);
     const tauxActifs = fd.getAll('tauxActifs').map(Number);
     const tvaDefaut = Number(values.tvaDefaut);
     if (!tauxActifs.includes(tvaDefaut)) tauxActifs.push(tvaDefaut);
     delete values.regimeTva;
-    data.entreprise = {
+    return {
       ...data.entreprise,
       ...values,
       logo,
@@ -1179,10 +1270,28 @@ function pageSettings() {
       acompteDefaut: Math.min(100, Math.max(0, Number(values.acompteDefaut) || 0)),
       prefixeDevis: (values.prefixeDevis || 'D').trim(),
       prefixeFacture: (values.prefixeFacture || 'F').trim(),
+      nonDecennale: fd.has('nonDecennale'),
+      clientsProUniquement: fd.has('clientsProUniquement'),
     };
+  }
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const etaitIncomplet = profilManquant().length > 0;
+    data.entreprise = collect();
     saveData();
-    $('saved').className = 'hint ok';
-    $('saved').textContent = '✓ Enregistré';
+    const manque = profilManquant();
+    $('saved').className = 'hint ' + (manque.length ? 'warn' : 'ok');
+    $('saved').textContent = manque.length
+      ? `✓ Enregistré · il manque encore ${manque.length} information${manque.length > 1 ? 's' : ''}`
+      : '✓ Enregistré';
+    majPastille();
+    if (etaitIncomplet && !manque.length) {
+      const go2 = await ask('Tout est prêt ! Vos devis et factures comporteront toutes les mentions obligatoires.', 'Créer mon premier devis');
+      if (go2) createDocument('devis');
+    } else if (manque.length) {
+      champSuivant(manque);
+    }
   });
 
   // Sauvegarde et restauration
@@ -1228,7 +1337,23 @@ function pageSettings() {
     reader.readAsText(file);
   });
 
+  $('checklist').addEventListener('click', (ev) => {
+    const id = ev.target.dataset.champ;
+    if (id) champSuivant([{ champ: id }]);
+  });
+
   refresh();
+  if (champ && $(champ)) {
+    // Ouvre la partie TVA si c'est elle qui manque.
+    if (champ === 'numeroTva') $('tva-options').hidden = false;
+    setTimeout(() => champSuivant([{ champ }]), 50);
+  }
+}
+
+function majPastille() {
+  const nb = profilManquant().length;
+  const lien = document.querySelector('.nav a[href="#/parametres"]');
+  if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
 }
 
 function pageNotFound() {
@@ -1267,13 +1392,15 @@ function render() {
     lastList = { hash: location.hash || '#/', label: LISTES[parts[0] ?? ''] };
   }
 
+  majPastille();
+
   switch (parts[0]) {
     case undefined: return pageDashboard();
     case 'documents': return pageDocuments(parts[1]);
-    case 'modifier': return pageEdit(parts[1]);
-    case 'voir': return pageView(parts[1]);
+    case 'modifier': return profilManquant().length ? pageBloquee() : pageEdit(parts[1]);
+    case 'voir': return profilManquant().length ? pageBloquee() : pageView(parts[1]);
     case 'clients': return parts[1] ? pageClientForm(parts[1], params.get('retour')) : pageClients();
-    case 'parametres': return pageSettings();
+    case 'parametres': return pageSettings(params.get('champ'));
     default: return pageNotFound();
   }
 }

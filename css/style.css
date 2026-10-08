@@ -40,6 +40,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -236,3 +237,26 @@ dialog.ask .actions { justify-content: flex-end; }
 
 .doc-logo { display: block; max-height: 70px; max-width: 220px; margin-bottom: 10px; }
 .totals .acompte { color: var(--muted); font-size: .95rem; border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 8px; }
+
+/* ---------- Profil obligatoire ---------- */
+.gate { border: 2px solid var(--warning); }
+.gate h1, .gate h2 { margin-top: 0; }
+.todo { margin: 8px 0 16px; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.todo li { display: flex; gap: 8px; align-items: baseline; }
+.todo li::before { content: "○"; color: var(--warning); font-weight: 700; }
+.todo a, .link {
+  color: var(--text); background: none; border: 0; padding: 0; font: inherit;
+  text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--border);
+}
+.todo a:hover, .link:hover { color: var(--primary); text-decoration-color: currentColor; }
+.checklist { border: 2px solid var(--warning); }
+.checklist.done { border-color: var(--success); color: var(--success); }
+.checklist .todo { margin-bottom: 0; }
+.checklist-head { display: grid; gap: 8px; }
+.progress { height: 8px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--warning); border-radius: inherit; transition: width .3s; }
+.pill {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: 999px; background: var(--danger); color: #ffffff; font-size: .75rem; font-weight: 700;
+}
+input.missing, textarea.missing, select.missing { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-soft); }
