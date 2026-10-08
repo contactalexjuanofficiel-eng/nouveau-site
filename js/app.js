@@ -162,9 +162,28 @@ function badge(doc) {
   return `<span class="badge badge-${esc(doc.statut)}">${esc(STATUTS[doc.type][doc.statut] || doc.statut)}</span>`;
 }
 
-function clientName(id) {
-  const c = getClient(id);
-  return c ? c.nom : '—';
+// Client d'un document. S'il a été supprimé du carnet d'adresses,
+// on utilise la copie gardée dans le document.
+function docClient(doc) {
+  return getClient(doc.clientId) || doc.clientArchive || null;
+}
+
+function clientName(doc) {
+  return docClient(doc)?.nom || '—';
+}
+
+async function deleteClient(client) {
+  const docs = data.documents.filter((d) => d.clientId === client.id);
+  const message = docs.length
+    ? `Supprimer ${client.nom} du carnet d'adresses ? Ses ${docs.length} devis et factures restent intacts, avec son nom et son adresse.`
+    : `Supprimer ${client.nom} du carnet d'adresses ?`;
+  if (!(await ask(message, 'Supprimer'))) return false;
+  for (const d of docs) {
+    d.clientArchive = { nom: client.nom, adresse: client.adresse, siret: client.siret };
+  }
+  data.clients = data.clients.filter((c) => c.id !== client.id);
+  saveData();
+  return true;
 }
 
 const view = document.getElementById('view');
@@ -225,7 +244,7 @@ function documentsTable(docs) {
         ${docs.map((d) => `
           <tr>
             <td><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
-            <td>${esc(clientName(d.clientId))}</td>
+            <td>${esc(clientName(d))}</td>
             <td>${dateFr(d.date)}</td>
             <td>${badge(d)}</td>
             <td class="num">${euro(computeTotals(d).ttc)}</td>
@@ -304,6 +323,7 @@ function pageEdit(id) {
             <select id="clientId" name="clientId">
               <option value="">— Choisir un client —</option>
               ${data.clients.map((c) => `<option value="${esc(c.id)}" ${c.id === doc.clientId ? 'selected' : ''}>${esc(c.nom)}</option>`).join('')}
+              ${doc.clientArchive && !getClient(doc.clientId) ? `<option value="${esc(doc.clientId)}" selected>${esc(doc.clientArchive.nom)} (supprimé du carnet)</option>` : ''}
             </select>
             <small><a href="#/clients/nouveau?retour=${esc(doc.id)}">+ Ajouter un client</a></small>
           </div>
@@ -411,6 +431,8 @@ function pageEdit(id) {
   form.addEventListener('input', (e) => {
     if (e.target.closest('#lines')) return;
     if (e.target.name) {
+      // Un autre client est choisi : la copie de l'ancien client n'est plus utile.
+      if (e.target.name === 'clientId' && e.target.value !== doc.clientId) delete doc.clientArchive;
       doc[e.target.name] = e.target.value;
       saveData();
     }
@@ -513,7 +535,7 @@ function pageView(id) {
   const doc = getDocument(id);
   if (!doc) return pageNotFound();
   const e = data.entreprise;
-  const client = getClient(doc.clientId) || {};
+  const client = docClient(doc) || {};
   const isFacture = doc.type === 'facture';
   const t = computeTotals(doc);
   const origine = doc.devisOrigine ? getDocument(doc.devisOrigine) : null;
@@ -631,7 +653,10 @@ function pageClients() {
                 <td><strong>${esc(c.nom)}</strong><br><small>${esc(c.adresse).replace(/\n/g, ', ')}</small></td>
                 <td>${esc(c.telephone)}</td>
                 <td>${esc(c.email)}</td>
-                <td class="num"><a class="btn btn-sm" href="#/clients/${esc(c.id)}">Modifier</a></td>
+                <td><div class="row-actions">
+                  <a class="btn btn-sm" href="#/clients/${esc(c.id)}">Modifier</a>
+                  <button class="btn btn-sm btn-danger" data-delete-client="${esc(c.id)}">Supprimer</button>
+                </div></td>
               </tr>`).join('')}
           </tbody>
         </table></div>` : `<p class="empty">Aucun client pour l'instant.</p>`}
@@ -643,7 +668,6 @@ function pageClientForm(id, retour) {
   const isNew = id === 'nouveau';
   const client = isNew ? { nom: '', adresse: '', telephone: '', email: '', siret: '' } : getClient(id);
   if (!client) return pageNotFound();
-  const utilise = !isNew && data.documents.some((d) => d.clientId === client.id);
 
   view.innerHTML = `
     <div class="page-head"><h1>${isNew ? 'Nouveau client' : esc(client.nom)}</h1></div>
@@ -658,7 +682,7 @@ function pageClientForm(id, retour) {
       <div class="actions" style="margin-top:16px">
         <button class="btn btn-primary" type="submit">Enregistrer</button>
         <a class="btn" href="${retour ? '#/modifier/' + esc(retour) : '#/clients'}">Annuler</a>
-        ${!isNew && !utilise ? `<button class="btn btn-danger" type="button" id="delete">Supprimer</button>` : ''}
+        ${!isNew ? `<button class="btn btn-danger" type="button" id="delete">Supprimer</button>` : ''}
       </div>
     </form>
   `;
@@ -679,11 +703,7 @@ function pageClientForm(id, retour) {
   });
 
   document.getElementById('delete')?.addEventListener('click', async () => {
-    if (await ask(`Supprimer le client ${client.nom} ?`, 'Supprimer')) {
-      data.clients = data.clients.filter((c) => c.id !== client.id);
-      saveData();
-      go('#/clients');
-    }
+    if (await deleteClient(client)) go('#/clients');
   });
 }
 
@@ -753,10 +773,11 @@ function render() {
 }
 
 document.addEventListener('click', async (e) => {
-  const { new: type, duplicate, delete: del } = e.target.dataset || {};
+  const { new: type, duplicate, delete: del, deleteClient: delClient } = e.target.dataset || {};
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();
+  if (delClient && (await deleteClient(getClient(delClient)))) render();
 });
 
 window.addEventListener('hashchange', () => {
