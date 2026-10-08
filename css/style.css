@@ -260,3 +260,5 @@ dialog.ask .actions { justify-content: flex-end; }
   border-radius: 999px; background: var(--danger); color: #ffffff; font-size: .75rem; font-weight: 700;
 }
 input.missing, textarea.missing, select.missing { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-soft); }
+.nav a.locked { color: var(--muted); }
+.nav a.locked::after { content: " 🔒"; font-size: .8em; }

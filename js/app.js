@@ -247,15 +247,16 @@ async function profilPret() {
   return false;
 }
 
+// Écran affiché à la place de toute l'application tant que le profil est incomplet.
 function pageBloquee() {
   const manque = profilManquant();
   view.innerHTML = `
-    ${backLink()}
     <div class="card gate">
-      <h1>Complétez d'abord votre entreprise</h1>
-      <p>Pour être valables, vos devis et factures doivent comporter les mentions obligatoires. Il manque encore :</p>
+      <h1>Bienvenue sur Devizo 👋</h1>
+      <p>Avant de créer vos devis, vos factures et vos clients, renseignez les informations de votre entreprise.
+      En France, elles doivent obligatoirement figurer sur chaque document. Il manque encore :</p>
       ${listeManquante(manque)}
-      <a class="btn btn-primary" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
+      <a class="btn btn-primary btn-lg" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
     </div>`;
 }
 
@@ -915,8 +916,9 @@ function pageClientForm(id, retour) {
     </form>
   `;
 
-  document.getElementById('client-form').addEventListener('submit', (e) => {
+  document.getElementById('client-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!(await profilPret())) return;
     const values = Object.fromEntries(new FormData(e.target));
     if (isNew) {
       const created = { id: newId(), ...values };
@@ -1354,6 +1356,8 @@ function majPastille() {
   const nb = profilManquant().length;
   const lien = document.querySelector('.nav a[href="#/parametres"]');
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
+  // Les autres pages sont verrouillées tant que le profil est incomplet.
+  document.querySelectorAll('.nav a:not([href="#/parametres"])').forEach((a) => a.classList.toggle('locked', nb > 0));
 }
 
 function pageNotFound() {
@@ -1394,11 +1398,15 @@ function render() {
 
   majPastille();
 
+  // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
+  const bloque = profilManquant().length > 0;
+  if (bloque && parts[0] !== 'parametres') return pageBloquee();
+
   switch (parts[0]) {
     case undefined: return pageDashboard();
     case 'documents': return pageDocuments(parts[1]);
-    case 'modifier': return profilManquant().length ? pageBloquee() : pageEdit(parts[1]);
-    case 'voir': return profilManquant().length ? pageBloquee() : pageView(parts[1]);
+    case 'modifier': return pageEdit(parts[1]);
+    case 'voir': return pageView(parts[1]);
     case 'clients': return parts[1] ? pageClientForm(parts[1], params.get('retour')) : pageClients();
     case 'parametres': return pageSettings(params.get('champ'));
     default: return pageNotFound();
