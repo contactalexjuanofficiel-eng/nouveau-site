@@ -259,7 +259,6 @@ function profilManquant(e = data.entreprise) {
     }
   }
   if (societe && !String(e.capital || '').trim()) manque.push({ champ: 'capital', texte: 'Capital social (obligatoire pour une société)' });
-  if (societe && !String(e.immatriculation || '').trim()) manque.push({ champ: 'immatriculation', texte: 'Immatriculation RCS (obligatoire pour une société)' });
   if (!e.franchiseTva && !checkTva(e.numeroTva || '')) manque.push({ champ: 'numeroTva', texte: 'N° de TVA intracommunautaire valide' });
   if (!e.nonDecennale && (!String(e.assureur || '').trim() || !String(e.numeroContrat || '').trim())) {
     manque.push({ champ: 'assureur', texte: 'Assurance décennale : assureur et n° de contrat' });
@@ -1012,8 +1011,9 @@ function pageSettings(champ) {
             <div id="siret-check"></div>
           </div>
           <div>
-            <label for="immatriculation">Immatriculation (RCS ou RM) <span id="star-immat">*</span></label>
-            <input id="immatriculation" name="immatriculation" value="${esc(e.immatriculation)}" placeholder="Ex : RM 123 456 789 ou RCS Paris 123 456 789">
+            <label for="immatriculation">Immatriculation RCS ou RM (facultatif)</label>
+            <input id="immatriculation" name="immatriculation" value="${esc(e.immatriculation)}" placeholder="Ex : RCS Bordeaux 123 456 789">
+            <small class="hint" id="hint-immat"></small>
           </div>
           <div>
             <label for="ape">Code APE / NAF</label>
@@ -1262,14 +1262,19 @@ function pageSettings(champ) {
   function refresh() {
     const forme = $('formeJuridique').value;
     const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(forme);
-    $('star-immat').hidden = !societe;
+    // Aide : le n° RCS, c'est « RCS » + ville du greffe + SIREN (les 9 premiers chiffres du SIRET).
+    const siren = $('siret').value.replace(/\s/g, '').slice(0, 9);
+    const sirenFormate = /^\d{9}$/.test(siren) ? siren.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') : '123 456 789';
+    $('hint-immat').textContent = societe
+      ? `Il s'écrit « RCS » + la ville de votre greffe + votre SIREN, par exemple : RCS Bordeaux ${sirenFormate}. Vous le trouvez sur votre extrait Kbis.`
+      : `Artisan : « RM » + votre SIREN, par exemple : RM ${sirenFormate}. Commerçant : « RCS » + la ville de votre greffe + votre SIREN.`;
     document.querySelectorAll('.star-decennale').forEach((el) => { el.hidden = form.nonDecennale.checked; });
 
     // Liste de contrôle en direct
     const actuel = collect();
     const manque = profilManquant(actuel);
     // Nombre d'informations obligatoires selon la situation de l'entreprise.
-    const total = 3 + (societe ? 2 : 0) + (actuel.franchiseTva ? 0 : 1) +
+    const total = 3 + (societe ? 1 : 0) + (actuel.franchiseTva ? 0 : 1) +
       (actuel.nonDecennale ? 0 : 1);
     $('checklist').className = 'card checklist ' + (manque.length ? '' : 'done');
     $('checklist').innerHTML = manque.length
