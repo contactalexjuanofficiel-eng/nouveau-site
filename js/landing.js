@@ -114,6 +114,13 @@ document.querySelectorAll('.billing-toggle button').forEach((button) => {
     document.querySelectorAll('.price .per').forEach((el) => {
       el.textContent = period === 'an' ? 'HT / an' : 'HT / mois';
     });
+    // Prix TTC (TVA 20 %) affiché sous le prix HT.
+    document.querySelectorAll('.plan').forEach((plan) => {
+      const ht = Number(plan.querySelector('.price .amount').dataset[period]);
+      plan.querySelector('.price-ttc .ttc').textContent =
+        (ht * 1.2).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      plan.querySelector('.price-ttc .per-ttc').textContent = period === 'an' ? '/ an' : '/ mois';
+    });
   });
 });
 
