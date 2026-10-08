@@ -203,11 +203,16 @@ async function verifierSiret(siret) {
     if (!etab) return { siret: clean, statut: 'introuvable' };
     const adresse = etab.adresse || [etab.numero_voie, etab.type_voie, etab.libelle_voie, etab.code_postal, etab.libelle_commune]
       .filter(Boolean).join(' ');
+    const rueAnnuaire = [etab.numero_voie, etab.indice_repetition, etab.type_voie, etab.libelle_voie].filter(Boolean).join(' ');
     return {
       siret: clean,
       statut: etab.etat_administratif === 'F' || entreprise.etat_administratif === 'C' ? 'ferme' : 'actif',
       nom: entreprise.nom_complet || entreprise.nom_raison_sociale || '',
       adresse,
+      rue: rueAnnuaire,
+      complement: etab.complement_adresse || '',
+      codePostal: etab.code_postal || '',
+      ville: etab.libelle_commune || '',
       ape: String(etab.activite_principale || entreprise.activite_principale || '').replace('.', ''),
       forme: NATURES[String(entreprise.nature_juridique)] || '',
       date: today(),
@@ -216,6 +221,142 @@ async function verifierSiret(siret) {
     console.warn('Vérification du SIRET indisponible', err);
     return { siret: clean, statut: 'indisponible' };
   }
+}
+
+// ====================================================================
+// Adresses : rue, complément, code postal et ville dans des champs séparés.
+// Le champ « adresse » (texte complet) est gardé pour l'affichage.
+// ====================================================================
+
+// Découpe une ancienne adresse en un seul texte (« 12 rue X\n75011 Paris »).
+function decomposeAdresse(obj = {}) {
+  if (obj.rue || obj.codePostal || obj.ville || obj.complement) {
+    return { rue: obj.rue || '', complement: obj.complement || '', codePostal: obj.codePostal || '', ville: obj.ville || '' };
+  }
+  const lignes = String(obj.adresse || '').split('\n').map((l) => l.trim()).filter(Boolean);
+  const a = { rue: '', complement: '', codePostal: '', ville: '' };
+  const i = lignes.findIndex((l) => /^\d{5}\s+\S/.test(l));
+  if (i >= 0) {
+    a.codePostal = lignes[i].slice(0, 5);
+    a.ville = lignes[i].slice(5).trim();
+    lignes.splice(i, 1);
+  }
+  a.rue = lignes.shift() || '';
+  a.complement = lignes.join(', ');
+  return a;
+}
+
+function composeAdresse(a) {
+  return [a.rue, a.complement, [a.codePostal, a.ville].filter(Boolean).join(' ')]
+    .map((x) => String(x || '').trim()).filter(Boolean).join('\n');
+}
+
+function champsAdresse(obj, requis) {
+  const a = decomposeAdresse(obj);
+  const etoile = requis ? ' *' : '';
+  return `
+    <div class="adresse-grid">
+      <div class="full rue-wrap">
+        <label for="rue">Numéro et rue${etoile}</label>
+        <input id="rue" name="rue" autocomplete="off" value="${esc(a.rue)}" placeholder="Ex : 12 rue des Lilas">
+        <ul class="suggestions" id="rue-suggestions" hidden></ul>
+      </div>
+      <div class="full">
+        <label for="complement">Complément (bâtiment, étage, lieu-dit…)</label>
+        <input id="complement" name="complement" value="${esc(a.complement)}">
+      </div>
+      <div>
+        <label for="codePostal">Code postal${etoile}</label>
+        <input id="codePostal" name="codePostal" inputmode="numeric" maxlength="5" autocomplete="postal-code" value="${esc(a.codePostal)}">
+      </div>
+      <div>
+        <label for="ville">Ville${etoile}</label>
+        <input id="ville" name="ville" list="villes" autocomplete="address-level2" value="${esc(a.ville)}">
+        <datalist id="villes"></datalist>
+      </div>
+    </div>`;
+}
+
+// Suggestions d'adresses (Base Adresse Nationale) et ville d'après le code postal
+// (geo.api.gouv.fr). Services publics gratuits ; s'ils ne répondent pas, la
+// saisie reste simplement manuelle.
+async function chercherAdresses(texte) {
+  const q = encodeURIComponent(texte);
+  const urls = [
+    `https://data.geopf.fr/geocodage/search?q=${q}&limit=5&index=address`,
+    `https://api-adresse.data.gouv.fr/search/?q=${q}&limit=5`,
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const json = await res.json();
+      return (json.features || []).map((f) => f.properties).filter((pr) => pr && pr.postcode);
+    } catch {
+      // service suivant
+    }
+  }
+  return [];
+}
+
+async function villesDuCodePostal(cp) {
+  try {
+    const res = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom`);
+    if (!res.ok) return [];
+    return (await res.json()).map((c) => c.nom);
+  } catch {
+    return [];
+  }
+}
+
+function brancherAdresse(root, onChange) {
+  const $ = (id) => root.querySelector('#' + id);
+  const rue = $('rue');
+  const liste = $('rue-suggestions');
+  const cp = $('codePostal');
+  const ville = $('ville');
+  let minuteur;
+  let resultats = [];
+
+  rue.addEventListener('input', () => {
+    clearTimeout(minuteur);
+    const texte = rue.value.trim();
+    if (texte.length < 5) {
+      liste.hidden = true;
+      return;
+    }
+    minuteur = setTimeout(async () => {
+      resultats = await chercherAdresses(texte + (cp.value.length === 5 ? ' ' + cp.value : ''));
+      if (!document.body.contains(rue) || rue.value.trim() !== texte) return;
+      liste.innerHTML = resultats.map((r, i) =>
+        `<li><button type="button" data-i="${i}">${esc(r.label)}</button></li>`).join('');
+      liste.hidden = !resultats.length;
+    }, 350);
+  });
+
+  liste.addEventListener('mousedown', (e) => e.preventDefault()); // garde le focus pendant le clic
+  liste.addEventListener('click', (e) => {
+    const r = resultats[e.target.closest('button')?.dataset.i];
+    if (!r) return;
+    rue.value = r.name || r.label;
+    cp.value = r.postcode || '';
+    ville.value = r.city || '';
+    liste.hidden = true;
+    onChange?.();
+  });
+  rue.addEventListener('blur', () => setTimeout(() => { liste.hidden = true; }, 150));
+
+  cp.addEventListener('input', async () => {
+    cp.value = cp.value.replace(/\D/g, '').slice(0, 5);
+    if (cp.value.length !== 5) return;
+    const villes = await villesDuCodePostal(cp.value);
+    if (!document.body.contains(cp)) return;
+    $('villes').innerHTML = villes.map((v) => `<option value="${esc(v)}">`).join('');
+    if (villes.length === 1 || (villes.length && !villes.includes(ville.value))) {
+      ville.value = villes[0];
+      onChange?.();
+    }
+  });
 }
 
 // IBAN : contrôle modulo 97.
@@ -247,7 +388,10 @@ function checkTva(value) {
 function profilManquant(e = data.entreprise) {
   const manque = [];
   if (!String(e.nom || '').trim()) manque.push({ champ: 'nom', texte: "Nom ou raison sociale de l'entreprise" });
-  if (!String(e.adresse || '').trim()) manque.push({ champ: 'adresse', texte: "Adresse de l'entreprise" });
+  const a = decomposeAdresse(e);
+  if (!a.rue.trim() || !/^\d{5}$/.test(a.codePostal) || !a.ville.trim()) {
+    manque.push({ champ: !a.rue.trim() ? 'rue' : !/^\d{5}$/.test(a.codePostal) ? 'codePostal' : 'ville', texte: "Adresse complète de l'entreprise (rue, code postal, ville)" });
+  }
   const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(e.formeJuridique);
   if (societe && !String(e.capital || '').trim()) manque.push({ champ: 'capital', texte: 'Capital social (obligatoire pour une société)' });
   if (!checkSiret(e.siret || '')) {
@@ -943,7 +1087,7 @@ function pageClientForm(id, retour) {
         <div><label for="email">Email</label><input id="email" name="email" type="email" value="${esc(client.email)}"></div>
         <div><label for="siret">SIRET (si professionnel)</label><input id="siret" name="siret" value="${esc(client.siret)}"></div>
       </div>
-      <div style="margin-top:12px"><label for="adresse">Adresse</label><textarea id="adresse" name="adresse" rows="3">${esc(client.adresse)}</textarea></div>
+      <div class="field">${champsAdresse(client, false)}</div>
       <div class="actions" style="margin-top:16px">
         <button class="btn btn-primary" type="submit">Enregistrer</button>
         <a class="btn" href="${retour ? '#/modifier/' + esc(retour) : '#/clients'}">Annuler</a>
@@ -956,6 +1100,7 @@ function pageClientForm(id, retour) {
     e.preventDefault();
     if (!(await profilPret())) return;
     const values = Object.fromEntries(new FormData(e.target));
+    values.adresse = composeAdresse(values);
     if (isNew) {
       const created = { id: newId(), ...values };
       data.clients.push(created);
@@ -967,6 +1112,8 @@ function pageClientForm(id, retour) {
     saveData();
     go(retour ? '#/modifier/' + retour : '#/clients');
   });
+
+  brancherAdresse(document.getElementById('client-form'));
 
   document.getElementById('delete')?.addEventListener('click', async () => {
     if (await deleteClient(client)) go('#/clients');
@@ -1038,7 +1185,7 @@ function pageSettings(champ) {
           <div><label for="email">Email</label><input id="email" name="email" type="email" value="${esc(e.email)}"></div>
           <div><label for="siteWeb">Site internet</label><input id="siteWeb" name="siteWeb" value="${esc(e.siteWeb)}" placeholder="Ex : www.dupont-plomberie.fr"></div>
         </div>
-        <div class="field"><label for="adresse">Adresse *</label><textarea id="adresse" name="adresse" rows="3" placeholder="N° et rue&#10;Code postal et ville">${esc(e.adresse)}</textarea></div>
+        <div class="field">${champsAdresse(e, true)}</div>
       </section>
 
       <section class="card">
@@ -1254,7 +1401,14 @@ function pageSettings(champ) {
 
   function remplirDepuisAnnuaire() {
     if (verif.nom) $('nom').value = verif.nom;
-    if (verif.adresse) $('adresse').value = verif.adresse;
+    if (verif.rue || verif.codePostal) {
+      $('rue').value = verif.rue || verif.adresse || '';
+      $('complement').value = verif.complement || '';
+      $('codePostal').value = verif.codePostal || '';
+      $('ville').value = verif.ville || '';
+    } else if (verif.adresse) {
+      $('rue').value = verif.adresse;
+    }
     if (verif.ape) $('ape').value = verif.ape;
     if (verif.forme && !(verif.forme === 'ei' && $('formeJuridique').value === 'micro')) $('formeJuridique').value = verif.forme;
     form.dispatchEvent(new Event('input'));
@@ -1367,6 +1521,7 @@ function pageSettings(champ) {
     const tvaDefaut = Number(values.tvaDefaut);
     if (!tauxActifs.includes(tvaDefaut)) tauxActifs.push(tvaDefaut);
     delete values.regimeTva;
+    values.adresse = composeAdresse(values);
     return {
       ...data.entreprise,
       ...values,
@@ -1455,6 +1610,7 @@ function pageSettings(champ) {
     if (id) champSuivant([{ champ: id }]);
   });
 
+  brancherAdresse(form, () => form.dispatchEvent(new Event('input')));
   refresh();
   lancerVerif();
   if (champ && $(champ)) {

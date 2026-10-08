@@ -275,3 +275,18 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .verif.ko strong { color: var(--warning); }
 .verif .btn { justify-self: start; }
 .verif .checkbox { color: var(--text); }
+
+/* ---------- Adresse en plusieurs champs ---------- */
+.adresse-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px 16px; }
+.adresse-grid .full { grid-column: 1 / -1; }
+.rue-wrap { position: relative; }
+.suggestions {
+  position: absolute; z-index: 5; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px;
+  list-style: none; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 12px 30px var(--shadow);
+}
+.suggestions button {
+  display: block; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-radius: 8px;
+  background: none; color: var(--text); font: inherit; cursor: pointer;
+}
+.suggestions button:hover, .suggestions button:focus-visible { background: var(--primary-soft); }
