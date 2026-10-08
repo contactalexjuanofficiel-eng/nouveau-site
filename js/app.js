@@ -49,7 +49,6 @@ const DEFAULT_DATA = {
     zoneCouverture: 'France métropolitaine',
     mediateur: '',
     nonDecennale: false, // activité non soumise à la garantie décennale
-    clientsProUniquement: false, // pas de particuliers : médiateur non obligatoire
     mentions: '',
     // Numérotation
     prefixeDevis: 'D',
@@ -264,9 +263,6 @@ function profilManquant(e = data.entreprise) {
   if (!e.franchiseTva && !checkTva(e.numeroTva || '')) manque.push({ champ: 'numeroTva', texte: 'N° de TVA intracommunautaire valide' });
   if (!e.nonDecennale && (!String(e.assureur || '').trim() || !String(e.numeroContrat || '').trim())) {
     manque.push({ champ: 'assureur', texte: 'Assurance décennale : assureur et n° de contrat' });
-  }
-  if (!e.clientsProUniquement && !String(e.mediateur || '').trim()) {
-    manque.push({ champ: 'mediateur', texte: 'Médiateur de la consommation (obligatoire avec des particuliers)' });
   }
   return manque;
 }
@@ -1148,13 +1144,12 @@ function pageSettings(champ) {
           <div><label for="numeroContrat">N° de contrat <span class="star-decennale">*</span></label><input id="numeroContrat" name="numeroContrat" value="${esc(e.numeroContrat)}"></div>
           <div><label for="zoneCouverture">Zone couverte</label><input id="zoneCouverture" name="zoneCouverture" value="${esc(e.zoneCouverture)}"></div>
           <div>
-            <label for="mediateur">Médiateur de la consommation <span id="star-mediateur">*</span></label>
+            <label for="mediateur">Médiateur de la consommation (facultatif)</label>
             <input id="mediateur" name="mediateur" value="${esc(e.mediateur)}" placeholder="Nom et site internet du médiateur">
-            <small class="hint">Obligatoire si vous travaillez pour des particuliers. Exemple : CM2C, Médiateur de la consommation CNPM…</small>
+            <small class="hint">Si vous en avez un, il sera indiqué sur les devis et factures de vos clients particuliers. Exemple : CM2C, CNPM…</small>
           </div>
         </div>
         <label class="checkbox field"><input type="checkbox" name="nonDecennale" ${checked(e.nonDecennale)}> Mon activité n'est pas soumise à la garantie décennale (par exemple : dépannage seul, sans travaux de construction)</label>
-        <label class="checkbox field"><input type="checkbox" name="clientsProUniquement" ${checked(e.clientsProUniquement)}> Je travaille uniquement pour des professionnels (pas de particuliers)</label>
         <div class="field"><label for="mentions">Autres mentions (ajoutées en bas de chaque document)</label>
           <textarea id="mentions" name="mentions" rows="2">${esc(e.mentions)}</textarea></div>
       </section>
@@ -1269,14 +1264,13 @@ function pageSettings(champ) {
     const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(forme);
     $('star-immat').hidden = !societe;
     document.querySelectorAll('.star-decennale').forEach((el) => { el.hidden = form.nonDecennale.checked; });
-    $('star-mediateur').hidden = form.clientsProUniquement.checked;
 
     // Liste de contrôle en direct
     const actuel = collect();
     const manque = profilManquant(actuel);
     // Nombre d'informations obligatoires selon la situation de l'entreprise.
     const total = 3 + (societe ? 2 : 0) + (actuel.franchiseTva ? 0 : 1) +
-      (actuel.nonDecennale ? 0 : 1) + (actuel.clientsProUniquement ? 0 : 1);
+      (actuel.nonDecennale ? 0 : 1);
     $('checklist').className = 'card checklist ' + (manque.length ? '' : 'done');
     $('checklist').innerHTML = manque.length
       ? `<div class="checklist-head"><strong>Encore ${manque.length} information${manque.length > 1 ? 's' : ''} obligatoire${manque.length > 1 ? 's' : ''} avant votre premier devis</strong>
@@ -1384,7 +1378,6 @@ function pageSettings(champ) {
       nonDecennale: fd.has('nonDecennale'),
       siretVerifie: verif && verif.statut !== 'enCours' && verif.statut !== 'indisponible' ? verif : null,
       siretConfirme: fd.has('siretConfirme'),
-      clientsProUniquement: fd.has('clientsProUniquement'),
     };
   }
 
