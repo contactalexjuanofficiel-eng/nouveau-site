@@ -3,19 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Devizo · Devis et factures pour artisans</title>
-  <meta name="description" content="Créez vos devis et factures en 2 minutes depuis votre téléphone. TVA, acompte et mentions légales gérés automatiquement. Essai gratuit 14 jours.">
+  <title>Devizo · Devis, factures et gestion pour artisans</title>
+  <meta name="description" content="Devis et factures conformes en 2 minutes, suivi des dépenses et tableau de bord qui vous dit combien il vous reste après charges et impôts. Pour les artisans. Essai gratuit 14 jours.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=19">
-  <link rel="stylesheet" href="css/landing.css?v=19">
+  <link rel="stylesheet" href="css/style.css?v=20">
+  <link rel="stylesheet" href="css/landing.css?v=20">
 </head>
 <body class="landing">
   <header class="l-header">
     <div class="l-wrap l-header-inner">
       <a class="logo" href="#top">Devizo</a>
       <nav class="l-nav" aria-label="Navigation principale">
+        <a href="#pilotage">Pilotage</a>
         <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#tarifs">Tarifs</a>
         <a href="#faq">Questions</a>
@@ -31,7 +32,7 @@
         <div class="hero-text">
           <p class="eyebrow">Pour plombiers, électriciens, peintres, maçons, menuisiers…</p>
           <h1>Le devis part du chantier.<br><span class="accent">La facture suit en un clic.</span></h1>
-          <p class="lead">Devizo crée des devis et des factures conformes en 2 minutes, depuis votre téléphone. La TVA, l'acompte et les mentions obligatoires se remplissent tout seuls.</p>
+          <p class="lead">Devis et factures conformes en 2 minutes depuis votre téléphone, suivi de vos dépenses, et un tableau de bord qui vous dit enfin <strong>combien il vous reste</strong> après charges et impôts.</p>
           <div class="hero-cta">
             <a class="btn btn-primary btn-lg" href="app.html">Commencer l'essai gratuit</a>
             <a class="btn btn-lg" href="#comment">Voir comment ça marche</a>
@@ -90,8 +91,62 @@
       <div class="l-wrap stats-grid">
         <div class="big-stat"><span class="num" data-count="2">2</span><span class="unit">min</span><p>pour faire un devis complet</p></div>
         <div class="big-stat"><span class="num" data-count="1">1</span><span class="unit">clic</span><p>pour transformer le devis en facture</p></div>
-        <div class="big-stat"><span class="num" data-count="5">5</span><span class="unit">taux</span><p>de TVA gérés : 20 %, 10 %, 5,5 %, 2,1 % et 0 %</p></div>
+        <div class="big-stat"><span class="num" data-count="12">12</span><span class="unit">mois</span><p>d'activité en graphiques : chiffre d'affaires, dépenses, ce qu'il reste</p></div>
         <div class="big-stat"><span class="num" data-count="14">14</span><span class="unit">jours</span><p>d'essai gratuit, sans carte bancaire</p></div>
+      </div>
+    </section>
+
+    <!-- Pilotage -->
+    <section class="section" id="pilotage">
+      <div class="l-wrap pilot-grid">
+        <div class="pilot-text">
+          <p class="eyebrow">Pilotage</p>
+          <h2 class="section-title">Sachez enfin combien il vous reste.</h2>
+          <p class="lead">Chaque facture payée et chaque dépense alimentent votre tableau de bord. Devizo calcule vos cotisations et vos impôts selon votre statut, et vous montre ce qui vous revient vraiment.</p>
+          <ul class="pilot-points">
+            <li><strong>Ce qu'il vous reste</strong> après dépenses, cotisations et impôts, ce mois-ci, ce trimestre ou cette année.</li>
+            <li><strong>Mois par mois, jour par jour</strong> : votre chiffre d'affaires face à vos dépenses, en graphiques.</li>
+            <li><strong>Les factures en retard</strong> signalées, avec le nombre de jours.</li>
+            <li><strong>Les plafonds</strong> de la micro-entreprise et de la franchise de TVA, avec une alerte avant de les dépasser.</li>
+            <li><strong>Micro-entreprise, société à l'IS ou réel</strong> : les taux 2026 sont déjà réglés.</li>
+          </ul>
+        </div>
+
+        <!-- Exemple de tableau de bord -->
+        <div class="dash-mock reveal" aria-hidden="true">
+          <p class="dm-tag">Exemple</p>
+          <p class="dm-label">Il vous reste · cette année</p>
+          <p class="dm-value"><span data-euro="6537">6 537</span> €</p>
+          <p class="dm-delta">▲ 18 % par rapport à l'an dernier</p>
+          <div class="dm-split">
+            <span style="flex:5090;background:var(--s2)"></span>
+            <span style="flex:1154;background:var(--s3)"></span>
+            <span style="flex:6537;background:var(--s1)"></span>
+          </div>
+          <ul class="dm-legend">
+            <li><i style="background:var(--s2)"></i>Dépenses <b>5 090 €</b></li>
+            <li><i style="background:var(--s3)"></i>Impôts <b>1 154 €</b></li>
+            <li><i style="background:var(--s1)"></i>Il vous reste <b>6 537 €</b></li>
+          </ul>
+          <div class="dm-chart">
+            <div class="mcol" style="--i:0"><span class="mbar" style="height:2%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>N</em></div>
+            <div class="mcol" style="--i:1"><span class="mbar" style="height:2%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>D</em></div>
+            <div class="mcol" style="--i:2"><span class="mbar" style="height:28%;background:var(--s1)"></span><span class="mbar" style="height:10%;background:var(--s2)"></span><em>J</em></div>
+            <div class="mcol" style="--i:3"><span class="mbar" style="height:6%;background:var(--s1)"></span><span class="mbar" style="height:13%;background:var(--s2)"></span><em>F</em></div>
+            <div class="mcol" style="--i:4"><span class="mbar" style="height:21%;background:var(--s1)"></span><span class="mbar" style="height:17%;background:var(--s2)"></span><em>M</em></div>
+            <div class="mcol" style="--i:5"><span class="mbar" style="height:63%;background:var(--s1)"></span><span class="mbar" style="height:6%;background:var(--s2)"></span><em>A</em></div>
+            <div class="mcol" style="--i:6"><span class="mbar" style="height:5%;background:var(--s1)"></span><span class="mbar" style="height:29%;background:var(--s2)"></span><em>M</em></div>
+            <div class="mcol" style="--i:7"><span class="mbar" style="height:100%;background:var(--s1)"></span><span class="mbar" style="height:4%;background:var(--s2)"></span><em>J</em></div>
+            <div class="mcol" style="--i:8"><span class="mbar" style="height:5%;background:var(--s1)"></span><span class="mbar" style="height:12%;background:var(--s2)"></span><em>J</em></div>
+            <div class="mcol" style="--i:9"><span class="mbar" style="height:10%;background:var(--s1)"></span><span class="mbar" style="height:8%;background:var(--s2)"></span><em>A</em></div>
+            <div class="mcol" style="--i:10"><span class="mbar" style="height:2%;background:var(--s1)"></span><span class="mbar" style="height:23%;background:var(--s2)"></span><em>S</em></div>
+            <div class="mcol" style="--i:11"><span class="mbar" style="height:68%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>O</em></div>
+          </div>
+          <div class="dm-alerts">
+            <span class="dm-pill bad">⚠ 1 facture en retard · 1 168 €</span>
+            <span class="dm-pill">Plafond micro : 15 %</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -99,7 +154,7 @@
     <section class="section" id="fonctionnalites">
       <div class="l-wrap">
         <p class="eyebrow">Fonctionnalités</p>
-        <h2 class="section-title">Tout ce qu'il faut pour être payé, rien de compliqué.</h2>
+        <h2 class="section-title">Tout pour être payé et gérer votre activité, rien de compliqué.</h2>
         <div class="features-grid">
           <article class="feat reveal">
             <h3>Devis professionnels</h3>
@@ -122,8 +177,20 @@
             <p>Acompte en pourcentage sur le devis, délai de paiement, IBAN vérifié et moyens de paiement acceptés sur chaque facture.</p>
           </article>
           <article class="feat reveal">
-            <h3>Suivi des encaissements</h3>
-            <p>Le tableau de bord montre ce qui est encaissé, ce qui reste à payer et les devis qui attendent une réponse.</p>
+            <h3>Tableau de bord</h3>
+            <p>Ce qu'il vous reste après charges et impôts, vos encaissements, les devis en attente et les factures en retard, en un coup d'œil.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Suivi des dépenses</h3>
+            <p>Matériaux, carburant, assurance, outillage : saisissez le montant TTC, le HT et la TVA déductible se calculent tout seuls.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Carnet de clients</h3>
+            <p>Vos clients et leurs coordonnées au même endroit. Un clic pour les retrouver sur un nouveau devis, et leurs anciens documents restent intacts.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Saisie express</h3>
+            <p>Votre SIRET est vérifié dans l'annuaire officiel des entreprises et remplit votre profil. Les adresses sont suggérées pendant la saisie.</p>
           </article>
         </div>
       </div>
@@ -147,8 +214,8 @@
           </li>
           <li class="reveal">
             <span class="step-num">3</span>
-            <h3>Facturez et suivez le paiement</h3>
-            <p>Transformez le devis accepté en facture, puis marquez-la payée quand l'argent arrive.</p>
+            <h3>Facturez et pilotez</h3>
+            <p>Transformez le devis accepté en facture, marquez-la payée, ajoutez vos dépenses : le tableau de bord vous dit combien il vous reste.</p>
           </li>
         </ol>
       </div>
@@ -183,12 +250,14 @@
           <article class="plan plan-featured reveal">
             <p class="plan-tag">Le plus choisi</p>
             <h3>Pro</h3>
-            <p class="plan-for">Pour l'artisan qui tourne bien</p>
+            <p class="plan-for">Pour gérer toute votre activité</p>
             <p class="price"><span class="amount" data-mois="19" data-an="190">19</span> € <small class="per">HT / mois</small></p>
             <ul>
               <li>Tout ce qui est dans Solo</li>
+              <li>Tableau de bord complet : ce qu'il vous reste, graphiques</li>
+              <li>Suivi des dépenses</li>
+              <li>Alertes plafonds micro et TVA</li>
               <li>Votre logo sur les documents</li>
-              <li>Acompte et suivi des paiements</li>
               <li>Envoi des devis par email <span class="soon">bientôt</span></li>
               <li>Signature en ligne du client <span class="soon">bientôt</span></li>
               <li>Relance des factures impayées <span class="soon">bientôt</span></li>
@@ -233,6 +302,10 @@
             <p>Oui. Cochez « Je ne facture pas la TVA » : les montants s'affichent sans TVA avec la bonne mention, et « EI » est ajouté à côté de votre nom.</p>
           </details>
           <details>
+            <summary>Le calcul de ce qu'il me reste est-il fiable ?</summary>
+            <p>C'est une estimation faite avec les taux 2026 de votre statut : cotisations de la micro-entreprise, impôt sur les sociétés ou charges au réel. Elle vous donne un ordre d'idée fiable au quotidien, mais ne remplace ni votre comptable ni vos déclarations. L'impôt sur le revenu, qui dépend de votre foyer, n'est pas calculé.</p>
+          </details>
+          <details>
             <summary>Où sont enregistrées mes données ?</summary>
             <p>Pour l'instant, vos devis, factures et clients sont enregistrés sur votre appareil. Vous pouvez télécharger une sauvegarde à tout moment depuis « Mon entreprise » et la restaurer sur un autre appareil.</p>
           </details>
@@ -251,7 +324,7 @@
     <!-- Appel final -->
     <section class="final-cta">
       <div class="l-wrap">
-        <h2>Votre prochain devis, faites-le en 2 minutes.</h2>
+        <h2>Vos devis en 2 minutes. Votre activité en un coup d'œil.</h2>
         <p>14 jours gratuits, sans carte bancaire.</p>
         <a class="btn btn-lg btn-light" href="app.html">Commencer l'essai gratuit</a>
       </div>
@@ -262,6 +335,7 @@
     <div class="l-wrap l-footer-inner">
       <a class="logo" href="#top">Devizo</a>
       <nav aria-label="Pied de page">
+        <a href="#pilotage">Pilotage</a>
         <a href="#fonctionnalites">Fonctionnalités</a>
         <a href="#tarifs">Tarifs</a>
         <a href="#faq">Questions</a>
@@ -271,6 +345,6 @@
     </div>
   </footer>
 
-  <script src="js/landing.js?v=19"></script>
+  <script src="js/landing.js?v=20"></script>
 </body>
 </html>

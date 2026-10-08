@@ -240,3 +240,43 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal.pre { opacity: 1; transform: none; }
 }
+
+/* ---------- Pilotage : exemple de tableau de bord ---------- */
+.pilot-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.pilot-text .section-title { margin-bottom: 16px; }
+.pilot-text .lead { margin-bottom: 20px; }
+.pilot-points { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.pilot-points li { padding-left: 28px; position: relative; color: var(--muted); }
+.pilot-points li strong { color: var(--text); }
+.pilot-points li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+
+.dash-mock {
+  position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; box-shadow: 0 30px 60px -24px var(--shadow); font-variant-numeric: tabular-nums;
+}
+.dm-tag {
+  position: absolute; top: 16px; right: 16px; margin: 0; font-size: .75rem; font-weight: 700;
+  color: var(--muted); background: var(--bg); border: 1px solid var(--border); padding: 2px 10px; border-radius: 999px;
+}
+.dm-label { margin: 0; color: var(--muted); font-size: .9rem; }
+.dm-value { margin: 2px 0; font-family: var(--display); font-size: clamp(2.4rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.05; }
+.dm-delta { margin: 0 0 16px; color: var(--success); font-size: .88rem; font-weight: 600; }
+.dm-split { display: flex; gap: 2px; height: 22px; border-radius: 6px; overflow: hidden; }
+.dm-legend { list-style: none; padding: 0; margin: 10px 0 18px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--muted); }
+.dm-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.dm-legend b { color: var(--text); font-weight: 600; margin-left: 4px; }
+.dm-chart {
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; align-items: end;
+  height: 130px; padding-bottom: 18px; border-bottom: 1px solid var(--border); position: relative;
+}
+.mcol { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: 2px; height: 100%; }
+.mbar {
+  width: min(10px, 40%); border-radius: 3px 3px 0 0; transform-origin: bottom;
+  transition: transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i) * 50ms);
+}
+.mcol em { position: absolute; bottom: -18px; font-style: normal; font-size: .7rem; color: var(--muted); }
+.dash-mock.pre .mbar { transform: scaleY(0); }
+.dm-alerts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.dm-pill { font-size: .82rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); }
+.dm-pill.bad { background: var(--danger-soft); color: var(--danger); }
+@media (max-width: 860px) { .pilot-grid { grid-template-columns: 1fr; gap: 32px; } }

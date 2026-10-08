@@ -43,6 +43,10 @@
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       entry.target.classList.remove('pre');
+      // Montant en euros qui grimpe (exemple de tableau de bord).
+      entry.target.querySelectorAll('[data-euro]').forEach((el) => {
+        countUp(el, Number(el.dataset.euro), (v) => Math.round(v).toLocaleString('fr-FR'), 1100);
+      });
       revealObserver.unobserve(entry.target);
     });
   }, { threshold: 0.15 });
