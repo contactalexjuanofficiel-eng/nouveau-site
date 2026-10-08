@@ -1,12 +1,16 @@
 // Animations de la page d'accueil. Tout reste lisible sans JavaScript.
+// Chaque animation se rejoue quand sa partie revient à l'écran.
 (function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 
   function countUp(el, to, format, duration) {
     if (reduceMotion) return;
+    const id = (el._countId || 0) + 1; // une nouvelle animation remplace la précédente
+    el._countId = id;
     const start = performance.now();
     function frame(now) {
+      if (el._countId !== id) return;
       const p = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - p, 3);
       el.textContent = format(to * eased);
@@ -15,49 +19,88 @@
     requestAnimationFrame(frame);
   }
 
-  // Total du devis qui grimpe une fois les lignes affichées.
-  const total = document.querySelector('.mock-count');
-  if (total) {
-    setTimeout(() => countUp(total, Number(total.dataset.to), (v) => euro.format(v), 1200), 2400);
+  // Relance une animation CSS déjà jouée.
+  function rejouer(el) {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
   }
 
-  // Visite guidée : une souris parcourt le devis et explique chaque partie.
+  // Devis de l'accroche : les lignes apparaissent puis le total grimpe.
+  const total = document.querySelector('.mock-count');
+  function animerDevis() {
+    document.querySelectorAll('.mock-lines li, .mock-total').forEach(rejouer);
+    if (total) setTimeout(() => countUp(total, Number(total.dataset.to), (v) => euro.format(v), 1200), 2400);
+  }
+  animerDevis();
+
+  // Visite guidée : une souris parcourt le devis et explique chaque partie, en boucle.
   const mock = document.querySelector('.mock');
   if (mock && !reduceMotion) startTour(mock);
 
-  // Compteurs des chiffres clés et apparition des blocs au défilement.
   if (!('IntersectionObserver' in window) || reduceMotion) return;
 
-  const counters = document.querySelectorAll('[data-count]');
-  const countObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      countUp(el, Number(el.dataset.count), (v) => String(Math.round(v)), 900);
-      countObserver.unobserve(el);
-    });
-  }, { threshold: 0.6 });
-  counters.forEach((el) => countObserver.observe(el));
-
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.remove('pre');
-      // Montant en euros qui grimpe (exemple de tableau de bord).
-      entry.target.querySelectorAll('[data-euro]').forEach((el) => {
-        countUp(el, Number(el.dataset.euro), (v) => Math.round(v).toLocaleString('fr-FR'), 1100);
+  // Appelle onEnter à chaque retour à l'écran, onLeave quand la partie sort.
+  function surveiller(elements, onEnter, onLeave, threshold) {
+    const vu = new WeakMap();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !vu.get(entry.target)) {
+          vu.set(entry.target, true);
+          onEnter(entry.target);
+        } else if (!entry.isIntersecting && vu.get(entry.target)) {
+          vu.set(entry.target, false);
+          onLeave?.(entry.target);
+        }
       });
-      revealObserver.unobserve(entry.target);
-    });
-  }, { threshold: 0.15 });
+    }, { threshold });
+    elements.forEach((el) => observer.observe(el));
+  }
+
+  // Le devis de l'accroche se rejoue quand on remonte en haut de la page.
+  const papier = document.querySelector('.mock-paper');
+  if (papier) {
+    let premierPassage = true;
+    surveiller([papier], () => {
+      if (!premierPassage) animerDevis();
+      premierPassage = false;
+    }, null, 0.3);
+  }
+
+  // Chiffres clés : ils remontent à chaque passage.
+  surveiller(document.querySelectorAll('[data-count]'), (el) => {
+    countUp(el, Number(el.dataset.count), (v) => String(Math.round(v)), 900);
+  }, null, 0.6);
+
+  // Blocs qui apparaissent en glissant, à chaque passage.
   document.querySelectorAll('.reveal').forEach((el, i) => {
-    // Seuls les blocs encore hors de l'écran sont masqués puis révélés.
-    if (el.getBoundingClientRect().top > window.innerHeight) {
-      el.classList.add('pre');
-      el.style.transitionDelay = (i % 3) * 80 + 'ms';
-      revealObserver.observe(el);
-    }
+    el.style.transitionDelay = (i % 3) * 80 + 'ms';
+    if (el.getBoundingClientRect().top > window.innerHeight) el.classList.add('pre');
   });
+  surveiller(document.querySelectorAll('.reveal'), (el) => {
+    requestAnimationFrame(() => el.classList.remove('pre'));
+  }, (el) => el.classList.add('pre'), 0.12);
+
+  // Exemple de tableau de bord : les barres poussent et le montant grimpe,
+  // puis l'animation recommence toutes les 7 secondes tant qu'il est visible.
+  const dash = document.querySelector('.dash-mock');
+  if (dash) {
+    let boucle;
+    const animerDash = () => {
+      dash.classList.add('regrow');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        dash.classList.remove('regrow');
+        dash.querySelectorAll('[data-euro]').forEach((el) => {
+          countUp(el, Number(el.dataset.euro), (v) => Math.round(v).toLocaleString('fr-FR'), 1100);
+        });
+      }));
+    };
+    surveiller([dash], () => {
+      animerDash();
+      clearInterval(boucle);
+      boucle = setInterval(animerDash, 7000);
+    }, () => clearInterval(boucle), 0.2);
+  }
 })();
 
 // Choix mensuel / annuel dans les tarifs.

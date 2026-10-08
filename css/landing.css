@@ -275,7 +275,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   transition: transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i) * 50ms);
 }
 .mcol em { position: absolute; bottom: -18px; font-style: normal; font-size: .7rem; color: var(--muted); }
-.dash-mock.pre .mbar { transform: scaleY(0); }
+.dash-mock.regrow .mbar { transform: scaleY(0); transition: none; }
 .dm-alerts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
 .dm-pill { font-size: .82rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); }
 .dm-pill.bad { background: var(--danger-soft); color: var(--danger); }
