@@ -1648,6 +1648,7 @@ function majPastille() {
   const nb = profilManquant().length;
   const lien = document.querySelector('.nav a[href="#/parametres"]');
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
+  document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
   // Les autres pages sont verrouillées tant que le profil est incomplet.
   document.querySelectorAll('.nav a:not([href="#/parametres"])').forEach((a) => a.classList.toggle('locked', nb > 0));
 }
@@ -1717,7 +1718,24 @@ document.addEventListener('click', async (e) => {
   if (delClient && (await deleteClient(getClient(delClient)))) render();
 });
 
+// Menu burger sur téléphone.
+const burger = document.getElementById('burger');
+const topbar = document.querySelector('.topbar');
+function menuOuvert(ouvert) {
+  topbar.classList.toggle('menu-open', ouvert);
+  burger.setAttribute('aria-expanded', String(ouvert));
+  burger.setAttribute('aria-label', ouvert ? 'Fermer le menu' : 'Ouvrir le menu');
+}
+burger?.addEventListener('click', () => menuOuvert(!topbar.classList.contains('menu-open')));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') menuOuvert(false);
+});
+document.addEventListener('click', (e) => {
+  if (topbar.classList.contains('menu-open') && !topbar.contains(e.target)) menuOuvert(false);
+});
+
 window.addEventListener('hashchange', () => {
+  menuOuvert(false);
   render();
   window.scrollTo(0, 0);
 });

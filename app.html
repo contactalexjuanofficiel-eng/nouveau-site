@@ -4,12 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Devizo · Application</title>
-  <link rel="stylesheet" href="css/style.css?v=25">
+  <link rel="stylesheet" href="css/style.css?v=26">
 </head>
 <body class="app">
   <header class="topbar no-print">
     <a class="logo" href="index.html">Devizo</a>
-    <nav class="nav">
+    <button type="button" class="burger" id="burger" aria-expanded="false" aria-controls="menu-principal" aria-label="Ouvrir le menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="menu-principal">
       <a href="#/">Tableau de bord</a>
       <a href="#/documents">Devis &amp; factures</a>
       <a href="#/clients">Clients</a>
@@ -21,9 +24,9 @@
 
   <main id="view" class="container"></main>
 
-  <script src="js/dashboard.js?v=25"></script>
-  <script src="js/catalogue.js?v=25"></script>
+  <script src="js/dashboard.js?v=26"></script>
+  <script src="js/catalogue.js?v=26"></script>
 
-  <script src="js/app.js?v=25"></script>
+  <script src="js/app.js?v=26"></script>
 </body>
 </html>
