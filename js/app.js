@@ -311,6 +311,7 @@ function pageEdit(id) {
   const isFacture = doc.type === 'facture';
 
   view.innerHTML = `
+    ${backLink()}
     <div class="page-head">
       <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)}</h1>
       <div class="actions">
@@ -555,6 +556,7 @@ function pageView(id) {
   if (e.mentions) mentions.push(e.mentions);
 
   view.innerHTML = `
+    ${backLink()}
     <div class="page-head no-print">
       <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
@@ -754,6 +756,19 @@ function pageNotFound() {
 // Navigation
 // ====================================================================
 
+// Dernière liste consultée, pour le bouton « Retour ».
+let lastList = { hash: '#/documents', label: 'Devis & factures' };
+
+function backLink() {
+  return `<a class="back no-print" href="${esc(lastList.hash)}">← Retour : ${esc(lastList.label)}</a>`;
+}
+
+const LISTES = {
+  '': 'Tableau de bord',
+  documents: 'Devis & factures',
+  clients: 'Clients',
+};
+
 function render() {
   const [path, query] = (location.hash.slice(1) || '/').split('?');
   const params = new URLSearchParams(query);
@@ -763,6 +778,11 @@ function render() {
     const target = a.getAttribute('href').slice(1);
     a.classList.toggle('active', target === '/' ? parts.length === 0 : path.startsWith(target));
   });
+
+  // On mémorise les pages de liste (pas les fiches client ni les documents).
+  if ((parts[0] ?? '') in LISTES && (parts[0] !== 'clients' || !parts[1])) {
+    lastList = { hash: location.hash || '#/', label: LISTES[parts[0] ?? ''] };
+  }
 
   switch (parts[0]) {
     case undefined: return pageDashboard();

@@ -200,3 +200,6 @@ dialog.ask .actions { justify-content: flex-end; }
 }
 
 .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+.back { display: inline-block; margin-bottom: 12px; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--primary); }
