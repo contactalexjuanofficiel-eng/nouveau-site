@@ -12,15 +12,46 @@ const STORAGE_KEY = 'devizo-data-v1';
 
 const DEFAULT_DATA = {
   entreprise: {
+    // Identité
     nom: '',
+    formeJuridique: 'micro',
+    capital: '',
+    siret: '',
+    immatriculation: '', // RCS ou RM (répertoire des métiers)
+    ape: '',
+    logo: '', // image en data URL
+    // Coordonnées
     adresse: '',
     telephone: '',
     email: '',
-    siret: '',
-    numeroTva: '',
+    siteWeb: '',
+    // TVA
     franchiseTva: true, // micro-entreprise : TVA non applicable
+    numeroTva: '',
+    tvaDefaut: 20,
+    tauxActifs: [20, 10, 5.5],
+    tvaDebits: false,
+    // Paiement
+    delaiPaiement: 30,
+    moyensPaiement: ['virement', 'cheque'],
     iban: '',
+    bic: '',
+    titulaire: '',
+    penalites: '',
+    // Devis
+    validiteDevis: 30,
+    acompteDefaut: 0,
+    devisGratuit: true,
+    conditionsDevis: '',
+    // Assurance et mentions
+    assureur: '',
+    numeroContrat: '',
+    zoneCouverture: 'France métropolitaine',
+    mediateur: '',
     mentions: '',
+    // Numérotation
+    prefixeDevis: 'D',
+    prefixeFacture: 'F',
   },
   clients: [],
   documents: [],
@@ -35,7 +66,7 @@ function loadData() {
       return {
         ...structuredClone(DEFAULT_DATA),
         ...saved,
-        entreprise: { ...DEFAULT_DATA.entreprise, ...saved.entreprise },
+        entreprise: { ...structuredClone(DEFAULT_DATA.entreprise), ...saved.entreprise },
       };
     }
   } catch (e) {
@@ -90,11 +121,96 @@ function getDocument(id) {
 
 // Numérotation chronologique et sans trou : D-2026-001, F-2026-001...
 function nextNumber(type) {
-  const prefix = (type === 'facture' ? 'F' : 'D') + '-' + new Date().getFullYear() + '-';
+  const e = data.entreprise;
+  const base = (type === 'facture' ? e.prefixeFacture : e.prefixeDevis) || (type === 'facture' ? 'F' : 'D');
+  const prefix = base + '-' + new Date().getFullYear() + '-';
   const max = data.documents
     .filter((d) => d.type === type && d.numero.startsWith(prefix))
     .reduce((m, d) => Math.max(m, parseInt(d.numero.slice(prefix.length), 10) || 0), 0);
   return prefix + String(max + 1).padStart(3, '0');
+}
+
+// ====================================================================
+// Référentiels et vérifications
+// ====================================================================
+
+const FORMES = {
+  micro: 'Micro-entreprise',
+  ei: 'Entreprise individuelle (EI)',
+  eurl: 'EURL',
+  sarl: 'SARL',
+  sasu: 'SASU',
+  sas: 'SAS',
+  autre: 'Autre',
+};
+
+const TAUX_TVA = [
+  { taux: 20, aide: 'Taux normal : construction neuve, vente de matériel seul, travaux pour les professionnels' },
+  { taux: 10, aide: "Travaux d'amélioration, de transformation et d'entretien dans un logement de plus de 2 ans" },
+  { taux: 5.5, aide: 'Travaux de rénovation énergétique dans un logement de plus de 2 ans' },
+  { taux: 2.1, aide: 'Cas particuliers (rare dans le bâtiment)' },
+  { taux: 0, aide: 'Autoliquidation (sous-traitance BTP) ou exonération' },
+];
+
+const MOYENS = { virement: 'Virement', cheque: 'Chèque', especes: 'Espèces', carte: 'Carte bancaire' };
+
+const PENALITES_DEFAUT = "En cas de retard de paiement, pénalités au taux de 3 fois le taux d'intérêt légal. Pas d'escompte pour paiement anticipé.";
+
+function isIndividuel(e) {
+  return e.formeJuridique === 'micro' || e.formeJuridique === 'ei';
+}
+
+function tauxFr(t) {
+  return String(t).replace('.', ',');
+}
+
+function newLine() {
+  return { description: '', quantite: 1, unite: 'u', prixUnitaire: 0, tva: Number(data.entreprise.tvaDefaut) || 0 };
+}
+
+// SIRET : 14 chiffres + clé de Luhn.
+function checkSiret(value) {
+  const d = String(value).replace(/\s/g, '');
+  if (!/^\d{14}$/.test(d)) return false;
+  let sum = 0;
+  for (let i = 0; i < 14; i++) {
+    let n = Number(d[i]);
+    if (i % 2 === 0) {
+      n *= 2;
+      if (n > 9) n -= 9;
+    }
+    sum += n;
+  }
+  return sum % 10 === 0;
+}
+
+// IBAN : contrôle modulo 97.
+function checkIban(value) {
+  const s = String(value).replace(/\s/g, '').toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(s)) return false;
+  const digits = (s.slice(4) + s.slice(0, 4)).replace(/[A-Z]/g, (c) => c.charCodeAt(0) - 55);
+  let mod = 0;
+  for (const ch of digits) mod = (mod * 10 + Number(ch)) % 97;
+  return mod === 1;
+}
+
+// N° de TVA français : FR + clé + SIREN (les 9 premiers chiffres du SIRET).
+function tvaFromSiret(siret) {
+  const siren = String(siret).replace(/\s/g, '').slice(0, 9);
+  if (!/^\d{9}$/.test(siren)) return '';
+  const key = (12 + 3 * (Number(siren) % 97)) % 97;
+  return 'FR' + String(key).padStart(2, '0') + siren;
+}
+
+function checkTva(value) {
+  const v = String(value).replace(/\s/g, '').toUpperCase();
+  if (!/^FR[0-9A-Z]{2}\d{9}$/.test(v)) return false;
+  return /^\d{2}$/.test(v.slice(2, 4)) ? tvaFromSiret(v.slice(4)) === v : true;
+}
+
+function echeanceDefaut(type) {
+  const e = data.entreprise;
+  return addDays(today(), Number(type === 'facture' ? e.delaiPaiement : e.validiteDevis) || 0);
 }
 
 // ====================================================================
@@ -292,10 +408,11 @@ function createDocument(type) {
     clientId: data.clients[0]?.id || '',
     date: today(),
     // Devis : date de validité. Facture : date d'échéance.
-    echeance: addDays(today(), 30),
+    echeance: echeanceDefaut(type),
     objet: '',
-    lignes: [{ description: '', quantite: 1, unite: 'u', prixUnitaire: 0, tva: 20 }],
-    notes: '',
+    lignes: [newLine()],
+    notes: type === 'devis' ? data.entreprise.conditionsDevis : '',
+    acompte: type === 'devis' ? Number(data.entreprise.acompteDefaut) || 0 : 0,
     statut: type === 'facture' ? 'a-payer' : 'brouillon',
     creeLe: Date.now(),
   };
@@ -349,6 +466,10 @@ function pageEdit(id) {
               ${Object.entries(STATUTS[doc.type]).map(([k, v]) => `<option value="${k}" ${k === doc.statut ? 'selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
+          ${!isFacture ? `<div>
+            <label for="acompte">Acompte demandé à la commande (%)</label>
+            <input id="acompte" name="acompte" type="number" min="0" max="100" step="1" value="${esc(doc.acompte || 0)}">
+          </div>` : ''}
         </div>
       </div>
 
@@ -393,7 +514,7 @@ function pageEdit(id) {
         </select></td>
         <td><input data-field="prixUnitaire" type="number" step="0.01" min="0" value="${esc(l.prixUnitaire)}"></td>
         ${franchise ? '' : `<td><select data-field="tva">
-          ${[20, 10, 5.5, 2.1, 0].map((t) => `<option value="${t}" ${Number(l.tva) === t ? 'selected' : ''}>${String(t).replace('.', ',')}</option>`).join('')}
+          ${tauxProposes(l.tva).map((t) => `<option value="${t}" ${Number(l.tva) === t ? 'selected' : ''}>${tauxFr(t)}</option>`).join('')}
         </select></td>`}
         <td class="num line-total">${euro(l.quantite * l.prixUnitaire)}</td>
         <td><button type="button" class="btn btn-sm btn-danger" data-remove="${i}" title="Supprimer la ligne">✕</button></td>
@@ -401,9 +522,16 @@ function pageEdit(id) {
     renderTotals();
   }
 
+  // Taux activés dans « Mon entreprise », plus celui déjà choisi sur la ligne.
+  function tauxProposes(actuel) {
+    const liste = (data.entreprise.tauxActifs || []).map(Number);
+    if (!liste.includes(Number(actuel))) liste.push(Number(actuel));
+    return liste.sort((a, b) => b - a);
+  }
+
   function renderTotals() {
     const t = computeTotals(doc);
-    document.getElementById('totals').innerHTML = totalsHtml(t);
+    document.getElementById('totals').innerHTML = totalsHtml(t, doc);
   }
 
   linesEl.addEventListener('input', (e) => {
@@ -426,7 +554,7 @@ function pageEdit(id) {
   });
 
   document.getElementById('add-line').addEventListener('click', () => {
-    doc.lignes.push({ description: '', quantite: 1, unite: 'u', prixUnitaire: 0, tva: 20 });
+    doc.lignes.push(newLine());
     saveData();
     renderLines();
     linesEl.querySelector('tr:last-child input').focus();
@@ -438,6 +566,7 @@ function pageEdit(id) {
       // Un autre client est choisi : la copie de l'ancien client n'est plus utile.
       if (e.target.name === 'clientId' && e.target.value !== doc.clientId) delete doc.clientArchive;
       doc[e.target.name] = e.target.value;
+      if (e.target.name === 'acompte') renderTotals();
       saveData();
     }
   });
@@ -452,15 +581,20 @@ function pageEdit(id) {
   renderLines();
 }
 
-function totalsHtml(t) {
+function totalsHtml(t, doc) {
+  const acompte = doc && doc.type === 'devis' ? Number(doc.acompte) || 0 : 0;
+  const ligneAcompte = acompte > 0
+    ? `<div class="acompte"><span>Acompte à la commande (${tauxFr(acompte)} %)</span><span>${euro((t.ttc * acompte) / 100)}</span></div>`
+    : '';
   if (data.entreprise.franchiseTva) {
-    return `<div class="grand"><span>Total</span><span>${euro(t.ht)}</span></div>`;
+    return `<div class="grand"><span>Total</span><span>${euro(t.ht)}</span></div>${ligneAcompte}`;
   }
   return `
     <div><span>Total HT</span><span>${euro(t.ht)}</span></div>
     ${Object.entries(t.tvaParTaux).filter(([, v]) => v).map(([taux, v]) =>
-      `<div><span>TVA ${String(taux).replace('.', ',')} %</span><span>${euro(v)}</span></div>`).join('')}
-    <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>`;
+      `<div><span>TVA ${tauxFr(taux)} %</span><span>${euro(v)}</span></div>`).join('')}
+    <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>
+    ${ligneAcompte}`;
 }
 
 // Crée une copie du document avec un nouveau numéro, puis l'ouvre.
@@ -470,7 +604,7 @@ function duplicateDocument(doc) {
     id: newId(),
     numero: nextNumber(doc.type),
     date: today(),
-    echeance: addDays(today(), 30),
+    echeance: echeanceDefaut(doc.type),
     statut: doc.type === 'facture' ? 'a-payer' : 'brouillon',
     creeLe: Date.now(),
   };
@@ -524,7 +658,7 @@ async function convertToInvoice(devis) {
     type: 'facture',
     numero: nextNumber('facture'),
     date: today(),
-    echeance: addDays(today(), 30),
+    echeance: echeanceDefaut('facture'),
     statut: 'a-payer',
     devisOrigine: devis.id,
     creeLe: Date.now(),
@@ -544,16 +678,41 @@ function pageView(id) {
   const t = computeTotals(doc);
   const origine = doc.devisOrigine ? getDocument(doc.devisOrigine) : null;
 
+  const clientPro = Boolean(client.siret);
   const mentions = [];
   if (e.franchiseTva) mentions.push('TVA non applicable, art. 293 B du CGI.');
+  else if (isFacture && e.tvaDebits) mentions.push("Option pour le paiement de la TVA d'après les débits.");
   if (isFacture) {
-    mentions.push(`Paiement à réception, au plus tard le ${dateFr(doc.echeance)}.`);
-    mentions.push("En cas de retard de paiement : pénalités au taux de 3 fois le taux d'intérêt légal et indemnité forfaitaire de 40 € pour frais de recouvrement. Pas d'escompte pour paiement anticipé.");
-    if (e.iban) mentions.push('IBAN : ' + e.iban);
+    mentions.push(doc.echeance && doc.echeance !== doc.date
+      ? `Date d'échéance : ${dateFr(doc.echeance)}.`
+      : 'Paiement à réception de la facture.');
+    const moyens = (e.moyensPaiement || []).map((m) => MOYENS[m]).filter(Boolean);
+    if (moyens.length) mentions.push('Moyens de paiement acceptés : ' + moyens.join(', ') + '.');
+    if (e.iban) {
+      mentions.push(['IBAN : ' + e.iban, e.bic && 'BIC : ' + e.bic, e.titulaire && 'Titulaire : ' + e.titulaire]
+        .filter(Boolean).join(' · '));
+    }
+    mentions.push(e.penalites || PENALITES_DEFAUT);
+    if (clientPro) mentions.push('Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.');
   } else {
     mentions.push(`Devis valable jusqu'au ${dateFr(doc.echeance)}.`);
+    if (e.devisGratuit) mentions.push('Devis gratuit.');
+  }
+  if (e.assureur) {
+    mentions.push(`Assurance décennale : ${e.assureur}` +
+      (e.numeroContrat ? `, contrat n° ${e.numeroContrat}` : '') +
+      (e.zoneCouverture ? `, couverture : ${e.zoneCouverture}` : '') + '.');
+  }
+  if (e.mediateur && !clientPro) {
+    mentions.push(`En cas de litige, le client consommateur peut recourir gratuitement au médiateur de la consommation : ${e.mediateur}.`);
   }
   if (e.mentions) mentions.push(e.mentions);
+
+  // « EI » obligatoire à côté du nom pour les entrepreneurs individuels.
+  const nomAffiche = (e.nom || 'Nom de votre entreprise') + (isIndividuel(e) && e.nom && !/\bEI\b/.test(e.nom) ? ' EI' : '');
+  const formeAffichee = !isIndividuel(e) && e.formeJuridique !== 'autre'
+    ? FORMES[e.formeJuridique] + (e.capital ? ` au capital de ${new Intl.NumberFormat('fr-FR').format(Number(String(e.capital).replace(/\s/g, '').replace(',', '.')) || 0)} €` : '')
+    : '';
 
   view.innerHTML = `
     ${backLink()}
@@ -574,11 +733,16 @@ function pageView(id) {
     <div class="doc">
       <div class="doc-head">
         <div>
-          <strong>${esc(e.nom || 'Nom de votre entreprise')}</strong><br>
+          ${e.logo ? `<img class="doc-logo" src="${esc(e.logo)}" alt="">` : ''}
+          <strong>${esc(nomAffiche)}</strong><br>
+          ${formeAffichee ? '<small>' + esc(formeAffichee) + '</small><br>' : ''}
           ${esc(e.adresse).replace(/\n/g, '<br>')}<br>
           ${e.telephone ? 'Tél. ' + esc(e.telephone) + '<br>' : ''}
           ${e.email ? esc(e.email) + '<br>' : ''}
+          ${e.siteWeb ? esc(e.siteWeb) + '<br>' : ''}
           ${e.siret ? '<small>SIRET : ' + esc(e.siret) + '</small><br>' : ''}
+          ${e.immatriculation ? '<small>' + esc(e.immatriculation) + '</small><br>' : ''}
+          ${e.ape ? '<small>Code APE : ' + esc(e.ape) + '</small><br>' : ''}
           ${e.numeroTva && !e.franchiseTva ? '<small>N° TVA : ' + esc(e.numeroTva) + '</small>' : ''}
         </div>
         <div style="text-align:right">
@@ -617,7 +781,7 @@ function pageView(id) {
         </tbody>
       </table></div>
 
-      <div class="totals" style="margin-top:16px">${totalsHtml(t)}</div>
+      <div class="totals" style="margin-top:16px">${totalsHtml(t, doc)}</div>
 
       ${doc.notes ? `<p style="margin-top:24px;white-space:pre-line">${esc(doc.notes)}</p>` : ''}
 
@@ -714,38 +878,357 @@ function pageClientForm(id, retour) {
 
 function pageSettings() {
   const e = data.entreprise;
+  let logo = e.logo || '';
+
+  const checked = (cond) => (cond ? 'checked' : '');
+  const selected = (cond) => (cond ? 'selected' : '');
+
   view.innerHTML = `
     <div class="page-head"><h1>Mon entreprise</h1></div>
-    <form id="settings-form" class="card">
-      <p style="margin-top:0;color:var(--muted)">Ces informations apparaissent sur tous vos devis et factures.</p>
-      <div class="grid-2">
-        <div><label for="nom">Nom de l'entreprise *</label><input id="nom" name="nom" value="${esc(e.nom)}" placeholder="Ex : Dupont Plomberie"></div>
-        <div><label for="siret">SIRET *</label><input id="siret" name="siret" value="${esc(e.siret)}"></div>
-        <div><label for="telephone">Téléphone</label><input id="telephone" name="telephone" type="tel" value="${esc(e.telephone)}"></div>
-        <div><label for="email">Email</label><input id="email" name="email" type="email" value="${esc(e.email)}"></div>
-        <div><label for="iban">IBAN (affiché sur les factures)</label><input id="iban" name="iban" value="${esc(e.iban)}"></div>
-        <div><label for="numeroTva">N° de TVA intracommunautaire</label><input id="numeroTva" name="numeroTva" value="${esc(e.numeroTva)}"></div>
-      </div>
-      <div style="margin-top:12px"><label for="adresse">Adresse</label><textarea id="adresse" name="adresse" rows="3">${esc(e.adresse)}</textarea></div>
-      <div style="margin-top:12px">
-        <label class="checkbox"><input type="checkbox" name="franchiseTva" ${e.franchiseTva ? 'checked' : ''}> Je ne facture pas la TVA (micro-entreprise, franchise en base de TVA)</label>
-      </div>
-      <div style="margin-top:12px"><label for="mentions">Mentions supplémentaires (assurance décennale, etc.)</label>
-        <textarea id="mentions" name="mentions" rows="3" placeholder="Ex : Assurance décennale n° ... auprès de ..., couverture France">${esc(e.mentions)}</textarea></div>
-      <div class="actions" style="margin-top:16px">
+    <p class="intro">Ces informations apparaissent sur tous vos devis et factures. Les champs marqués * sont obligatoires sur une facture.</p>
+
+    <form id="settings-form" novalidate>
+      <section class="card">
+        <h2>Identité de l'entreprise</h2>
+        <div class="grid-2">
+          <div>
+            <label for="nom">Nom ou raison sociale *</label>
+            <input id="nom" name="nom" value="${esc(e.nom)}" placeholder="Ex : Dupont Plomberie">
+          </div>
+          <div>
+            <label for="formeJuridique">Forme juridique</label>
+            <select id="formeJuridique" name="formeJuridique">
+              ${Object.entries(FORMES).map(([k, v]) => `<option value="${k}" ${selected(k === e.formeJuridique)}>${v}</option>`).join('')}
+            </select>
+            <small class="hint" id="hint-forme"></small>
+          </div>
+          <div id="field-capital">
+            <label for="capital">Capital social (€)</label>
+            <input id="capital" name="capital" inputmode="decimal" value="${esc(e.capital)}" placeholder="Ex : 5000">
+          </div>
+          <div>
+            <label for="siret">SIRET *</label>
+            <input id="siret" name="siret" inputmode="numeric" value="${esc(e.siret)}" placeholder="14 chiffres">
+            <small class="hint" id="hint-siret"></small>
+          </div>
+          <div>
+            <label for="immatriculation">Immatriculation (RCS ou RM)</label>
+            <input id="immatriculation" name="immatriculation" value="${esc(e.immatriculation)}" placeholder="Ex : RM 123 456 789 ou RCS Paris 123 456 789">
+          </div>
+          <div>
+            <label for="ape">Code APE / NAF</label>
+            <input id="ape" name="ape" value="${esc(e.ape)}" placeholder="Ex : 4322A (plomberie)">
+          </div>
+        </div>
+
+        <div class="logo-field">
+          <div class="logo-preview" id="logo-preview">${logo ? `<img src="${esc(logo)}" alt="Logo">` : '<span>Aucun logo</span>'}</div>
+          <div>
+            <label for="logo-input">Logo (affiché en haut des devis et factures)</label>
+            <input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+            <button type="button" class="btn btn-sm btn-danger" id="logo-remove" ${logo ? '' : 'hidden'}>Retirer le logo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Coordonnées</h2>
+        <div class="grid-2">
+          <div><label for="telephone">Téléphone</label><input id="telephone" name="telephone" type="tel" value="${esc(e.telephone)}"></div>
+          <div><label for="email">Email</label><input id="email" name="email" type="email" value="${esc(e.email)}"></div>
+          <div><label for="siteWeb">Site internet</label><input id="siteWeb" name="siteWeb" value="${esc(e.siteWeb)}" placeholder="Ex : www.dupont-plomberie.fr"></div>
+        </div>
+        <div class="field"><label for="adresse">Adresse *</label><textarea id="adresse" name="adresse" rows="3" placeholder="N° et rue&#10;Code postal et ville">${esc(e.adresse)}</textarea></div>
+      </section>
+
+      <section class="card">
+        <h2>TVA</h2>
+        <div class="choices">
+          <label class="choice">
+            <input type="radio" name="regimeTva" value="franchise" ${checked(e.franchiseTva)}>
+            <span><strong>Je ne facture pas la TVA</strong><br><small>Franchise en base (micro-entreprise sous les seuils). La mention « TVA non applicable, art. 293 B du CGI » est ajoutée automatiquement.</small></span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="regimeTva" value="assujetti" ${checked(!e.franchiseTva)}>
+            <span><strong>Je facture la TVA</strong><br><small>Les montants sont affichés en HT et TTC, avec le détail par taux.</small></span>
+          </label>
+        </div>
+
+        <div id="tva-options" ${e.franchiseTva ? 'hidden' : ''}>
+          <div class="grid-2">
+            <div>
+              <label for="numeroTva">N° de TVA intracommunautaire</label>
+              <div class="input-row">
+                <input id="numeroTva" name="numeroTva" value="${esc(e.numeroTva)}" placeholder="FR12 345678901">
+                <button type="button" class="btn btn-sm" id="tva-calc">Calculer depuis le SIRET</button>
+              </div>
+              <small class="hint" id="hint-tva"></small>
+            </div>
+            <div>
+              <label for="tvaDefaut">Taux appliqué par défaut sur une nouvelle ligne</label>
+              <select id="tvaDefaut" name="tvaDefaut">
+                ${TAUX_TVA.map(({ taux }) => `<option value="${taux}" ${selected(Number(e.tvaDefaut) === taux)}>${tauxFr(taux)} %</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <p class="label">Taux proposés dans vos devis et factures</p>
+          <div class="taux-list">
+            ${TAUX_TVA.map(({ taux, aide }) => `
+              <label class="choice">
+                <input type="checkbox" name="tauxActifs" value="${taux}" ${checked((e.tauxActifs || []).map(Number).includes(taux))}>
+                <span><strong>${tauxFr(taux)} %</strong><br><small>${esc(aide)}</small></span>
+              </label>`).join('')}
+          </div>
+
+          <label class="checkbox field"><input type="checkbox" name="tvaDebits" ${checked(e.tvaDebits)}> J'ai opté pour le paiement de la TVA d'après les débits (mention ajoutée sur les factures)</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Paiement</h2>
+        <div class="grid-2">
+          <div>
+            <label for="delaiPaiement">Délai de paiement des factures</label>
+            <select id="delaiPaiement" name="delaiPaiement">
+              ${[[0, 'À réception'], [15, '15 jours'], [30, '30 jours'], [45, '45 jours'], [60, '60 jours (maximum légal)']]
+                .map(([v, l]) => `<option value="${v}" ${selected(Number(e.delaiPaiement) === v)}>${l}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <p class="label">Moyens de paiement acceptés</p>
+            <div class="inline-checks">
+              ${Object.entries(MOYENS).map(([k, v]) => `<label class="checkbox"><input type="checkbox" name="moyensPaiement" value="${k}" ${checked((e.moyensPaiement || []).includes(k))}> ${v}</label>`).join('')}
+            </div>
+          </div>
+          <div>
+            <label for="iban">IBAN</label>
+            <input id="iban" name="iban" value="${esc(e.iban)}" placeholder="FR76 ...">
+            <small class="hint" id="hint-iban"></small>
+          </div>
+          <div><label for="bic">BIC</label><input id="bic" name="bic" value="${esc(e.bic)}" placeholder="Ex : BNPAFRPPXXX"></div>
+          <div><label for="titulaire">Titulaire du compte</label><input id="titulaire" name="titulaire" value="${esc(e.titulaire)}"></div>
+        </div>
+        <div class="field">
+          <label for="penalites">Pénalités de retard</label>
+          <textarea id="penalites" name="penalites" rows="2" placeholder="${esc(PENALITES_DEFAUT)}">${esc(e.penalites)}</textarea>
+          <small class="hint">Laissez vide pour utiliser le texte proposé. L'indemnité de 40 € est ajoutée automatiquement pour les clients professionnels.</small>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Devis</h2>
+        <div class="grid-2">
+          <div>
+            <label for="validiteDevis">Durée de validité</label>
+            <select id="validiteDevis" name="validiteDevis">
+              ${[15, 30, 60, 90].map((v) => `<option value="${v}" ${selected(Number(e.validiteDevis) === v)}>${v} jours</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label for="acompteDefaut">Acompte demandé par défaut (%)</label>
+            <input id="acompteDefaut" name="acompteDefaut" type="number" min="0" max="100" step="1" value="${esc(e.acompteDefaut)}">
+          </div>
+        </div>
+        <label class="checkbox field"><input type="checkbox" name="devisGratuit" ${checked(e.devisGratuit)}> Indiquer « Devis gratuit » sur mes devis</label>
+        <div class="field">
+          <label for="conditionsDevis">Conditions pré-remplies sur chaque nouveau devis</label>
+          <textarea id="conditionsDevis" name="conditionsDevis" rows="3" placeholder="Ex : Délai d'intervention : 2 semaines après acceptation. Le matériel reste la propriété de l'entreprise jusqu'au paiement complet.">${esc(e.conditionsDevis)}</textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Assurance et mentions légales</h2>
+        <div class="grid-2">
+          <div><label for="assureur">Assureur (garantie décennale)</label><input id="assureur" name="assureur" value="${esc(e.assureur)}" placeholder="Ex : MAAF Pro"></div>
+          <div><label for="numeroContrat">N° de contrat</label><input id="numeroContrat" name="numeroContrat" value="${esc(e.numeroContrat)}"></div>
+          <div><label for="zoneCouverture">Zone couverte</label><input id="zoneCouverture" name="zoneCouverture" value="${esc(e.zoneCouverture)}"></div>
+          <div>
+            <label for="mediateur">Médiateur de la consommation</label>
+            <input id="mediateur" name="mediateur" value="${esc(e.mediateur)}" placeholder="Nom et site internet du médiateur">
+            <small class="hint">Obligatoire si vous travaillez pour des particuliers.</small>
+          </div>
+        </div>
+        <div class="field"><label for="mentions">Autres mentions (ajoutées en bas de chaque document)</label>
+          <textarea id="mentions" name="mentions" rows="2">${esc(e.mentions)}</textarea></div>
+      </section>
+
+      <section class="card">
+        <h2>Numérotation</h2>
+        <div class="grid-2">
+          <div><label for="prefixeDevis">Préfixe des devis</label><input id="prefixeDevis" name="prefixeDevis" maxlength="6" value="${esc(e.prefixeDevis)}"></div>
+          <div><label for="prefixeFacture">Préfixe des factures</label><input id="prefixeFacture" name="prefixeFacture" maxlength="6" value="${esc(e.prefixeFacture)}"></div>
+        </div>
+        <small class="hint" id="hint-numeros"></small>
+      </section>
+
+      <section class="card">
+        <h2>Sauvegarde de vos données</h2>
+        <p class="hint">Vos devis, factures et clients sont enregistrés sur cet appareil. Téléchargez régulièrement une sauvegarde pour ne rien perdre, ou pour passer sur un autre appareil.</p>
+        <div class="actions">
+          <button type="button" class="btn" id="export">Télécharger une sauvegarde</button>
+          <label class="btn" for="import-input">Restaurer une sauvegarde</label>
+          <input id="import-input" type="file" accept="application/json,.json" hidden>
+        </div>
+      </section>
+
+      <div class="save-bar">
+        <span id="saved" class="hint"></span>
         <button class="btn btn-primary" type="submit">Enregistrer</button>
-        <span id="saved" style="color:var(--success);align-self:center"></span>
       </div>
     </form>
   `;
 
-  document.getElementById('settings-form').addEventListener('submit', (ev) => {
-    ev.preventDefault();
-    const values = Object.fromEntries(new FormData(ev.target));
-    data.entreprise = { ...data.entreprise, ...values, franchiseTva: values.franchiseTva === 'on' };
-    saveData();
-    document.getElementById('saved').textContent = '✓ Enregistré';
+  const form = document.getElementById('settings-form');
+  const $ = (id) => document.getElementById(id);
+
+  function hint(id, ok, okText, koText) {
+    const el = $(id);
+    const value = el.dataset.value;
+    el.className = 'hint ' + (value ? (ok ? 'ok' : 'warn') : '');
+    el.textContent = value ? (ok ? okText : koText) : '';
+  }
+
+  function refresh() {
+    const forme = $('formeJuridique').value;
+    $('field-capital').hidden = forme === 'micro' || forme === 'ei' || forme === 'autre';
+    $('hint-forme').textContent = forme === 'micro' || forme === 'ei'
+      ? 'La mention « EI » sera ajoutée après votre nom, comme la loi l’exige.'
+      : '';
+    $('tva-options').hidden = form.regimeTva.value !== 'assujetti';
+
+    $('hint-siret').dataset.value = $('siret').value.trim();
+    hint('hint-siret', checkSiret($('siret').value), '✓ SIRET valide', '⚠ Ce SIRET semble incorrect : vérifiez les 14 chiffres.');
+    $('hint-iban').dataset.value = $('iban').value.trim();
+    hint('hint-iban', checkIban($('iban').value), '✓ IBAN valide', '⚠ Cet IBAN semble incorrect.');
+    $('hint-tva').dataset.value = $('numeroTva').value.trim();
+    hint('hint-tva', checkTva($('numeroTva').value), '✓ Numéro de TVA valide', '⚠ Format attendu : FR + 2 caractères + SIREN (9 chiffres).');
+
+    const year = new Date().getFullYear();
+    $('hint-numeros').textContent =
+      `Exemple : ${$('prefixeDevis').value || 'D'}-${year}-001 et ${$('prefixeFacture').value || 'F'}-${year}-001. ` +
+      'Changer de préfixe démarre une nouvelle série numérotée à partir de 001.';
+  }
+
+  form.addEventListener('input', () => {
+    refresh();
+    $('saved').className = 'hint warn';
+    $('saved').textContent = 'Modifications non enregistrées';
   });
+
+  $('tva-calc').addEventListener('click', async () => {
+    const numero = tvaFromSiret($('siret').value);
+    if (!numero) {
+      await ask("Renseignez d'abord un SIRET valide (14 chiffres) pour calculer votre numéro de TVA.", "D'accord", false);
+      return;
+    }
+    $('numeroTva').value = numero;
+    form.dispatchEvent(new Event('input'));
+  });
+
+  // Logo : redimensionné pour rester léger.
+  $('logo-input').addEventListener('change', (ev) => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = Math.min(1, 400 / img.width, 200 / img.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        logo = canvas.toDataURL('image/png');
+        $('logo-preview').innerHTML = `<img src="${logo}" alt="Logo">`;
+        $('logo-remove').hidden = false;
+        form.dispatchEvent(new Event('input'));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  $('logo-remove').addEventListener('click', () => {
+    logo = '';
+    $('logo-input').value = '';
+    $('logo-preview').innerHTML = '<span>Aucun logo</span>';
+    $('logo-remove').hidden = true;
+    form.dispatchEvent(new Event('input'));
+  });
+
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const fd = new FormData(form);
+    const values = Object.fromEntries(fd);
+    const tauxActifs = fd.getAll('tauxActifs').map(Number);
+    const tvaDefaut = Number(values.tvaDefaut);
+    if (!tauxActifs.includes(tvaDefaut)) tauxActifs.push(tvaDefaut);
+    delete values.regimeTva;
+    data.entreprise = {
+      ...data.entreprise,
+      ...values,
+      logo,
+      franchiseTva: form.regimeTva.value !== 'assujetti',
+      tvaDefaut,
+      tauxActifs,
+      tvaDebits: fd.has('tvaDebits'),
+      devisGratuit: fd.has('devisGratuit'),
+      moyensPaiement: fd.getAll('moyensPaiement'),
+      delaiPaiement: Number(values.delaiPaiement),
+      validiteDevis: Number(values.validiteDevis),
+      acompteDefaut: Math.min(100, Math.max(0, Number(values.acompteDefaut) || 0)),
+      prefixeDevis: (values.prefixeDevis || 'D').trim(),
+      prefixeFacture: (values.prefixeFacture || 'F').trim(),
+    };
+    saveData();
+    $('saved').className = 'hint ok';
+    $('saved').textContent = '✓ Enregistré';
+  });
+
+  // Sauvegarde et restauration
+  $('export').addEventListener('click', async () => {
+    if (window.DEVIZO_DEMO) {
+      await ask("Dans l'aperçu, le téléchargement est bloqué. Sur le vrai site, ce bouton télécharge un fichier avec toutes vos données.", "D'accord", false);
+      return;
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `devizo-sauvegarde-${today()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  $('import-input').addEventListener('change', (ev) => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      let saved;
+      try {
+        saved = JSON.parse(reader.result);
+      } catch {
+        saved = null;
+      }
+      if (!saved || !saved.entreprise || !Array.isArray(saved.clients) || !Array.isArray(saved.documents)) {
+        await ask("Ce fichier n'est pas une sauvegarde Devizo.", "D'accord", false);
+        return;
+      }
+      const ok = await ask(
+        `Restaurer cette sauvegarde (${saved.documents.length} documents, ${saved.clients.length} clients) ? Les données actuelles de cet appareil seront remplacées.`,
+        'Restaurer');
+      if (!ok) return;
+      data = {
+        ...structuredClone(DEFAULT_DATA),
+        ...saved,
+        entreprise: { ...structuredClone(DEFAULT_DATA.entreprise), ...saved.entreprise },
+      };
+      saveData();
+      render();
+    };
+    reader.readAsText(file);
+  });
+
+  refresh();
 }
 
 function pageNotFound() {

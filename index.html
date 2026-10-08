@@ -2,44 +2,267 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Devizo · Devis et factures pour artisans</title>
-  <meta name="description" content="Créez vos devis et factures en 2 minutes depuis votre téléphone. Pensé pour les artisans.">
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <meta name="description" content="Créez vos devis et factures en 2 minutes depuis votre téléphone. TVA, acompte et mentions légales gérés automatiquement. Essai gratuit 14 jours.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+  <link rel="stylesheet" href="css/style.css?v=7">
+  <link rel="stylesheet" href="css/landing.css?v=7">
 </head>
 <body class="landing">
-  <header class="topbar">
-    <a class="logo" href="index.html">Devizo</a>
-    <a class="btn btn-primary" href="app.html">Ouvrir l'application</a>
+  <header class="l-header">
+    <div class="l-wrap l-header-inner">
+      <a class="logo" href="#top">Devizo</a>
+      <nav class="l-nav" aria-label="Navigation principale">
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#tarifs">Tarifs</a>
+        <a href="#faq">Questions</a>
+      </nav>
+      <a class="btn btn-primary" href="app.html">Essai gratuit</a>
+    </div>
   </header>
 
-  <main>
+  <main id="top">
+    <!-- Accroche -->
     <section class="hero">
-      <h1>Vos devis et factures en 2 minutes, même depuis le chantier.</h1>
-      <p>Devizo est l'outil simple pour les plombiers, électriciens, peintres, maçons et tous les artisans. Fini les devis sur Word.</p>
-      <a class="btn btn-primary btn-lg" href="app.html">Créer mon premier devis gratuitement</a>
+      <div class="l-wrap hero-grid">
+        <div class="hero-text">
+          <p class="eyebrow">Pour plombiers, électriciens, peintres, maçons, menuisiers…</p>
+          <h1>Le devis part du chantier.<br><span class="accent">La facture suit en un clic.</span></h1>
+          <p class="lead">Devizo crée des devis et des factures conformes en 2 minutes, depuis votre téléphone. La TVA, l'acompte et les mentions obligatoires se remplissent tout seuls.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary btn-lg" href="app.html">Commencer l'essai gratuit</a>
+            <a class="btn btn-lg" href="#comment">Voir comment ça marche</a>
+          </div>
+          <ul class="trust">
+            <li>14 jours gratuits</li>
+            <li>Sans carte bancaire</li>
+            <li>Sans engagement</li>
+          </ul>
+        </div>
+
+        <!-- Devis qui se remplit tout seul -->
+        <div class="mock" aria-hidden="true">
+          <div class="mock-paper">
+            <div class="mock-head">
+              <div>
+                <strong>Dupont Plomberie</strong>
+                <small>SIRET 123 456 789 00007</small>
+              </div>
+              <div class="mock-title">
+                <span>DEVIS</span>
+                <small>N° D-2026-014</small>
+              </div>
+            </div>
+            <p class="mock-objet"><b>Objet :</b> Rénovation salle de bain</p>
+            <ul class="mock-lines">
+              <li style="--i:0"><span>Dépose baignoire et évacuation</span><span>280,00 €</span></li>
+              <li style="--i:1"><span>Receveur de douche 90×120</span><span>640,00 €</span></li>
+              <li style="--i:2"><span>Mitigeur thermostatique</span><span>189,00 €</span></li>
+              <li style="--i:3"><span>Main d'œuvre · 14 h</span><span>672,00 €</span></li>
+            </ul>
+            <div class="mock-total">
+              <div><span>TVA 10 %</span><span>178,10 €</span></div>
+              <div class="mock-ttc"><span>Total TTC</span><span class="mock-count" data-to="1959.10">1 959,10 €</span></div>
+              <div class="mock-acompte"><span>Acompte 30 %</span><span>587,73 €</span></div>
+            </div>
+            <p class="mock-legal">Assurance décennale MAAF Pro · Devis gratuit · Valable 30 jours</p>
+          </div>
+          <div class="mock-badge">
+            <span class="dot"></span> Devis accepté · facture F-2026-009 créée
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="features">
-      <div class="feature">
-        <h3>📝 Devis professionnels</h3>
-        <p>Ajoutez vos prestations, la TVA se calcule toute seule. Un devis propre à votre nom, prêt à envoyer.</p>
+    <!-- Chiffres -->
+    <section class="stats-band">
+      <div class="l-wrap stats-grid">
+        <div class="big-stat"><span class="num" data-count="2">2</span><span class="unit">min</span><p>pour faire un devis complet</p></div>
+        <div class="big-stat"><span class="num" data-count="1">1</span><span class="unit">clic</span><p>pour transformer le devis en facture</p></div>
+        <div class="big-stat"><span class="num" data-count="5">5</span><span class="unit">taux</span><p>de TVA gérés : 20 %, 10 %, 5,5 %, 2,1 % et 0 %</p></div>
+        <div class="big-stat"><span class="num" data-count="14">14</span><span class="unit">jours</span><p>d'essai gratuit, sans carte bancaire</p></div>
       </div>
-      <div class="feature">
-        <h3>🔁 Devis → facture en 1 clic</h3>
-        <p>Le client a accepté ? Transformez le devis en facture sans rien ressaisir.</p>
+    </section>
+
+    <!-- Fonctionnalités -->
+    <section class="section" id="fonctionnalites">
+      <div class="l-wrap">
+        <p class="eyebrow">Fonctionnalités</p>
+        <h2 class="section-title">Tout ce qu'il faut pour être payé, rien de compliqué.</h2>
+        <div class="features-grid">
+          <article class="feat reveal">
+            <h3>Devis professionnels</h3>
+            <p>Vos prestations en heures, m², ml, forfait ou unité. Les totaux HT, TVA et TTC se calculent pendant que vous tapez.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Devis → facture en 1 clic</h3>
+            <p>Le client a signé ? La facture reprend le devis, avec un numéro qui se suit sans trou, comme l'exige la loi.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>La bonne TVA</h3>
+            <p>10 % pour l'amélioration d'un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, 20 % pour le neuf. Ou la franchise en base pour les micro-entrepreneurs.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Mentions légales automatiques</h3>
+            <p>Assurance décennale, médiateur de la consommation, pénalités de retard, indemnité de 40 €, mention « EI » : tout est ajouté selon votre situation.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Acompte et paiement</h3>
+            <p>Acompte en pourcentage sur le devis, délai de paiement, IBAN vérifié et moyens de paiement acceptés sur chaque facture.</p>
+          </article>
+          <article class="feat reveal">
+            <h3>Suivi des encaissements</h3>
+            <p>Le tableau de bord montre ce qui est encaissé, ce qui reste à payer et les devis qui attendent une réponse.</p>
+          </article>
+        </div>
       </div>
-      <div class="feature">
-        <h3>📄 Export PDF</h3>
-        <p>Téléchargez ou imprimez vos documents en PDF avec les mentions obligatoires.</p>
+    </section>
+
+    <!-- Comment ça marche -->
+    <section class="section section-alt" id="comment">
+      <div class="l-wrap">
+        <p class="eyebrow">Comment ça marche</p>
+        <h2 class="section-title">Trois étapes, la première ne se fait qu'une fois.</h2>
+        <ol class="steps">
+          <li class="reveal">
+            <span class="step-num">1</span>
+            <h3>Renseignez votre entreprise</h3>
+            <p>SIRET, assurance, TVA, logo. Le SIRET et l'IBAN sont vérifiés, le numéro de TVA se calcule tout seul.</p>
+          </li>
+          <li class="reveal">
+            <span class="step-num">2</span>
+            <h3>Faites le devis sur place</h3>
+            <p>Ajoutez vos lignes depuis le téléphone, devant le client. Téléchargez le PDF et envoyez-le.</p>
+          </li>
+          <li class="reveal">
+            <span class="step-num">3</span>
+            <h3>Facturez et suivez le paiement</h3>
+            <p>Transformez le devis accepté en facture, puis marquez-la payée quand l'argent arrive.</p>
+          </li>
+        </ol>
       </div>
-      <div class="feature">
-        <h3>📱 Sur téléphone</h3>
-        <p>Fonctionne sur mobile, tablette et ordinateur. Rien à installer.</p>
+    </section>
+
+    <!-- Tarifs -->
+    <section class="section" id="tarifs">
+      <div class="l-wrap">
+        <p class="eyebrow">Tarifs</p>
+        <h2 class="section-title">Un prix simple. 14 jours pour essayer.</h2>
+
+        <div class="billing-toggle" role="group" aria-label="Période de facturation">
+          <button type="button" class="active" data-period="mois">Mensuel</button>
+          <button type="button" data-period="an">Annuel <span class="save">2 mois offerts</span></button>
+        </div>
+
+        <div class="plans">
+          <article class="plan reveal">
+            <h3>Solo</h3>
+            <p class="plan-for">Pour démarrer en micro-entreprise</p>
+            <p class="price"><span class="amount" data-mois="9" data-an="90">9</span> € <small class="per">HT / mois</small></p>
+            <ul>
+              <li>Devis et factures illimités</li>
+              <li>Clients illimités</li>
+              <li>Export PDF</li>
+              <li>Mentions légales automatiques</li>
+              <li>Franchise de TVA ou TVA multi-taux</li>
+            </ul>
+            <a class="btn btn-lg plan-cta" href="app.html">Essayer 14 jours gratuits</a>
+          </article>
+
+          <article class="plan plan-featured reveal">
+            <p class="plan-tag">Le plus choisi</p>
+            <h3>Pro</h3>
+            <p class="plan-for">Pour l'artisan qui tourne bien</p>
+            <p class="price"><span class="amount" data-mois="19" data-an="190">19</span> € <small class="per">HT / mois</small></p>
+            <ul>
+              <li>Tout ce qui est dans Solo</li>
+              <li>Votre logo sur les documents</li>
+              <li>Acompte et suivi des paiements</li>
+              <li>Envoi des devis par email <span class="soon">bientôt</span></li>
+              <li>Signature en ligne du client <span class="soon">bientôt</span></li>
+              <li>Relance des factures impayées <span class="soon">bientôt</span></li>
+            </ul>
+            <a class="btn btn-primary btn-lg plan-cta" href="app.html">Essayer 14 jours gratuits</a>
+          </article>
+
+          <article class="plan reveal">
+            <h3>Équipe</h3>
+            <p class="plan-for">Pour les entreprises avec salariés</p>
+            <p class="price"><span class="amount" data-mois="39" data-an="390">39</span> € <small class="per">HT / mois</small></p>
+            <ul>
+              <li>Tout ce qui est dans Pro</li>
+              <li>Jusqu'à 5 utilisateurs <span class="soon">bientôt</span></li>
+              <li>Bibliothèque d'ouvrages et de prix <span class="soon">bientôt</span></li>
+              <li>Export pour le comptable <span class="soon">bientôt</span></li>
+              <li>Assistance prioritaire</li>
+            </ul>
+            <a class="btn btn-lg plan-cta" href="app.html">Essayer 14 jours gratuits</a>
+          </article>
+        </div>
+        <p class="plans-note">Aucune carte bancaire demandée pendant l'essai. Sans engagement : vous arrêtez quand vous voulez.</p>
+      </div>
+    </section>
+
+    <!-- Questions fréquentes -->
+    <section class="section section-alt" id="faq">
+      <div class="l-wrap l-narrow">
+        <p class="eyebrow">Questions fréquentes</p>
+        <h2 class="section-title">Vous vous demandez sûrement…</h2>
+        <div class="faq">
+          <details>
+            <summary>Comment fonctionne l'essai gratuit ?</summary>
+            <p>Vous avez accès à tout pendant 14 jours, sans carte bancaire. À la fin de l'essai, vous choisissez une formule ou vous arrêtez, sans frais.</p>
+          </details>
+          <details>
+            <summary>Mes factures sont-elles conformes ?</summary>
+            <p>Devizo ajoute les mentions obligatoires : numéro qui se suit sans trou, SIRET, TVA ou mention « TVA non applicable, art. 293 B du CGI », date d'échéance, pénalités de retard, indemnité de 40 € pour les clients professionnels, assurance décennale et médiateur de la consommation.</p>
+          </details>
+          <details>
+            <summary>Je suis micro-entrepreneur, ça marche pour moi ?</summary>
+            <p>Oui. Cochez « Je ne facture pas la TVA » : les montants s'affichent sans TVA avec la bonne mention, et « EI » est ajouté à côté de votre nom.</p>
+          </details>
+          <details>
+            <summary>Où sont enregistrées mes données ?</summary>
+            <p>Pour l'instant, vos devis, factures et clients sont enregistrés sur votre appareil. Vous pouvez télécharger une sauvegarde à tout moment depuis « Mon entreprise » et la restaurer sur un autre appareil.</p>
+          </details>
+          <details>
+            <summary>Je peux l'utiliser sur mon téléphone ?</summary>
+            <p>Oui, Devizo fonctionne sur téléphone, tablette et ordinateur, sans rien installer.</p>
+          </details>
+          <details>
+            <summary>Comment j'arrête mon abonnement ?</summary>
+            <p>Il n'y a pas d'engagement. Vous pouvez arrêter à tout moment, l'abonnement s'arrête à la fin du mois en cours.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Appel final -->
+    <section class="final-cta">
+      <div class="l-wrap">
+        <h2>Votre prochain devis, faites-le en 2 minutes.</h2>
+        <p>14 jours gratuits, sans carte bancaire.</p>
+        <a class="btn btn-lg btn-light" href="app.html">Commencer l'essai gratuit</a>
       </div>
     </section>
   </main>
 
-  <footer class="footer">© 2026 Devizo</footer>
+  <footer class="l-footer">
+    <div class="l-wrap l-footer-inner">
+      <a class="logo" href="#top">Devizo</a>
+      <nav aria-label="Pied de page">
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#tarifs">Tarifs</a>
+        <a href="#faq">Questions</a>
+        <a href="app.html">Ouvrir l'application</a>
+      </nav>
+      <p>© 2026 Devizo</p>
+    </div>
+  </footer>
+
+  <script src="js/landing.js?v=7"></script>
 </body>
 </html>
