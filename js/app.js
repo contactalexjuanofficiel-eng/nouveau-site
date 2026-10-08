@@ -97,7 +97,7 @@ function newId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// Fenêtre de confirmation intégrée à la page.
+// Fenêtre de confirmation intégrée à la page. withCancel : false, true ou le texte du bouton d'annulation.
 function ask(message, okLabel = 'Confirmer', withCancel = true) {
   return new Promise((resolve) => {
     const dialog = document.createElement('dialog');
@@ -105,7 +105,7 @@ function ask(message, okLabel = 'Confirmer', withCancel = true) {
     dialog.innerHTML = `
       <p>${esc(message)}</p>
       <div class="actions">
-        ${withCancel ? '<button class="btn" value="non">Annuler</button>' : ''}
+        ${withCancel ? `<button class="btn" value="non">${esc(typeof withCancel === 'string' ? withCancel : 'Annuler')}</button>` : ''}
         <button class="btn btn-primary" value="oui">${esc(okLabel)}</button>
       </div>`;
     dialog.addEventListener('click', (e) => {

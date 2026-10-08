@@ -158,7 +158,19 @@ const Compte = (() => {
         versionDistante = Date.parse(ligne.mis_a_jour);
         setEtat('ok');
       } else {
-        // Premier passage : on part des données déjà présentes sur cet appareil.
+        // Premier passage : s'il y a déjà des données sur cet appareil (utilisées
+        // sans compte, ou par quelqu'un d'autre), on demande avant de les reprendre.
+        const e = data.entreprise;
+        const nbDocs = data.documents.length;
+        const nbClients = data.clients.length;
+        if (e.nom || nbDocs || nbClients || (data.depenses || []).length) {
+          const importer = await ask(
+            `Des données sont déjà enregistrées sur cet appareil` +
+            `${e.nom ? ` (entreprise « ${e.nom} »` : ' ('}${e.nom ? ', ' : ''}${nbDocs} devis et factures, ${nbClients} client${nbClients > 1 ? 's' : ''}). ` +
+            `Voulez-vous les mettre dans votre nouveau compte ?`,
+            'Oui, les importer', 'Non, partir de zéro');
+          if (!importer) remplacerDonnees(structuredClone(DEFAULT_DATA));
+        }
         await envoyer();
       }
     } catch (e) {
