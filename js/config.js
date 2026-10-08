@@ -9,6 +9,6 @@
  * seulement sur l'appareil.
  */
 window.DEVIZO_CONFIG = {
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://ryiqhstcshbqvuldfhok.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aXFoc3Rjc2hicXZ1bGRmaG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0ODkzOTIsImV4cCI6MjEwNzA2NTM5Mn0.qvUr4p_pg-BrMcAevc0LVTK0BQfe1ZcxcPVhLaSpjZY',
 };
