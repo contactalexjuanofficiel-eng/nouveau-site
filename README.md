@@ -36,3 +36,11 @@ Les données sont enregistrées dans le navigateur (localStorage) : rien n'est e
 
 Après chaque modification de `css/style.css` ou `js/app.js`, augmenter le numéro
 `?v=` dans `app.html` et `index.html` pour que les navigateurs chargent la nouvelle version.
+
+## Tableau de bord et dépenses
+
+- `js/dashboard.js` : tableau de bord de gestion (ce qu'il reste après dépenses,
+  cotisations et impôts, graphiques mois par mois et jour par jour, échéances,
+  devis, plafonds micro et TVA, meilleurs clients) et page Dépenses.
+- Les taux 2026 (micro-entreprise, impôt sur les sociétés) sont en haut du fichier.
+  Ce sont des estimations : à vérifier chaque année sur urssaf.fr et impots.gouv.fr.

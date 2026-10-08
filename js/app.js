@@ -53,9 +53,15 @@ const DEFAULT_DATA = {
     // Numérotation
     prefixeDevis: 'D',
     prefixeFacture: 'F',
+    // Fiscalité (estimations du tableau de bord)
+    regimeFiscal: '', // 'micro', 'is' ou 'reel' ; vide = déduit de la forme juridique
+    activiteMicro: 'services',
+    versementLiberatoire: false,
+    tauxCharges: 45,
   },
   clients: [],
   documents: [],
+  depenses: [],
 };
 
 let data = loadData();
@@ -544,51 +550,6 @@ function go(hash) {
 // Pages
 // ====================================================================
 
-function pageDashboard() {
-  const devis = data.documents.filter((d) => d.type === 'devis');
-  const factures = data.documents.filter((d) => d.type === 'facture');
-  const enAttente = devis.filter((d) => d.statut === 'envoye');
-  const impayees = factures.filter((d) => d.statut === 'a-payer');
-  const year = String(new Date().getFullYear());
-  const caAnnee = factures
-    .filter((d) => d.statut === 'payee' && d.date.startsWith(year))
-    .reduce((s, d) => s + computeTotals(d).ttc, 0);
-
-  const manque = profilManquant();
-
-  view.innerHTML = `
-    <div class="page-head">
-      <h1>Tableau de bord</h1>
-      <div class="actions">
-        <button class="btn btn-primary" data-new="devis">+ Nouveau devis</button>
-        <button class="btn" data-new="facture">+ Nouvelle facture</button>
-      </div>
-    </div>
-
-    ${manque.length ? `<div class="card gate">
-      <h2>Étape 1 : complétez votre entreprise</h2>
-      <p>Vous pourrez créer vos devis et factures dès que les mentions obligatoires seront renseignées. Il manque :</p>
-      ${listeManquante(manque)}
-      <a class="btn btn-primary" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
-    </div>` : ''}
-
-    <div class="stats">
-      <div class="stat"><div class="label">Encaissé en ${year}</div><div class="value">${euro(caAnnee)}</div></div>
-      <div class="stat"><div class="label">Factures à encaisser</div><div class="value">${euro(impayees.reduce((s, d) => s + computeTotals(d).ttc, 0))}</div></div>
-      <div class="stat"><div class="label">Devis en attente de réponse</div><div class="value">${enAttente.length}</div></div>
-      <div class="stat"><div class="label">Clients</div><div class="value">${data.clients.length}</div></div>
-    </div>
-
-    <div class="card">
-      <div class="page-head" style="margin-bottom:8px">
-        <h2 style="margin:0">5 derniers documents</h2>
-        ${data.documents.length > 5 ? `<a href="#/documents">Voir tout (${data.documents.length}) →</a>` : ''}
-      </div>
-      ${documentsTable(data.documents.slice().sort((a, b) => b.creeLe - a.creeLe).slice(0, 5))}
-    </div>
-  `;
-}
-
 function documentsTable(docs) {
   if (!docs.length) {
     return `<p class="empty">Aucun document pour l'instant. Créez votre premier devis !</p>`;
@@ -704,6 +665,10 @@ function pageEdit(id) {
               ${Object.entries(STATUTS[doc.type]).map(([k, v]) => `<option value="${k}" ${k === doc.statut ? 'selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
+          ${isFacture ? `<div id="field-paiement" ${doc.statut === 'payee' ? '' : 'hidden'}>
+            <label for="datePaiement">Payée le</label>
+            <input id="datePaiement" name="datePaiement" type="date" value="${esc(doc.datePaiement || '')}">
+          </div>` : ''}
           ${!isFacture ? `<div>
             <label for="acompte">Acompte demandé à la commande (%)</label>
             <input id="acompte" name="acompte" type="number" min="0" max="100" step="1" value="${esc(doc.acompte || 0)}">
@@ -805,6 +770,15 @@ function pageEdit(id) {
       if (e.target.name === 'clientId' && e.target.value !== doc.clientId) delete doc.clientArchive;
       doc[e.target.name] = e.target.value;
       if (e.target.name === 'acompte') renderTotals();
+      if (e.target.name === 'statut') {
+        // La date de paiement sert au calcul du chiffre d'affaires encaissé.
+        if (e.target.value === 'payee' && !doc.datePaiement) doc.datePaiement = today();
+        const champ = document.getElementById('field-paiement');
+        if (champ) {
+          champ.hidden = e.target.value !== 'payee';
+          document.getElementById('datePaiement').value = doc.datePaiement || '';
+        }
+      }
       saveData();
     }
   });
@@ -1037,6 +1011,7 @@ function pageView(id) {
   });
   document.getElementById('mark-paid')?.addEventListener('click', () => {
     doc.statut = 'payee';
+    doc.datePaiement = today();
     saveData();
     render();
   });
@@ -1302,6 +1277,33 @@ function pageSettings(champ) {
       </section>
 
       <section class="card">
+        <h2>Fiscalité</h2>
+        <p class="hint" style="margin-top:0">Sert à estimer vos cotisations, vos impôts et ce qu'il vous reste dans le tableau de bord.</p>
+        <div class="grid-2">
+          <div>
+            <label for="regimeFiscal">Régime</label>
+            <select id="regimeFiscal" name="regimeFiscal">
+              <option value="micro" ${selected(regimeFiscal(e) === 'micro')}>Micro-entreprise (cotisations sur le chiffre d'affaires)</option>
+              <option value="is" ${selected(regimeFiscal(e) === 'is')}>Société à l'impôt sur les sociétés (SAS, SARL…)</option>
+              <option value="reel" ${selected(regimeFiscal(e) === 'reel')}>Entreprise individuelle au réel</option>
+            </select>
+          </div>
+          <div id="field-activite">
+            <label for="activiteMicro">Type d'activité</label>
+            <select id="activiteMicro" name="activiteMicro">
+              ${Object.entries(MICRO).map(([k, m]) => `<option value="${k}" ${selected(k === (e.activiteMicro || 'services'))}>${esc(m.label)}</option>`).join('')}
+            </select>
+          </div>
+          <div id="field-charges">
+            <label for="tauxCharges">Charges sociales estimées (% du bénéfice)</label>
+            <input id="tauxCharges" name="tauxCharges" type="number" min="0" max="80" step="1" value="${esc(e.tauxCharges ?? 45)}">
+          </div>
+        </div>
+        <label class="checkbox field" id="field-vl"><input type="checkbox" name="versementLiberatoire" ${checked(e.versementLiberatoire)}> J'ai opté pour le versement libératoire de l'impôt sur le revenu</label>
+        <small class="hint" id="hint-fiscal"></small>
+      </section>
+
+      <section class="card">
         <h2>Numérotation</h2>
         <div class="grid-2">
           <div><label for="prefixeDevis">Préfixe des devis</label><input id="prefixeDevis" name="prefixeDevis" maxlength="6" value="${esc(e.prefixeDevis)}"></div>
@@ -1442,6 +1444,19 @@ function pageSettings(champ) {
       if (!manque.some((m) => m.champ === el.id)) el.classList.remove('missing');
     });
     $('field-capital').hidden = forme === 'micro' || forme === 'ei' || forme === 'autre';
+
+    // Fiscalité : champs selon le régime, et rappel des taux appliqués.
+    const reg = $('regimeFiscal').value;
+    $('field-activite').hidden = reg !== 'micro';
+    $('field-vl').hidden = reg !== 'micro';
+    $('field-charges').hidden = reg !== 'reel';
+    const mi = MICRO[$('activiteMicro').value] || MICRO.services;
+    $('hint-fiscal').textContent = reg === 'micro'
+      ? `Taux 2026 appliqués : cotisations ${tauxFr(mi.cotis)} % + formation ${tauxFr(mi.cfp)} % du chiffre d'affaires` +
+        (form.versementLiberatoire.checked ? `, impôt ${tauxFr(mi.vl)} %` : '') + `. Plafond micro : ${euro(mi.plafond)}.`
+      : reg === 'is'
+        ? `Impôt sur les sociétés : ${IS_TAUX_REDUIT} % jusqu'à ${euro(IS_PLAFOND_REDUIT)} de bénéfice, ${IS_TAUX_NORMAL} % au-delà. La rémunération du dirigeant n'est pas prise en compte.`
+        : "Au réel, les charges sociales sont d'environ 40 à 45 % du bénéfice. L'impôt sur le revenu n'est pas estimé.";
     $('hint-forme').textContent = forme === 'micro' || forme === 'ei'
       ? 'La mention « EI » sera ajoutée après votre nom, comme la loi l’exige.'
       : '';
@@ -1538,6 +1553,8 @@ function pageSettings(champ) {
       prefixeDevis: (values.prefixeDevis || 'D').trim(),
       prefixeFacture: (values.prefixeFacture || 'F').trim(),
       nonDecennale: fd.has('nonDecennale'),
+      versementLiberatoire: fd.has('versementLiberatoire'),
+      tauxCharges: Number(values.tauxCharges) || 0,
       siretVerifie: verif && verif.statut !== 'enCours' && verif.statut !== 'indisponible' ? verif : null,
       siretConfirme: fd.has('siretConfirme'),
     };
@@ -1647,6 +1664,7 @@ const LISTES = {
   '': 'Tableau de bord',
   documents: 'Devis & factures',
   clients: 'Clients',
+  depenses: 'Dépenses',
 };
 
 function render() {
@@ -1677,6 +1695,7 @@ function render() {
     case 'voir': return pageView(parts[1]);
     case 'clients': return parts[1] ? pageClientForm(parts[1], params.get('retour')) : pageClients();
     case 'parametres': return pageSettings(params.get('champ'));
+    case 'depenses': return pageDepenses(params);
     default: return pageNotFound();
   }
 }
