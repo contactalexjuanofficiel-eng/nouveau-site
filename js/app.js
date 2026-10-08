@@ -62,6 +62,7 @@ const DEFAULT_DATA = {
   clients: [],
   documents: [],
   depenses: [],
+  catalogue: [],
 };
 
 let data = loadData();
@@ -682,11 +683,15 @@ function pageEdit(id) {
           <thead><tr>
             <th>Description</th><th>Qté</th><th>Unité</th><th>Prix unit. HT</th>
             ${franchise ? '' : '<th>TVA %</th>'}
-            <th class="num">Total HT</th><th></th>
+            <th class="num">Total HT</th><th></th><th></th>
           </tr></thead>
           <tbody id="lines"></tbody>
         </table></div>
-        <button type="button" class="btn btn-sm" id="add-line" style="margin-top:10px">+ Ajouter une ligne</button>
+        <div class="actions" style="margin-top:10px">
+          <button type="button" class="btn btn-sm" id="add-line">+ Ajouter une ligne</button>
+          <button type="button" class="btn btn-sm" id="add-from-catalogue">+ Depuis le catalogue</button>
+        </div>
+        <p class="hint">Astuce : tapez quelques lettres dans la description pour retrouver une prestation de votre catalogue, ou touchez ☆ pour y enregistrer une ligne.</p>
         <div class="totals" id="totals" style="margin-top:16px"></div>
       </div>
 
@@ -720,6 +725,7 @@ function pageEdit(id) {
           ${tauxProposes(l.tva).map((t) => `<option value="${t}" ${Number(l.tva) === t ? 'selected' : ''}>${tauxFr(t)}</option>`).join('')}
         </select></td>`}
         <td class="num line-total">${euro(l.quantite * l.prixUnitaire)}</td>
+        <td>${etoileLigne(l, i)}</td>
         <td><button type="button" class="btn btn-sm btn-danger" data-remove="${i}" title="Supprimer la ligne">✕</button></td>
       </tr>`).join('');
     renderTotals();
@@ -790,6 +796,7 @@ function pageEdit(id) {
     if (await deleteDocument(doc)) go('#/documents');
   });
 
+  brancherCatalogue(linesEl, doc, renderLines);
   renderLines();
 }
 
@@ -1665,6 +1672,7 @@ const LISTES = {
   documents: 'Devis & factures',
   clients: 'Clients',
   depenses: 'Dépenses',
+  catalogue: 'Catalogue',
 };
 
 function render() {
@@ -1696,6 +1704,7 @@ function render() {
     case 'clients': return parts[1] ? pageClientForm(parts[1], params.get('retour')) : pageClients();
     case 'parametres': return pageSettings(params.get('champ'));
     case 'depenses': return pageDepenses(params);
+    case 'catalogue': return pageCatalogue(params);
     default: return pageNotFound();
   }
 }

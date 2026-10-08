@@ -44,3 +44,5 @@ Après chaque modification de `css/style.css` ou `js/app.js`, augmenter le numé
   devis, plafonds micro et TVA, meilleurs clients) et page Dépenses.
 - Les taux 2026 (micro-entreprise, impôt sur les sociétés) sont en haut du fichier.
   Ce sont des estimations : à vérifier chaque année sur urssaf.fr et impots.gouv.fr.
+- `js/catalogue.js` : catalogue de prestations et de prix (page Catalogue,
+  suggestions dans les lignes de devis, étoile pour enregistrer une ligne).

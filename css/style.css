@@ -131,7 +131,7 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 td a[href^="#/voir/"] { white-space: nowrap; }
 .empty { color: var(--muted); text-align: center; padding: 24px; }
 
-.lines input { min-width: 70px; }
+.lines input, .lines select { min-width: 70px; }
 .lines td:first-child input { min-width: 200px; }
 
 .totals { margin-left: auto; max-width: 320px; }
@@ -374,3 +374,19 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
   background: var(--text); color: var(--card); box-shadow: 0 8px 24px var(--shadow);
 }
 .disclaimer { color: var(--muted); font-size: .82rem; margin-top: 8px; }
+
+/* ---------- Catalogue ---------- */
+.star { color: var(--warning); min-width: 34px; }
+.cat-suggestions { position: absolute; top: 0; left: 0; right: auto; z-index: 60; max-height: 320px; overflow-y: auto; }
+.cat-suggestions button, .cat-choix button {
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
+  width: 100%; text-align: left; padding: 10px 12px; border: 0; border-radius: 8px;
+  background: none; color: var(--text); font: inherit; cursor: pointer;
+}
+.cat-suggestions button small, .cat-choix button small { grid-column: 1; color: var(--muted); }
+.cat-suggestions button:hover, .cat-suggestions button.active, .cat-choix button:hover { background: var(--primary-soft); }
+.cat-dialog { max-width: 520px; }
+.cat-dialog h2 { margin-top: 0; }
+.cat-choix { list-style: none; margin: 12px 0; padding: 0; max-height: 50vh; overflow-y: auto; display: grid; gap: 2px; }
+.cat-choix button b { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--primary); font-size: .85rem; white-space: nowrap; }
+.cat-filtre { margin-bottom: 12px; }
