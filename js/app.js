@@ -1202,6 +1202,7 @@ function pageSettings(champ) {
   let siretVerifieEnCours = '';
 
   function afficherVerif() {
+    if (!document.body.contains(form)) return;
     const box = $('siret-check');
     const clean = $('siret').value.replace(/\s/g, '');
     if (!checkSiret(clean) || !verif || verif.siret !== clean) {
@@ -1231,6 +1232,7 @@ function pageSettings(champ) {
   }
 
   async function lancerVerif() {
+    if (!document.body.contains(form)) return; // la page a été quittée entre-temps
     const clean = $('siret').value.replace(/\s/g, '');
     if (!checkSiret(clean) || clean === siretVerifieEnCours || (verif && verif.siret === clean && verif.statut !== 'indisponible')) {
       afficherVerif();
@@ -1241,7 +1243,7 @@ function pageSettings(champ) {
     afficherVerif();
     const resultat = await verifierSiret(clean);
     siretVerifieEnCours = '';
-    if ($('siret') && $('siret').value.replace(/\s/g, '') === clean) {
+    if (document.body.contains(form) && $('siret').value.replace(/\s/g, '') === clean) {
       verif = resultat;
       afficherVerif();
       form.dispatchEvent(new Event('input'));
