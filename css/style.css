@@ -262,3 +262,16 @@ dialog.ask .actions { justify-content: flex-end; }
 input.missing, textarea.missing, select.missing { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-soft); }
 .nav a.locked { color: var(--muted); }
 .nav a.locked::after { content: " 🔒"; font-size: .8em; }
+
+.verif {
+  display: grid; gap: 6px; margin-top: 8px; padding: 10px 12px;
+  border-radius: 10px; border: 1px solid var(--border); background: var(--bg);
+  font-size: .88rem; color: var(--muted);
+}
+.verif strong { color: var(--text); }
+.verif.ok { border-color: var(--success); background: var(--success-soft); }
+.verif.ok strong { color: var(--success); }
+.verif.ko { border-color: var(--warning); background: var(--warning-soft); }
+.verif.ko strong { color: var(--warning); }
+.verif .btn { justify-self: start; }
+.verif .checkbox { color: var(--text); }

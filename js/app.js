@@ -186,6 +186,39 @@ function checkSiret(value) {
   return sum % 10 === 0;
 }
 
+// Vérifie un SIRET dans l'annuaire officiel des entreprises (service public
+// gratuit de l'État : recherche-entreprises.api.gouv.fr, données INSEE).
+// Renvoie { siret, statut: 'actif' | 'ferme' | 'introuvable' | 'indisponible', ... }.
+const NATURES = { '1000': 'ei', '5498': 'eurl', '5499': 'sarl', '5710': 'sas', '5720': 'sasu' };
+
+async function verifierSiret(siret) {
+  const clean = String(siret).replace(/\s/g, '');
+  try {
+    const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${clean}&page=1&per_page=5`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const entreprise = (json.results || []).find((r) => r.siren === clean.slice(0, 9));
+    if (!entreprise) return { siret: clean, statut: 'introuvable' };
+    const etablissements = [entreprise.siege, ...(entreprise.matching_etablissements || [])].filter(Boolean);
+    const etab = etablissements.find((x) => x.siret === clean);
+    if (!etab) return { siret: clean, statut: 'introuvable' };
+    const adresse = etab.adresse || [etab.numero_voie, etab.type_voie, etab.libelle_voie, etab.code_postal, etab.libelle_commune]
+      .filter(Boolean).join(' ');
+    return {
+      siret: clean,
+      statut: etab.etat_administratif === 'F' || entreprise.etat_administratif === 'C' ? 'ferme' : 'actif',
+      nom: entreprise.nom_complet || entreprise.nom_raison_sociale || '',
+      adresse,
+      ape: String(etab.activite_principale || entreprise.activite_principale || '').replace('.', ''),
+      forme: NATURES[String(entreprise.nature_juridique)] || '',
+      date: today(),
+    };
+  } catch (err) {
+    console.warn('Vérification du SIRET indisponible', err);
+    return { siret: clean, statut: 'indisponible' };
+  }
+}
+
 // IBAN : contrôle modulo 97.
 function checkIban(value) {
   const s = String(value).replace(/\s/g, '').toUpperCase();
@@ -217,7 +250,15 @@ function profilManquant(e = data.entreprise) {
   const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(e.formeJuridique);
   if (!String(e.nom || '').trim()) manque.push({ champ: 'nom', texte: "Nom ou raison sociale de l'entreprise" });
   if (!String(e.adresse || '').trim()) manque.push({ champ: 'adresse', texte: "Adresse de l'entreprise" });
-  if (!checkSiret(e.siret || '')) manque.push({ champ: 'siret', texte: 'SIRET valide (14 chiffres)' });
+  if (!checkSiret(e.siret || '')) {
+    manque.push({ champ: 'siret', texte: 'SIRET valide (14 chiffres)' });
+  } else {
+    const v = e.siretVerifie;
+    if (v && v.siret === String(e.siret).replace(/\s/g, '')) {
+      if (v.statut === 'ferme') manque.push({ champ: 'siret', texte: "SIRET d'un établissement en activité (celui-ci est fermé)" });
+      if (v.statut === 'introuvable' && !e.siretConfirme) manque.push({ champ: 'siret', texte: "SIRET reconnu par l'annuaire officiel des entreprises" });
+    }
+  }
   if (societe && !String(e.capital || '').trim()) manque.push({ champ: 'capital', texte: 'Capital social (obligatoire pour une société)' });
   if (societe && !String(e.immatriculation || '').trim()) manque.push({ champ: 'immatriculation', texte: 'Immatriculation RCS (obligatoire pour une société)' });
   if (!e.franchiseTva && !checkTva(e.numeroTva || '')) manque.push({ champ: 'numeroTva', texte: 'N° de TVA intracommunautaire valide' });
@@ -972,6 +1013,7 @@ function pageSettings(champ) {
             <label for="siret">SIRET *</label>
             <input id="siret" name="siret" inputmode="numeric" value="${esc(e.siret)}" placeholder="14 chiffres">
             <small class="hint" id="hint-siret"></small>
+            <div id="siret-check"></div>
           </div>
           <div>
             <label for="immatriculation">Immatriculation (RCS ou RM) <span id="star-immat">*</span></label>
@@ -1162,6 +1204,66 @@ function pageSettings(champ) {
     el.classList.add('missing');
   }
 
+  // Résultat de la vérification en ligne du SIRET.
+  let verif = e.siretVerifie || null;
+  let siretVerifieEnCours = '';
+
+  function afficherVerif() {
+    const box = $('siret-check');
+    const clean = $('siret').value.replace(/\s/g, '');
+    if (!checkSiret(clean) || !verif || verif.siret !== clean) {
+      box.innerHTML = '';
+      return;
+    }
+    if (verif.statut === 'enCours') {
+      box.innerHTML = `<div class="verif">Vérification dans l'annuaire officiel des entreprises…</div>`;
+    } else if (verif.statut === 'actif') {
+      box.innerHTML = `<div class="verif ok">
+        <strong>✓ Entreprise trouvée dans l'annuaire officiel</strong>
+        <span>${esc(verif.nom)}${verif.adresse ? ' · ' + esc(verif.adresse) : ''}${verif.ape ? ' · APE ' + esc(verif.ape) : ''}</span>
+        <button type="button" class="btn btn-sm" id="siret-remplir">Remplir mes informations avec ces données</button>
+      </div>`;
+      $('siret-remplir').addEventListener('click', remplirDepuisAnnuaire);
+    } else if (verif.statut === 'ferme') {
+      box.innerHTML = `<div class="verif ko"><strong>⚠ Cet établissement est fermé</strong>
+        <span>${esc(verif.nom)}. Utilisez le SIRET de votre établissement en activité.</span></div>`;
+    } else if (verif.statut === 'introuvable') {
+      box.innerHTML = `<div class="verif ko"><strong>⚠ Ce SIRET n'existe pas dans l'annuaire officiel</strong>
+        <span>Vérifiez-le sur votre avis de situation INSEE ou votre extrait d'immatriculation.</span>
+        <label class="checkbox"><input type="checkbox" name="siretConfirme" ${checked(e.siretConfirme)}> Mon SIRET est correct : mon entreprise n'apparaît pas dans l'annuaire public (données non diffusibles)</label>
+      </div>`;
+    } else {
+      box.innerHTML = `<div class="verif">La vérification en ligne n'est pas disponible pour le moment. Le format du SIRET est correct.</div>`;
+    }
+  }
+
+  async function lancerVerif() {
+    const clean = $('siret').value.replace(/\s/g, '');
+    if (!checkSiret(clean) || clean === siretVerifieEnCours || (verif && verif.siret === clean && verif.statut !== 'indisponible')) {
+      afficherVerif();
+      return;
+    }
+    siretVerifieEnCours = clean;
+    verif = { siret: clean, statut: 'enCours' };
+    afficherVerif();
+    const resultat = await verifierSiret(clean);
+    siretVerifieEnCours = '';
+    if ($('siret') && $('siret').value.replace(/\s/g, '') === clean) {
+      verif = resultat;
+      afficherVerif();
+      form.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function remplirDepuisAnnuaire() {
+    if (verif.nom) $('nom').value = verif.nom;
+    if (verif.adresse) $('adresse').value = verif.adresse;
+    if (verif.ape) $('ape').value = verif.ape;
+    if (verif.forme && !(verif.forme === 'ei' && $('formeJuridique').value === 'micro')) $('formeJuridique').value = verif.forme;
+    form.dispatchEvent(new Event('input'));
+    $('siret-remplir').textContent = '✓ Informations remplies, pensez à enregistrer';
+  }
+
   function refresh() {
     const forme = $('formeJuridique').value;
     const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(forme);
@@ -1202,6 +1304,13 @@ function pageSettings(champ) {
       `Exemple : ${$('prefixeDevis').value || 'D'}-${year}-001 et ${$('prefixeFacture').value || 'F'}-${year}-001. ` +
       'Changer de préfixe démarre une nouvelle série numérotée à partir de 001.';
   }
+
+  let minuteur;
+  $('siret').addEventListener('input', () => {
+    clearTimeout(minuteur);
+    minuteur = setTimeout(lancerVerif, 600);
+    afficherVerif();
+  });
 
   form.addEventListener('input', () => {
     refresh();
@@ -1273,6 +1382,8 @@ function pageSettings(champ) {
       prefixeDevis: (values.prefixeDevis || 'D').trim(),
       prefixeFacture: (values.prefixeFacture || 'F').trim(),
       nonDecennale: fd.has('nonDecennale'),
+      siretVerifie: verif && verif.statut !== 'enCours' && verif.statut !== 'indisponible' ? verif : null,
+      siretConfirme: fd.has('siretConfirme'),
       clientsProUniquement: fd.has('clientsProUniquement'),
     };
   }
@@ -1345,6 +1456,7 @@ function pageSettings(champ) {
   });
 
   refresh();
+  lancerVerif();
   if (champ && $(champ)) {
     // Ouvre la partie TVA si c'est elle qui manque.
     if (champ === 'numeroTva') $('tva-options').hidden = false;
