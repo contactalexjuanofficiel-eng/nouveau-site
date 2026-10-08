@@ -125,7 +125,6 @@ const Compte = (() => {
   async function demarrer(render) {
     renderApp = render;
     if (!actif) return render();
-    document.getElementById('nav-compte')?.removeAttribute('hidden');
     view.innerHTML = '<div class="card auth-loading">Chargement de votre compte…</div>';
 
     // Retour d'un lien reçu par e-mail (confirmation, mot de passe oublié).
@@ -367,13 +366,50 @@ const Compte = (() => {
   }
 
   // ------------------------------------------------------------------
+  // Mon compte, en mode sans compte (données sur l'appareil uniquement)
+  // ------------------------------------------------------------------
+  function pageSansCompte() {
+    const e = data.entreprise;
+    const nb = data.documents.length + data.clients.length + (data.depenses || []).length;
+    view.innerHTML = `
+      <div class="page-head"><h1>Mon compte</h1></div>
+      <section class="card">
+        <h2>Vos données sur cet appareil</h2>
+        <p>${e.nom ? `Entreprise : <strong>${esc(e.nom)}</strong><br>` : ''}
+          ${data.documents.length} devis et factures, ${data.clients.length} client${data.clients.length > 1 ? 's' : ''},
+          ${(data.depenses || []).length} dépense${(data.depenses || []).length > 1 ? 's' : ''}.</p>
+        <p class="hint">Vos informations sont enregistrées uniquement dans ce navigateur, sur cet appareil.
+          Personne d'autre n'y a accès.</p>
+        <div class="actions">
+          <a class="btn" href="#/parametres?champ=export">Télécharger une sauvegarde</a>
+        </div>
+      </section>
+      <section class="card danger-zone">
+        <h2>Tout effacer et recommencer</h2>
+        <p>Efface de cet appareil l'entreprise, les clients, les devis, les factures, les dépenses et le catalogue.
+          Utile si vous testez le site ou si vous prêtez votre appareil.${nb ? ' Téléchargez d\u2019abord une sauvegarde si vous voulez garder vos documents.' : ''}</p>
+        <button class="btn btn-danger" id="local-effacer">Effacer toutes mes données</button>
+      </section>`;
+    document.getElementById('local-effacer').addEventListener('click', async () => {
+      if (!(await ask('Effacer définitivement toutes les données de cet appareil ? Cette action est irréversible.', 'Tout effacer'))) return;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (err) {
+        // rien à faire
+      }
+      data = structuredClone(window.DEVIZO_DEMO_DATA || DEFAULT_DATA);
+      history.replaceState(null, '', location.pathname + '#/');
+      renderApp();
+      await ask('Toutes les données ont été effacées. Vous pouvez recommencer depuis le début.', "D'accord", false);
+    });
+  }
+
+  // ------------------------------------------------------------------
   // Page « Mon compte »
   // ------------------------------------------------------------------
   function page() {
     if (!actif || !utilisateur) {
-      view.innerHTML = `<div class="card"><h1>Mon compte</h1>
-        <p>Les comptes en ligne ne sont pas encore activés : vos données sont enregistrées uniquement sur cet appareil.
-        Pensez à télécharger une sauvegarde depuis <a href="#/parametres">Mon entreprise</a>.</p></div>`;
+      pageSansCompte();
       return;
     }
     const cree = utilisateur.created_at ? new Date(utilisateur.created_at) : null;

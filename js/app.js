@@ -1651,7 +1651,7 @@ function majPastille() {
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
   // Les autres pages sont verrouillées tant que le profil est incomplet.
-  document.querySelectorAll('.nav a:not([href="#/parametres"])').forEach((a) => a.classList.toggle('locked', nb > 0));
+  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"])').forEach((a) => a.classList.toggle('locked', nb > 0));
 }
 
 function pageNotFound() {
