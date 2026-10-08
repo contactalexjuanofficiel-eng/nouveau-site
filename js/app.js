@@ -90,6 +90,7 @@ function saveData() {
   } catch (e) {
     console.error("Impossible d'enregistrer les données", e);
   }
+  Compte.modifie(); // envoi en ligne si un compte est connecté
 }
 
 function newId() {
@@ -1677,6 +1678,8 @@ const LISTES = {
 };
 
 function render() {
+  // Avec les comptes en ligne, rien ne s'affiche tant qu'on n'est pas connecté.
+  if (Compte.actif && !Compte.connecte()) return;
   const [path, query] = (location.hash.slice(1) || '/').split('?');
   const params = new URLSearchParams(query);
   const parts = path.split('/').filter(Boolean);
@@ -1695,7 +1698,7 @@ function render() {
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
   const bloque = profilManquant().length > 0;
-  if (bloque && parts[0] !== 'parametres') return pageBloquee();
+  if (bloque && parts[0] !== 'parametres' && parts[0] !== 'compte') return pageBloquee();
 
   switch (parts[0]) {
     case undefined: return pageDashboard();
@@ -1706,6 +1709,9 @@ function render() {
     case 'parametres': return pageSettings(params.get('champ'));
     case 'depenses': return pageDepenses(params);
     case 'catalogue': return pageCatalogue(params);
+    case 'compte': return Compte.page();
+    case 'inscription':
+    case 'connexion': return go('#/');
     default: return pageNotFound();
   }
 }
@@ -1739,4 +1745,4 @@ window.addEventListener('hashchange', () => {
   render();
   window.scrollTo(0, 0);
 });
-render();
+Compte.demarrer(render);

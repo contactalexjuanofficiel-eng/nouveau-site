@@ -46,3 +46,20 @@ Après chaque modification de `css/style.css` ou `js/app.js`, augmenter le numé
   Ce sont des estimations : à vérifier chaque année sur urssaf.fr et impots.gouv.fr.
 - `js/catalogue.js` : catalogue de prestations et de prix (page Catalogue,
   suggestions dans les lignes de devis, étoile pour enregistrer une ligne).
+
+## Comptes et sauvegarde en ligne (Supabase)
+
+Sans configuration, le site fonctionne sans compte (données sur l'appareil).
+Pour activer les comptes :
+
+1. Créer un projet sur https://supabase.com (région Europe, par exemple Paris ou Francfort).
+2. Dans **SQL Editor**, exécuter le contenu de `supabase/schema.sql`.
+3. Dans **Authentication > URL Configuration** :
+   - *Site URL* : `https://contactalexjuanofficiel-eng.github.io/nouveau-site/app.html`
+   - *Redirect URLs* : ajouter la même adresse.
+4. Dans **Project Settings > API**, copier *Project URL* et la clé *anon public*
+   dans `js/config.js`. Ne jamais y mettre la clé *service_role*.
+
+Fichiers : `js/compte.js` (connexion, inscription, mot de passe oublié,
+synchronisation, page Mon compte), `js/vendor/supabase.js` (bibliothèque
+officielle supabase-js 2.45.4, licence MIT dans `js/vendor/supabase-LICENSE.txt`).

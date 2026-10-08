@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Devizo · Application</title>
-  <link rel="stylesheet" href="css/style.css?v=26">
+  <link rel="stylesheet" href="css/style.css?v=27">
 </head>
 <body class="app">
   <header class="topbar no-print">
@@ -19,14 +19,21 @@
       <a href="#/depenses">Dépenses</a>
       <a href="#/catalogue">Catalogue</a>
       <a href="#/parametres">Mon entreprise</a>
+      <a href="#/compte" id="nav-compte" hidden>Mon compte</a>
     </nav>
   </header>
 
   <main id="view" class="container"></main>
 
-  <script src="js/dashboard.js?v=26"></script>
-  <script src="js/catalogue.js?v=26"></script>
+  <script src="js/config.js?v=27"></script>
 
-  <script src="js/app.js?v=26"></script>
+  <script src="js/vendor/supabase.js"></script>
+
+  <script src="js/compte.js?v=27"></script>
+
+  <script src="js/dashboard.js?v=27"></script>
+  <script src="js/catalogue.js?v=27"></script>
+
+  <script src="js/app.js?v=27"></script>
 </body>
 </html>
