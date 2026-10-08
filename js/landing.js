@@ -82,7 +82,7 @@
   }, (el) => el.classList.add('pre'), 0.12);
 
   // Exemple de tableau de bord : les barres poussent et le montant grimpe,
-  // puis l'animation recommence toutes les 7 secondes tant qu'il est visible.
+  // puis l'animation recommence toutes les 5 secondes tant qu'il est visible.
   const dash = document.querySelector('.dash-mock');
   if (dash) {
     let boucle;
@@ -98,7 +98,7 @@
     surveiller([dash], () => {
       animerDash();
       clearInterval(boucle);
-      boucle = setInterval(animerDash, 7000);
+      boucle = setInterval(animerDash, 5000);
     }, () => clearInterval(boucle), 0.2);
   }
 })();
