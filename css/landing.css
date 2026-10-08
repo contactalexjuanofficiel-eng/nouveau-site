@@ -1,8 +1,7 @@
-/* Page d'accueil : grille de plan d'architecte en fond, devis qui se
-   remplit tout seul dans l'accroche, puis sections empilées. */
+/* Page d'accueil : un devis dans l'accroche, parcouru par une souris
+   qui explique les fonctionnalités, puis sections empilées. */
 :root {
   --display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --grid-line: rgba(31, 94, 255, .07);
   --paper: #ffffff;
   --paper-ink: #1c2333;
   --paper-muted: #6b7385;
@@ -12,9 +11,9 @@
   --band-muted: #b8c4e6;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --grid-line: rgba(111, 151, 255, .08); --band: #0b1430; }
+  :root:not([data-theme="light"]) { --band: #0b1430; }
 }
-:root[data-theme="dark"] { --grid-line: rgba(111, 151, 255, .08); --band: #0b1430; }
+:root[data-theme="dark"] { --band: #0b1430; }
 
 .landing { background: var(--bg); }
 .l-wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
@@ -41,11 +40,7 @@
 /* ---------- Accroche ---------- */
 .hero {
   position: relative;
-  padding-block: 64px 72px;
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 32px 32px;
+  padding-block: 64px 80px;
   overflow: hidden;
 }
 .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
@@ -64,7 +59,6 @@
   background: var(--paper); color: var(--paper-ink);
   border-radius: 6px; padding: 28px;
   box-shadow: 0 30px 60px -20px rgba(15, 27, 61, .35), 0 0 0 1px rgba(15, 27, 61, .06);
-  transform: rotate(1.2deg);
   font-size: .92rem;
   font-variant-numeric: tabular-nums;
 }
@@ -93,17 +87,51 @@
   border: 1px solid var(--border); border-radius: 999px;
   padding: 10px 16px; font-size: .9rem; font-weight: 600;
   box-shadow: 0 10px 30px var(--shadow);
-  animation: pop-in .5s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: 3.4s;
+  transition: opacity .35s ease, transform .35s cubic-bezier(.2, 1.4, .4, 1);
 }
+.mock-badge.off { opacity: 0; transform: scale(.85) translateY(10px); }
 .mock-badge .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 4px var(--success-soft); }
 
+/* Visite guidée : souris, bulle et zone mise en avant */
+.mock-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px; }
+.mock-btn {
+  padding: 7px 12px; border-radius: 8px; border: 1px solid var(--paper-line);
+  font-size: .82rem; color: var(--paper-ink); background: #ffffff; transition: transform .15s;
+}
+.mock-btn-primary { background: #1f5eff; border-color: #1f5eff; color: #ffffff; }
+.mock-btn.pressed { transform: scale(.94); }
+[data-tour] { border-radius: 6px; transition: box-shadow .3s, background-color .3s; }
+[data-tour].tour-on { box-shadow: 0 0 0 3px rgba(31, 94, 255, .35); background-color: rgba(31, 94, 255, .06); }
+.mock-btn-primary.tour-on { background-color: #1f5eff; }
+
+.tour-cursor {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
+  transition: transform .9s cubic-bezier(.5, 0, .2, 1);
+  filter: drop-shadow(0 3px 4px rgba(15, 27, 61, .35));
+}
+.tour-cursor::after {
+  content: ""; position: absolute; left: -9px; top: -9px; width: 22px; height: 22px;
+  border-radius: 50%; border: 2px solid #1f5eff; opacity: 0;
+}
+.tour-cursor.click::after { animation: ripple .5s ease-out; }
+.tour-bubble {
+  position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none;
+  max-width: 250px; padding: 10px 14px; border-radius: 12px;
+  background: #0f1b3d; color: #ffffff; font-size: .88rem; line-height: 1.4;
+  box-shadow: 0 12px 30px rgba(15, 27, 61, .35);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.tour-bubble.off { opacity: 0; transform: translateY(6px); }
+.tour-bubble strong { display: block; color: #8eadff; font-size: .78rem; letter-spacing: .03em; margin-bottom: 2px; }
+
+@keyframes ripple { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.8); } }
 @keyframes line-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes pop-in { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 860px) {
   .hero-grid { grid-template-columns: 1fr; }
   .mock { max-width: 480px; margin-bottom: 16px; }
-  .mock-paper { transform: none; padding: 20px; }
+  .mock-paper { padding: 20px; }
   .mock-badge { left: 8px; }
 }
 

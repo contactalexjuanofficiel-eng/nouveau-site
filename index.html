@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=7">
-  <link rel="stylesheet" href="css/landing.css?v=7">
+  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/landing.css?v=8">
 </head>
 <body class="landing">
   <header class="l-header">
@@ -56,20 +56,28 @@
                 <small>N° D-2026-014</small>
               </div>
             </div>
-            <p class="mock-objet"><b>Objet :</b> Rénovation salle de bain</p>
-            <ul class="mock-lines">
+            <p class="mock-objet" data-tour="client"><b>Client :</b> Mme Martin · <b>Objet :</b> Rénovation salle de bain</p>
+            <ul class="mock-lines" data-tour="lignes">
               <li style="--i:0"><span>Dépose baignoire et évacuation</span><span>280,00 €</span></li>
               <li style="--i:1"><span>Receveur de douche 90×120</span><span>640,00 €</span></li>
               <li style="--i:2"><span>Mitigeur thermostatique</span><span>189,00 €</span></li>
               <li style="--i:3"><span>Main d'œuvre · 14 h</span><span>672,00 €</span></li>
             </ul>
             <div class="mock-total">
-              <div><span>TVA 10 %</span><span>178,10 €</span></div>
+              <div data-tour="tva"><span>TVA 10 %</span><span>178,10 €</span></div>
               <div class="mock-ttc"><span>Total TTC</span><span class="mock-count" data-to="1959.10">1 959,10 €</span></div>
-              <div class="mock-acompte"><span>Acompte 30 %</span><span>587,73 €</span></div>
+              <div class="mock-acompte" data-tour="acompte"><span>Acompte 30 %</span><span>587,73 €</span></div>
             </div>
-            <p class="mock-legal">Assurance décennale MAAF Pro · Devis gratuit · Valable 30 jours</p>
+            <p class="mock-legal" data-tour="mentions">Assurance décennale MAAF Pro · Devis gratuit · Valable 30 jours</p>
+            <div class="mock-actions">
+              <span class="mock-btn" data-tour="pdf">Télécharger le PDF</span>
+              <span class="mock-btn mock-btn-primary" data-tour="facture">Transformer en facture</span>
+            </div>
           </div>
+          <div class="tour-cursor" hidden>
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2l16 9.5-7 1.6-3.6 6.9z" fill="#ffffff" stroke="#0f1b3d" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="tour-bubble" hidden></div>
           <div class="mock-badge">
             <span class="dot"></span> Devis accepté · facture F-2026-009 créée
           </div>
@@ -263,6 +271,6 @@
     </div>
   </footer>
 
-  <script src="js/landing.js?v=7"></script>
+  <script src="js/landing.js?v=8"></script>
 </body>
 </html>
