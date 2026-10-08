@@ -441,3 +441,41 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .sync-envoi { color: var(--muted); background: var(--bg); }
 .sync-erreur { color: var(--warning); background: var(--warning-soft); }
 .danger-zone { border-color: var(--danger-soft); }
+
+/* ---------- Abonnement ---------- */
+.bandeau-abo {
+  padding: 10px 16px; text-align: center; font-size: .92rem;
+  background: var(--primary-soft); color: var(--text); border-bottom: 1px solid var(--border);
+}
+.bandeau-abo.warn { background: var(--warning-soft); }
+.bandeau-abo.bad { background: var(--danger-soft); }
+.bandeau-abo a { font-weight: 600; margin-left: 4px; }
+.upsell { border: 2px solid var(--primary); }
+.upsell h2 { margin: 4px 0 6px; }
+.upsell p { color: var(--muted); }
+.upsell-tag { display: inline-block; margin: 0; padding: 2px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary) !important; font-size: .8rem; font-weight: 700; }
+
+.billing-toggle {
+  display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+}
+.billing-toggle button { border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; padding: 8px 18px; border-radius: 999px; }
+.billing-toggle button.active { background: var(--primary); color: var(--on-primary); }
+.billing-toggle .save { font-size: .78rem; font-weight: 700; color: var(--success); margin-left: 4px; }
+.billing-toggle button.active .save { color: inherit; opacity: .85; }
+.plans-app { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px; }
+.plans-app .plan { position: relative; display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.plans-app .plan-featured { border: 2px solid var(--primary); }
+.plans-app .plan h3 { margin: 0; font-size: 1.4rem; }
+.plans-app .plan-for { color: var(--muted); margin: 4px 0 12px; }
+.plans-app .price { margin: 0 0 16px; font-weight: 700; }
+.plans-app .price .amount { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+.plans-app .price .per { color: var(--muted); font-weight: 400; }
+.plans-app .price-ttc { display: block; color: var(--muted); font-weight: 400; font-size: .88rem; margin-top: 4px; }
+.plans-app ul { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 8px; flex: 1; align-content: start; }
+.plans-app li { padding-left: 24px; position: relative; }
+.plans-app li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+.plans-app .plan-cta { text-align: center; }
+.plans-app .plan-cta[aria-disabled="true"] { opacity: .7; cursor: default; }
+.plans-app .plan-tag { position: absolute; top: -13px; left: 24px; margin: 0; background: var(--primary); color: var(--on-primary); font-size: .8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; }
+.plans-note { color: var(--muted); font-size: .88rem; margin-top: 16px; }

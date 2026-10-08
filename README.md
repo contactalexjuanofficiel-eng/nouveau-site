@@ -63,3 +63,14 @@ Pour activer les comptes :
 Fichiers : `js/compte.js` (connexion, inscription, mot de passe oublié,
 synchronisation, page Mon compte), `js/vendor/supabase.js` (bibliothèque
 officielle supabase-js 2.45.4, licence MIT dans `js/vendor/supabase-LICENSE.txt`).
+
+## Abonnements et paiement (Stripe)
+
+- `js/abonnement.js` : essai de 14 jours, formules Solo et Pro, page Abonnement.
+- `supabase/abonnements.sql` : table des abonnements et règle « lecture seule après l'essai »
+  (appliquée par la base de données).
+- `supabase/functions/stripe-webhook/index.ts` : fonction Supabase qui reçoit les
+  événements Stripe et enregistre l'abonnement (secrets `STRIPE_SECRET_KEY` et
+  `STRIPE_WEBHOOK_SECRET`, vérification JWT désactivée).
+- Liens de paiement et portail client Stripe : dans `js/config.js` (rubrique `stripe`).
+  Produits Stripe « Devizo Solo » et « Devizo Pro » avec la métadonnée `formule` = `solo` ou `pro`.

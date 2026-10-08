@@ -37,3 +37,5 @@ $$;
 
 revoke all on function public.supprimer_mon_compte() from public, anon;
 grant execute on function public.supprimer_mon_compte() to authenticated;
+
+-- Abonnements : voir supabase/abonnements.sql (à exécuter après ce fichier).

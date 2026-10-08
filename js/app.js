@@ -85,6 +85,13 @@ function loadData() {
 }
 
 function saveData() {
+  // Fin d'essai sans abonnement : lecture seule, la modification est annulée.
+  if (!Abonnement.peutModifier()) {
+    data = loadData();
+    Abonnement.refuserModification();
+    render();
+    return;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -425,6 +432,10 @@ function listeManquante(manque) {
 
 // Bloque l'action si le profil n'est pas complet. Renvoie true si on peut continuer.
 async function profilPret() {
+  if (!Abonnement.peutModifier()) {
+    Abonnement.refuserModification();
+    return false;
+  }
   const manque = profilManquant();
   if (!manque.length) return true;
   const ok = await ask(
@@ -955,7 +966,7 @@ function pageView(id) {
     <div class="doc">
       <div class="doc-head">
         <div>
-          ${e.logo ? `<img class="doc-logo" src="${esc(e.logo)}" alt="">` : ''}
+          ${e.logo && Abonnement.aAcces('pro') ? `<img class="doc-logo" src="${esc(e.logo)}" alt="">` : ''}
           <strong>${esc(nomAffiche)}</strong><br>
           ${formeAffichee ? '<small>' + esc(formeAffichee) + '</small><br>' : ''}
           ${esc(e.adresse).replace(/\n/g, '<br>')}<br>
@@ -1680,6 +1691,7 @@ const LISTES = {
 function render() {
   // Avec les comptes en ligne, rien ne s'affiche tant qu'on n'est pas connecté.
   if (Compte.actif && !Compte.connecte()) return;
+  Abonnement.majBandeau();
   const [path, query] = (location.hash.slice(1) || '/').split('?');
   const params = new URLSearchParams(query);
   const parts = path.split('/').filter(Boolean);
@@ -1698,7 +1710,15 @@ function render() {
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
   const bloque = profilManquant().length > 0;
-  if (bloque && parts[0] !== 'parametres' && parts[0] !== 'compte') return pageBloquee();
+  if (bloque && !['parametres', 'compte', 'abonnement'].includes(parts[0])) return pageBloquee();
+
+  // Abonnement : lecture seule après l'essai, fonctions réservées à la formule Pro.
+  if (!Abonnement.peutModifier() && (parts[0] === 'modifier' || (parts[0] === 'clients' && parts[1]))) {
+    return Abonnement.pageLectureSeule();
+  }
+  if (!Abonnement.aAcces('pro') && (parts[0] === 'depenses' || parts[0] === 'catalogue')) {
+    return Abonnement.pageUpsell(parts[0]);
+  }
 
   switch (parts[0]) {
     case undefined: return pageDashboard();
@@ -1710,6 +1730,7 @@ function render() {
     case 'depenses': return pageDepenses(params);
     case 'catalogue': return pageCatalogue(params);
     case 'compte': return Compte.page();
+    case 'abonnement': return Abonnement.page(params);
     case 'inscription':
     case 'connexion': return go('#/');
     default: return pageNotFound();

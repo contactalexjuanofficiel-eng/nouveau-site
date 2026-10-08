@@ -177,6 +177,7 @@ const Compte = (() => {
       console.warn('Lecture des données en ligne impossible', e);
       setEtat('erreur');
     }
+    await Abonnement.charger(client, user);
     renderApp();
   }
 
@@ -197,6 +198,13 @@ const Compte = (() => {
   }
 
   window.addEventListener('focus', rafraichir);
+  // Au retour sur l'onglet (par exemple après un paiement), l'abonnement est relu.
+  window.addEventListener('focus', async () => {
+    if (!utilisateur) return;
+    const avant = Abonnement.etat();
+    await Abonnement.charger(client, utilisateur);
+    if (Abonnement.etat() !== avant) renderApp();
+  });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') rafraichir();
   });
@@ -437,6 +445,7 @@ const Compte = (() => {
           <button class="btn" id="compte-deco">Se déconnecter</button>
         </div>
       </section>
+      ${Abonnement.resume()}
       <section class="card">
         <h2>Changer de mot de passe</h2>
         <form id="compte-mdp" novalidate>

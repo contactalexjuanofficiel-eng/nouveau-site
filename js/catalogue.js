@@ -47,6 +47,10 @@ function ligneDepuisCatalogue(p) {
 // ====================================================================
 
 function brancherCatalogue(linesEl, doc, renderLines) {
+  if (!Abonnement.aAcces('pro')) {
+    document.getElementById('add-from-catalogue')?.remove();
+    return;
+  }
   const liste = document.createElement('ul');
   liste.className = 'suggestions cat-suggestions';
   liste.hidden = true;
@@ -147,6 +151,7 @@ function brancherCatalogue(linesEl, doc, renderLines) {
 }
 
 function etoileLigne(l, i) {
+  if (!Abonnement.aAcces('pro')) return '';
   const dedans = catalogue().some((p) => normaliser(p.description) === normaliser(l.description) && l.description);
   return `<button type="button" class="btn btn-sm star" data-catalogue="${i}" title="${dedans ? 'Dans votre catalogue' : 'Enregistrer dans le catalogue'}">${dedans ? '★' : '☆'}</button>`;
 }

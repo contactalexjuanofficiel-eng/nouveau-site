@@ -258,6 +258,7 @@ function variation(actuel, precedent, hausseBonne) {
 
 function pageDashboard() {
   const e = data.entreprise;
+  const pro = Abonnement.aAcces('pro');
   const regime = regimeFiscal(e);
   const now = new Date();
   const b = bornesPeriode(periodeChoisie, now);
@@ -313,7 +314,7 @@ function pageDashboard() {
       <div class="actions">
         <button class="btn btn-primary" data-new="devis">+ Nouveau devis</button>
         <button class="btn" data-new="facture">+ Nouvelle facture</button>
-        <a class="btn" href="#/depenses?ajout=1">+ Dépense</a>
+        ${pro ? '<a class="btn" href="#/depenses?ajout=1">+ Dépense</a>' : ''}
       </div>
     </div>
 
@@ -321,7 +322,8 @@ function pageDashboard() {
       ${Object.entries(PERIODES).map(([k, v]) => `<button type="button" class="chip ${k === periodeChoisie ? 'active' : ''}" data-periode="${k}">${v}</button>`).join('')}
     </div>
 
-    <section class="card hero-card">
+    ${!pro ? Abonnement.carteUpsell('dashboard') : ''}
+    ${pro ? `<section class="card hero-card">
       <div class="hero-main">
         <p class="kpi-label">Il vous reste (estimation, ${PERIODES[periodeChoisie].toLowerCase()})</p>
         <p class="hero-value ${actuel.reste < 0 ? 'neg' : ''}">${euro(actuel.reste)}</p>
@@ -341,7 +343,7 @@ function pageDashboard() {
           ${actuel.reste < 0 ? `<p class="status bad">⚠ Vos dépenses et charges dépassent votre chiffre d'affaires de ${euro(-actuel.reste)} sur cette période.</p>` : ''}
         ` : `<p class="empty-inline">Aucune facture encaissée sur cette période. Dès qu'une facture est marquée « payée », vous verrez ici ce qu'il vous reste.</p>`}
       </div>
-    </section>
+    </section>` : ''}
 
     <div class="stats">
       <div class="stat"><div class="label">Chiffre d'affaires encaissé HT</div><div class="value">${euro(actuel.caHT)}</div>${variation(actuel.caHT, prec.caHT, true)}</div>
@@ -352,7 +354,7 @@ function pageDashboard() {
         : `<div class="stat"><div class="label">TVA à reverser</div><div class="value">${euro(actuel.tvaAReverser)}</div><span class="delta">${euro(actuel.tvaCollectee)} collectée − ${euro(actuel.tvaDeductible)} déductible</span></div>`}
     </div>
 
-    <section class="card">
+    ${pro ? `<section class="card">
       <div class="card-head">
         <h2>Mois par mois</h2>
         <ul class="legend inline"><li><span class="key" style="background:var(--s1)"></span>Chiffre d'affaires HT</li><li><span class="key" style="background:var(--s2)"></span>Dépenses HT</li></ul>
@@ -367,7 +369,7 @@ function pageDashboard() {
         <p class="card-sub" id="jours-resume"></p>
       </div>
       <div class="chart-box" id="chart-jours"></div>
-    </section>
+    </section>` : ''}
 
     <div class="panels">
       <section class="card">
@@ -391,7 +393,7 @@ function pageDashboard() {
           <div class="meter meter-ok"><span style="width:${tauxAcceptation}%"></span></div>`}
       </section>
 
-      ${regime === 'micro' ? `
+      ${regime === 'micro' && pro ? `
       <section class="card">
         <h2>Plafonds ${annee}</h2>
         <p class="kpi-label">Plafond de la micro-entreprise</p>
@@ -404,10 +406,10 @@ function pageDashboard() {
           ${caAnnee >= m.seuilTva ? '<p class="status bad">⚠ Seuil dépassé : vous devrez facturer la TVA. Parlez-en à votre comptable.</p>' : caAnnee >= m.seuilTva * 0.8 ? '<p class="status warn">⚠ Vous approchez du seuil de TVA.</p>' : ''}` : ''}
       </section>` : ''}
 
-      <section class="card">
+      ${pro ? `<section class="card">
         <h2>Meilleurs clients ${annee}</h2>
         ${topClients.length ? barList(topClients, 'var(--s1)') : '<p class="empty-inline">Vos meilleurs clients apparaîtront ici dès les premières factures payées.</p>'}
-      </section>
+      </section>` : ''}
     </div>
 
     <section class="card">
@@ -427,7 +429,7 @@ function pageDashboard() {
     pageDashboard();
   }));
 
-  dessinerGraphiques(now);
+  if (pro) dessinerGraphiques(now);
   brancherInfobulles(view);
 }
 
