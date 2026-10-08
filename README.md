@@ -31,3 +31,8 @@ Les données sont enregistrées dans le navigateur (localStorage) : rien n'est e
 - `app.html` : l'application
 - `js/app.js` : toute la logique
 - `css/style.css` : le style
+
+## Mettre à jour le site
+
+Après chaque modification de `css/style.css` ou `js/app.js`, augmenter le numéro
+`?v=` dans `app.html` et `index.html` pour que les navigateurs chargent la nouvelle version.

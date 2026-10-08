@@ -227,7 +227,10 @@ function pageDashboard() {
     </div>
 
     <div class="card">
-      <h2>Derniers documents</h2>
+      <div class="page-head" style="margin-bottom:8px">
+        <h2 style="margin:0">5 derniers documents</h2>
+        ${data.documents.length > 5 ? `<a href="#/documents">Voir tout (${data.documents.length}) →</a>` : ''}
+      </div>
       ${documentsTable(data.documents.slice().sort((a, b) => b.creeLe - a.creeLe).slice(0, 5))}
     </div>
   `;
