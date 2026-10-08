@@ -41,15 +41,43 @@ function loadData() {
   } catch (e) {
     console.error('Impossible de lire les données enregistrées', e);
   }
-  return structuredClone(DEFAULT_DATA);
+  // Mode démo : on part d'exemples déjà remplis.
+  return structuredClone(window.DEVIZO_DEMO_DATA || DEFAULT_DATA);
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error("Impossible d'enregistrer les données", e);
+  }
 }
 
 function newId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// Fenêtre de confirmation intégrée à la page.
+function ask(message, okLabel = 'Confirmer') {
+  return new Promise((resolve) => {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'ask';
+    dialog.innerHTML = `
+      <p>${esc(message)}</p>
+      <div class="actions">
+        <button class="btn" value="non">Annuler</button>
+        <button class="btn btn-primary" value="oui">${esc(okLabel)}</button>
+      </div>`;
+    dialog.addEventListener('click', (e) => {
+      if (e.target.value) dialog.close(e.target.value);
+    });
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      resolve(dialog.returnValue === 'oui');
+    });
+    document.body.appendChild(dialog);
+    dialog.showModal();
+  });
 }
 
 function getClient(id) {
@@ -384,8 +412,8 @@ function pageEdit(id) {
   form.addEventListener('submit', (e) => e.preventDefault());
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
-  document.getElementById('delete')?.addEventListener('click', () => {
-    if (confirm(`Supprimer le devis ${doc.numero} ?`)) {
+  document.getElementById('delete')?.addEventListener('click', async () => {
+    if (await ask(`Supprimer le devis ${doc.numero} ?`, 'Supprimer')) {
       data.documents = data.documents.filter((d) => d.id !== doc.id);
       saveData();
       go('#/documents');
@@ -406,10 +434,10 @@ function totalsHtml(t) {
     <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>`;
 }
 
-function convertToInvoice(devis) {
+async function convertToInvoice(devis) {
   const deja = data.documents.find((d) => d.devisOrigine === devis.id);
   if (deja) {
-    if (confirm(`Ce devis a déjà été transformé en facture (${deja.numero}). L'ouvrir ?`)) {
+    if (await ask(`Ce devis a déjà été transformé en facture (${deja.numero}). L'ouvrir ?`, 'Ouvrir la facture')) {
       go('#/voir/' + deja.id);
     }
     return;
@@ -456,7 +484,9 @@ function pageView(id) {
       <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
         <a class="btn" href="#/modifier/${esc(doc.id)}">Modifier</a>
-        <button class="btn btn-primary" onclick="window.print()">Télécharger / Imprimer (PDF)</button>
+        ${window.DEVIZO_DEMO
+          ? `<button class="btn btn-primary" id="print">Télécharger en PDF</button>`
+          : `<button class="btn btn-primary" onclick="window.print()">Télécharger / Imprimer (PDF)</button>`}
         ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut !== 'payee' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
       </div>
@@ -519,6 +549,9 @@ function pageView(id) {
   `;
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
+  document.getElementById('print')?.addEventListener('click', () => {
+    ask("Dans l'aperçu, le téléchargement est bloqué. Sur le vrai site, ce bouton enregistre le document en PDF.", "D'accord");
+  });
   document.getElementById('mark-paid')?.addEventListener('click', () => {
     doc.statut = 'payee';
     saveData();
@@ -589,8 +622,8 @@ function pageClientForm(id, retour) {
     go(retour ? '#/modifier/' + retour : '#/clients');
   });
 
-  document.getElementById('delete')?.addEventListener('click', () => {
-    if (confirm(`Supprimer le client ${client.nom} ?`)) {
+  document.getElementById('delete')?.addEventListener('click', async () => {
+    if (await ask(`Supprimer le client ${client.nom} ?`, 'Supprimer')) {
       data.clients = data.clients.filter((c) => c.id !== client.id);
       saveData();
       go('#/clients');
