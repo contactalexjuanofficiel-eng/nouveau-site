@@ -246,7 +246,6 @@ function checkTva(value) {
 // Renvoie la liste de ce qui manque : [{ champ, texte }].
 function profilManquant(e = data.entreprise) {
   const manque = [];
-  const societe = ['eurl', 'sarl', 'sasu', 'sas'].includes(e.formeJuridique);
   if (!String(e.nom || '').trim()) manque.push({ champ: 'nom', texte: "Nom ou raison sociale de l'entreprise" });
   if (!String(e.adresse || '').trim()) manque.push({ champ: 'adresse', texte: "Adresse de l'entreprise" });
   if (!checkSiret(e.siret || '')) {
@@ -258,7 +257,6 @@ function profilManquant(e = data.entreprise) {
       if (v.statut === 'introuvable' && !e.siretConfirme) manque.push({ champ: 'siret', texte: "SIRET reconnu par l'annuaire officiel des entreprises" });
     }
   }
-  if (societe && !String(e.capital || '').trim()) manque.push({ champ: 'capital', texte: 'Capital social (obligatoire pour une société)' });
   if (!e.franchiseTva && !checkTva(e.numeroTva || '')) manque.push({ champ: 'numeroTva', texte: 'N° de TVA intracommunautaire valide' });
   if (!e.nonDecennale && (!String(e.assureur || '').trim() || !String(e.numeroContrat || '').trim())) {
     manque.push({ champ: 'assureur', texte: 'Assurance décennale : assureur et n° de contrat' });
@@ -1001,7 +999,7 @@ function pageSettings(champ) {
             <small class="hint" id="hint-forme"></small>
           </div>
           <div id="field-capital">
-            <label for="capital">Capital social (€) *</label>
+            <label for="capital">Capital social (€, facultatif)</label>
             <input id="capital" name="capital" inputmode="decimal" value="${esc(e.capital)}" placeholder="Ex : 5000">
           </div>
           <div>
@@ -1274,7 +1272,7 @@ function pageSettings(champ) {
     const actuel = collect();
     const manque = profilManquant(actuel);
     // Nombre d'informations obligatoires selon la situation de l'entreprise.
-    const total = 3 + (societe ? 1 : 0) + (actuel.franchiseTva ? 0 : 1) +
+    const total = 3 + (actuel.franchiseTva ? 0 : 1) +
       (actuel.nonDecennale ? 0 : 1);
     $('checklist').className = 'card checklist ' + (manque.length ? '' : 'done');
     $('checklist').innerHTML = manque.length
