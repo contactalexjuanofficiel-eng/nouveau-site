@@ -14,10 +14,10 @@ window.DEVIZO_CONFIG = {
   // Liens de paiement Stripe (Stripe > Liens de paiement), un par formule.
   // Vides : le paiement est affiché « bientôt disponible ».
   stripe: {
-    soloMois: '',
-    soloAn: '',
-    proMois: '',
-    proAn: '',
+    soloMois: 'https://buy.stripe.com/test_3cI14gaGf2rFayJ3mi8Zq00',
+    soloAn: 'https://buy.stripe.com/test_28E4gs3dNgivgX7cWS8Zq01',
+    proMois: 'https://buy.stripe.com/test_3cI4gsdSr6HV8qB4qm8Zq02',
+    proAn: 'https://buy.stripe.com/test_14A5kw3dN0jx36h7Cy8Zq03',
     // Espace client Stripe (Paramètres > Facturation > Portail client) : changer de
     // carte, de formule, télécharger les factures, résilier.
     portail: '',
