@@ -222,6 +222,8 @@ const Abonnement = (() => {
           let bouton;
           if (actuelle === f) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">✓ Votre formule actuelle</span>';
           else if (actuelle && lienPortail()) bouton = `<a class="btn btn-lg plan-cta ${f === 'pro' ? 'btn-primary' : ''}" href="${esc(lienPortail())}" target="_blank" rel="noopener">Passer à ${FORMULES[f].nom}</a>`;
+          // Déjà abonné : un lien de paiement créerait un second abonnement.
+          else if (actuelle) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">Changement de formule bientôt disponible</span>';
           else if (url) bouton = `<a class="btn btn-lg plan-cta ${f === 'pro' ? 'btn-primary' : ''}" href="${esc(url)}">Choisir ${FORMULES[f].nom}</a>`;
           else bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">Paiement bientôt disponible</span>';
           return `
