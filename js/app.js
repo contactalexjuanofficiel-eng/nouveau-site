@@ -600,6 +600,7 @@ function pageDocuments(filtre) {
       <div class="actions">
         <button class="btn btn-primary" data-new="devis">+ Nouveau devis</button>
         <button class="btn" data-new="facture">+ Nouvelle facture</button>
+        <a class="btn" href="#/export">Export comptable</a>
       </div>
     </div>
     <div class="actions" style="margin-bottom:12px">
@@ -1719,6 +1720,7 @@ function render() {
   if (!Abonnement.aAcces('pro') && (parts[0] === 'depenses' || parts[0] === 'catalogue')) {
     return Abonnement.pageUpsell(parts[0]);
   }
+  if (!Abonnement.aAcces('equipe') && parts[0] === 'export') return Abonnement.pageUpsell('export');
 
   switch (parts[0]) {
     case undefined: return pageDashboard();
@@ -1729,6 +1731,7 @@ function render() {
     case 'parametres': return pageSettings(params.get('champ'));
     case 'depenses': return pageDepenses(params);
     case 'catalogue': return pageCatalogue(params);
+    case 'export': return pageExport(params);
     case 'compte': return Compte.page();
     case 'abonnement': return Abonnement.page(params);
     case 'inscription':

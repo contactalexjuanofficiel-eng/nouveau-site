@@ -5,7 +5,8 @@
  * - Après l'essai sans abonnement : lecture seule (la base de données refuse
  *   aussi toute modification, voir supabase/abonnements.sql).
  * - Solo : devis, factures, clients. Pro : en plus tableau de bord complet,
- *   dépenses, catalogue et logo.
+ *   dépenses, catalogue et logo. Équipe : en plus 5 utilisateurs et export
+ *   comptable ; les membres d'une équipe dépendent de l'abonnement du titulaire.
  * - Sans comptes en ligne (ou dans l'aperçu), tout reste accessible.
  *
  * Chargé après compte.js et avant app.js.
@@ -13,7 +14,9 @@
 const Abonnement = (() => {
   const ESSAI_JOURS = 14;
   const STATUTS_ACTIFS = ['active', 'trialing', 'past_due'];
-  const PRIX = { solo: { mois: 9, an: 90 }, pro: { mois: 19, an: 190 } };
+  const PRIX = { solo: { mois: 9, an: 90 }, pro: { mois: 19, an: 190 }, equipe: { mois: 39, an: 390 } };
+  const NIVEAU = { solo: 1, pro: 2, equipe: 3 };
+  const CONTACT = 'devizocontact@gmail.com';
   const FORMULES = {
     solo: {
       nom: 'Solo',
@@ -26,17 +29,32 @@ const Abonnement = (() => {
       inclus: ['Tout ce qui est dans Solo', 'Catalogue de vos prestations et de vos prix', "Tableau de bord complet : ce qu'il vous reste, graphiques",
         'Suivi des dépenses', 'Alertes plafonds micro et TVA', 'Votre logo sur les documents'],
     },
+    equipe: {
+      nom: 'Équipe',
+      pour: 'Pour les entreprises avec salariés',
+      inclus: ['Tout ce qui est dans Pro', "Jusqu'à 5 utilisateurs, chacun avec son compte", 'Export pour le comptable (ventes et dépenses)',
+        'Assistance prioritaire'],
+    },
   };
   const liens = (window.DEVIZO_CONFIG || {}).stripe || {};
 
   let client = null;
   let user = null;
   let infos = null; // ligne de la table « abonnements »
+  let equipe = null; // réponse de mon_equipe() : titulaire ou membre d'une équipe
   let periode = 'mois';
 
-  async function charger(c, u) {
+  const membre = () => equipe?.role === 'membre';
+
+  async function charger(c, u, eq) {
     client = c;
     user = u;
+    equipe = eq || null;
+    if (membre()) {
+      // L'accès vient de l'abonnement du titulaire de l'équipe.
+      infos = equipe.abonnement || null;
+      return;
+    }
     try {
       const { data: ligne, error } = await c.from('abonnements').select('*').eq('user_id', u.id).maybeSingle();
       if (!error) infos = ligne || null;
@@ -59,7 +77,8 @@ const Abonnement = (() => {
   // 'libre' (sans compte en ligne), 'essai', 'solo', 'pro' ou 'expire'.
   function etat() {
     if (typeof Compte === 'undefined' || !Compte.actif || !user) return 'libre';
-    if (abonnementActif()) return infos.formule === 'solo' ? 'solo' : 'pro';
+    if (membre()) return equipe.active ? 'equipe' : 'expire';
+    if (abonnementActif()) return NIVEAU[infos.formule] ? infos.formule : 'pro';
     if (joursEssaiRestants() > 0) return 'essai';
     return 'expire';
   }
@@ -68,12 +87,15 @@ const Abonnement = (() => {
     return etat() !== 'expire';
   }
 
-  function aAcces(niveau) {
+  // niveau : 'solo', 'pro' ou 'equipe' (formule minimale nécessaire).
+  function aAcces(niveau = 'solo') {
     const e = etat();
-    if (e === 'libre' || e === 'essai' || e === 'pro') return true;
-    if (e === 'solo') return niveau !== 'pro';
-    return false;
+    if (e === 'libre' || e === 'essai') return true;
+    if (!NIVEAU[e]) return false;
+    return NIVEAU[e] >= (NIVEAU[niveau] || 1);
   }
+
+  const estAbonne = (e) => Boolean(NIVEAU[e]);
 
   function lienPaiement(formule) {
     const url = liens[formule + (periode === 'an' ? 'An' : 'Mois')];
@@ -96,14 +118,17 @@ const Abonnement = (() => {
     const e = etat();
     let html = '';
     let classe = '';
-    if (e === 'essai') {
+    if (e === 'expire' && membre()) {
+      classe = 'bad';
+      html = `L'abonnement Équipe de ${esc(equipe.email_titulaire)} n'est plus actif : les documents restent consultables, mais plus modifiables.`;
+    } else if (e === 'essai') {
       const j = joursEssaiRestants();
       classe = j <= 3 ? 'warn' : '';
       html = `🎁 Essai gratuit : encore <strong>${j} jour${j > 1 ? 's' : ''}</strong>. <a href="#/abonnement">Choisir une formule</a>`;
     } else if (e === 'expire') {
       classe = 'bad';
       html = 'Votre essai gratuit est terminé : vos documents restent consultables, mais vous ne pouvez plus en créer. <a href="#/abonnement">Choisir une formule</a>';
-    } else if ((e === 'solo' || e === 'pro') && infos?.statut === 'past_due') {
+    } else if (estAbonne(e) && !membre() && infos?.statut === 'past_due') {
       classe = 'bad';
       html = `⚠ Le dernier paiement a échoué. ${lienPortail() ? `<a href="${esc(lienPortail())}" target="_blank" rel="noopener">Mettre à jour ma carte</a>` : 'Mettez à jour votre carte bancaire.'}`;
     }
@@ -124,6 +149,16 @@ const Abonnement = (() => {
   // Écrans de blocage
   // ------------------------------------------------------------------
   function pageLectureSeule() {
+    if (membre()) {
+      view.innerHTML = `
+        <div class="card gate">
+          <h1>Abonnement de l'équipe inactif</h1>
+          <p>L'abonnement Équipe de ${esc(equipe.email_titulaire)} n'est plus actif. Les devis, factures et clients restent consultables ;
+            pour les modifier, demandez-lui de renouveler l'abonnement.</p>
+          <div class="actions"><a class="btn" href="#/documents">Voir les documents</a></div>
+        </div>`;
+      return;
+    }
     view.innerHTML = `
       <div class="card gate">
         <h1>Votre essai gratuit est terminé</h1>
@@ -138,24 +173,29 @@ const Abonnement = (() => {
 
   // Appelé quand une modification est refusée (fin d'essai).
   async function refuserModification() {
+    if (membre()) {
+      await ask(`L'abonnement Équipe de ${equipe.email_titulaire} n'est plus actif : les documents restent consultables, mais plus modifiables.`, "D'accord", false);
+      return;
+    }
     const ok = await ask("Votre essai gratuit est terminé : vos documents restent consultables, mais pour créer ou modifier il faut choisir une formule.", 'Voir les formules', 'Plus tard');
     if (ok) go('#/abonnement');
   }
 
   const FONCTIONS_PRO = {
-    depenses: ['Suivi des dépenses', 'Notez vos achats de matériel, carburant, assurance… et connaissez votre vrai bénéfice.'],
-    catalogue: ['Catalogue de prestations', 'Enregistrez vos prestations et vos prix une fois, retrouvez-les en quelques lettres dans vos devis.'],
-    dashboard: ["Tableau de bord complet", "Ce qu'il vous reste après charges et impôts, graphiques mois par mois et jour par jour, alertes de plafonds."],
+    depenses: ['Suivi des dépenses', 'Notez vos achats de matériel, carburant, assurance… et connaissez votre vrai bénéfice.', 'pro'],
+    catalogue: ['Catalogue de prestations', 'Enregistrez vos prestations et vos prix une fois, retrouvez-les en quelques lettres dans vos devis.', 'pro'],
+    dashboard: ["Tableau de bord complet", "Ce qu'il vous reste après charges et impôts, graphiques mois par mois et jour par jour, alertes de plafonds.", 'pro'],
+    export: ['Export pour le comptable', 'Journal des ventes et liste des dépenses sur la période de votre choix, en un clic, prêts à envoyer à votre comptable.', 'equipe'],
   };
 
   function carteUpsell(cle) {
-    const [titre, texte] = FONCTIONS_PRO[cle];
+    const [titre, texte, formule] = FONCTIONS_PRO[cle];
     return `
       <div class="card upsell">
-        <p class="upsell-tag">Formule Pro</p>
+        <p class="upsell-tag">Formule ${FORMULES[formule].nom}</p>
         <h2>${esc(titre)}</h2>
         <p>${esc(texte)}</p>
-        <a class="btn btn-primary" href="#/abonnement">Passer à Pro · ${PRIX.pro.mois} € HT / mois</a>
+        <a class="btn btn-primary" href="#/abonnement">Passer à ${FORMULES[formule].nom} · ${PRIX[formule].mois} € HT / mois</a>
       </div>`;
   }
 
@@ -176,17 +216,22 @@ const Abonnement = (() => {
   function statutHtml() {
     const e = etat();
     const fin = infos?.fin_periode ? new Date(infos.fin_periode).toLocaleDateString('fr-FR') : '';
+    if (membre()) {
+      return `<p class="big">Équipe de ${esc(equipe.email_titulaire)} <small>${equipe.active ? 'accès actif' : 'abonnement inactif'}</small></p>
+        <p class="hint">Votre accès est fourni par l'abonnement de ${esc(equipe.email_titulaire)} : c'est cette personne qui gère l'abonnement et les factures Stripe.</p>`;
+    }
     if (e === 'essai') {
       const j = joursEssaiRestants();
       const finEssai = new Date(Date.parse(user.created_at) + ESSAI_JOURS * 86400000).toLocaleDateString('fr-FR');
       return `<p class="big">Essai gratuit <small>encore ${j} jour${j > 1 ? 's' : ''}, jusqu'au ${finEssai}</small></p>
         <p class="hint">Pendant l'essai, vous avez accès à tout. Choisissez une formule quand vous voulez : rien n'est prélevé avant.</p>`;
     }
-    if (e === 'solo' || e === 'pro') {
+    if (estAbonne(e)) {
       const resilie = infos.statut === 'canceled' || infos.fin_prevue === true;
       return `<p class="big">Formule ${FORMULES[e].nom} <small>${resilie ? `résiliée, active jusqu'au ${fin}` : fin ? `renouvellement le ${fin}` : 'active'}</small></p>
         ${infos.statut === 'past_due' ? '<p class="status bad">⚠ Le dernier paiement a échoué : mettez à jour votre carte.</p>' : ''}
-        ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement (carte, factures, résiliation)</a>` : ''}`;
+        ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement (carte, factures, résiliation)</a>` : ''}
+        ${e === 'equipe' ? `<p class="hint">Assistance prioritaire : écrivez à <a href="mailto:${CONTACT}">${CONTACT}</a>, votre demande est traitée en premier.</p>` : ''}`;
     }
     if (e === 'expire') {
       return `<p class="big">Essai terminé</p>
@@ -200,9 +245,13 @@ const Abonnement = (() => {
       view.innerHTML = `<div class="card"><h1>Abonnement</h1>${statutHtml()}</div>`;
       return;
     }
+    if (membre()) {
+      view.innerHTML = `<div class="page-head"><h1>Abonnement</h1></div><section class="card">${statutHtml()}</section>`;
+      return;
+    }
     const merci = params?.get('merci');
     const e = etat();
-    const actuelle = e === 'solo' || e === 'pro' ? e : null;
+    const actuelle = estAbonne(e) ? e : null;
     const paiementPret = Boolean(liens.soloMois || liens.proMois);
 
     view.innerHTML = `
@@ -217,7 +266,7 @@ const Abonnement = (() => {
       </div>
 
       <div class="plans plans-app">
-        ${['solo', 'pro'].map((f) => {
+        ${['solo', 'pro', 'equipe'].map((f) => {
           const url = lienPaiement(f);
           let bouton;
           if (actuelle === f) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">✓ Votre formule actuelle</span>';
@@ -269,14 +318,15 @@ const Abonnement = (() => {
   function resume() {
     const e = etat();
     if (e === 'libre') return '';
-    const libelle = {
+    const libelle = membre() ? `Équipe de ${esc(equipe.email_titulaire)}` : {
       essai: `Essai gratuit, encore ${joursEssaiRestants()} jour${joursEssaiRestants() > 1 ? 's' : ''}`,
       solo: 'Formule Solo',
       pro: 'Formule Pro',
+      equipe: 'Formule Équipe',
       expire: 'Essai terminé',
     }[e];
     return `<section class="card"><h2>Abonnement</h2><p><strong>${libelle}</strong></p>
-      <a class="btn" href="#/abonnement">${e === 'solo' || e === 'pro' ? 'Gérer mon abonnement' : 'Choisir une formule'}</a></section>`;
+      <a class="btn" href="#/abonnement">${estAbonne(e) || membre() ? 'Voir mon abonnement' : 'Choisir une formule'}</a></section>`;
   }
 
   return {

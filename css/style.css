@@ -479,3 +479,13 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .plans-app .plan-cta[aria-disabled="true"] { opacity: .7; cursor: default; }
 .plans-app .plan-tag { position: absolute; top: -13px; left: 24px; margin: 0; background: var(--primary); color: var(--on-primary); font-size: .8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; }
 .plans-note { color: var(--muted); font-size: .88rem; margin-top: 16px; }
+
+/* Mon équipe */
+.equipe-liste { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
+.equipe-liste li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; overflow-wrap: anywhere; }
+.equipe-liste small { display: block; }
+.equipe-liste small.ok { color: var(--success); }
+#equipe-inviter label { display: block; font-weight: 600; margin-bottom: 6px; }
+.equipe-message { margin-top: 12px; display: grid; gap: 8px; }
+.equipe-message textarea { width: 100%; }
+.equipe-message .btn { justify-self: start; }

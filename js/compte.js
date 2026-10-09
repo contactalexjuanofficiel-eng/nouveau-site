@@ -7,6 +7,9 @@
  *   Les données de l'artisan sont gardées dans la table « espaces » et
  *   envoyées automatiquement à chaque modification. Une copie reste sur
  *   l'appareil pour un affichage immédiat et le mode hors ligne.
+ * - Formule Équipe : les membres travaillent dans l'espace du titulaire.
+ *   Chaque envoi ne réussit que si personne n'a écrit entre-temps ; sinon
+ *   les deux versions sont fusionnées (fiche par fiche) avant de réessayer.
  *
  * Chargé avant app.js ; utilise data, saveData, render, view, ask... d'app.js
  * au moment de l'appel.
@@ -24,7 +27,11 @@ const Compte = (() => {
   let renderApp = () => {};
   let minuteurEnvoi = null;
   let envoiEnCours = false;
-  let versionDistante = 0; // date (ms) de la dernière version en ligne connue
+  let espaceId = null; // compte dont on utilise les données : le sien, ou celui du titulaire de l'équipe
+  let equipe = null; // réponse de mon_equipe() (null si la formule Équipe n'est pas installée)
+  let versionBrute = null; // « mis_a_jour » exact de la dernière version en ligne connue
+  let base = null; // données de cette version, pour fusionner avec celles d'un collègue
+  let minuteurEquipe = null;
   let etat = 'ok'; // 'ok' | 'envoi' | 'erreur'
 
   const adresseRetour = () => location.origin + location.pathname;
@@ -55,12 +62,15 @@ const Compte = (() => {
   // ------------------------------------------------------------------
   // Données en ligne
   // ------------------------------------------------------------------
-  function remplacerDonnees(d) {
-    data = {
+  function completer(d) {
+    return {
       ...structuredClone(DEFAULT_DATA),
       ...d,
       entreprise: { ...structuredClone(DEFAULT_DATA.entreprise), ...(d.entreprise || {}) },
     };
+  }
+
+  function garderSurAppareil() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
@@ -68,31 +78,86 @@ const Compte = (() => {
     }
   }
 
+  function remplacerDonnees(d) {
+    data = completer(d);
+    garderSurAppareil();
+  }
+
   async function lireEnLigne() {
     const { data: ligne, error } = await client
-      .from('espaces').select('donnees, mis_a_jour').eq('user_id', utilisateur.id).maybeSingle();
+      .from('espaces').select('donnees, mis_a_jour').eq('user_id', espaceId).maybeSingle();
     if (error) throw error;
     return ligne;
+  }
+
+  // Prend la version en ligne en gardant les modifications faites ici depuis
+  // la dernière version connue. Renvoie les documents renumérotés.
+  function appliquerDistant(ligne) {
+    const serveur = completer(ligne.donnees || {});
+    let renumerotes = [];
+    // Sans version connue (premier envoi), tout ce qui est ici compte comme nouveau.
+    const res = Fusion.fusionner(base || completer({}), data, serveur);
+    data = res.donnees;
+    renumerotes = res.renumerotes;
+    garderSurAppareil();
+    base = structuredClone(serveur);
+    versionBrute = ligne.mis_a_jour;
+    return renumerotes;
+  }
+
+  function signalerRenumerotes(liste) {
+    if (!liste.length) return;
+    ask(liste.map(([avant, apres]) =>
+      `Un membre de l'équipe a créé le numéro ${avant} en même temps que vous : votre document est devenu ${apres}.`).join('\n'),
+    "D'accord", false);
   }
 
   async function envoyer() {
     clearTimeout(minuteurEnvoi);
     minuteurEnvoi = null;
-    if (!utilisateur || envoiEnCours) return;
+    if (!utilisateur) return;
+    if (envoiEnCours) {
+      minuteurEnvoi = setTimeout(envoyer, 500); // envoi suivant juste après
+      return;
+    }
     envoiEnCours = true;
     setEtat('envoi');
-    const maintenant = new Date().toISOString();
-    const { error } = await client.from('espaces')
-      .upsert({ user_id: utilisateur.id, donnees: data, mis_a_jour: maintenant });
-    envoiEnCours = false;
-    if (error) {
+    const renumerotes = [];
+    try {
+      for (let essai = 0; ; essai++) {
+        if (essai >= 5) throw new Error('Trop de modifications simultanées');
+        const maintenant = new Date().toISOString();
+        const copie = JSON.parse(JSON.stringify(data));
+        const res = versionBrute === null
+          // Premier envoi : l'espace n'existe pas encore.
+          ? await client.from('espaces').insert({ user_id: espaceId, donnees: copie, mis_a_jour: maintenant }).select('mis_a_jour')
+          // Envoi accepté seulement si la version en ligne est celle qu'on connaît.
+          : await client.from('espaces').update({ donnees: copie, mis_a_jour: maintenant })
+            .eq('user_id', espaceId).eq('mis_a_jour', versionBrute).select('mis_a_jour');
+        if (res.error && res.error.code !== '23505') throw res.error;
+        if (!res.error && res.data?.length) {
+          versionBrute = res.data[0].mis_a_jour;
+          base = copie;
+          break;
+        }
+        // Quelqu'un a enregistré entre-temps : on fusionne puis on réessaie.
+        const ligne = await lireEnLigne();
+        if (!ligne) throw new Error('Espace introuvable');
+        if (versionBrute !== null && Date.parse(ligne.mis_a_jour) === Date.parse(versionBrute)) {
+          throw new Error('Modification refusée');
+        }
+        renumerotes.push(...appliquerDistant(ligne));
+        if (!document.activeElement?.matches?.('input, textarea, select')) renderApp();
+      }
+      setEtat('ok');
+    } catch (error) {
       console.warn('Sauvegarde en ligne impossible', error);
       setEtat('erreur');
       minuteurEnvoi = setTimeout(envoyer, 15000); // nouvel essai
-      return;
+    } finally {
+      envoiEnCours = false;
     }
-    versionDistante = Date.parse(maintenant);
-    setEtat('ok');
+    signalerRenumerotes(renumerotes);
   }
 
   // Appelé par saveData() à chaque modification.
@@ -108,14 +173,63 @@ const Compte = (() => {
     if (!utilisateur || minuteurEnvoi || envoiEnCours || etat === 'erreur') return;
     try {
       const ligne = await lireEnLigne();
-      if (ligne && Date.parse(ligne.mis_a_jour) > versionDistante) {
-        remplacerDonnees(ligne.donnees);
-        versionDistante = Date.parse(ligne.mis_a_jour);
+      if (minuteurEnvoi || envoiEnCours) return; // modifié pendant la lecture : l'envoi fusionnera
+      if (ligne && (versionBrute === null || Date.parse(ligne.mis_a_jour) !== Date.parse(versionBrute))) {
+        appliquerDistant(ligne);
         // Ne pas interrompre une saisie en cours dans un formulaire.
         if (!document.activeElement?.matches?.('input, textarea, select')) renderApp();
       }
     } catch (e) {
       // pas de réseau : on garde ce qu'on a
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Équipe
+  // ------------------------------------------------------------------
+  async function chargerEquipe() {
+    equipe = null;
+    espaceId = utilisateur.id;
+    try {
+      const { data: res, error } = await client.rpc('mon_equipe');
+      if (error) return; // formule Équipe pas encore installée dans la base
+      equipe = res;
+      if (equipe?.role === 'membre') espaceId = equipe.proprietaire;
+    } catch (e) {
+      // pas de réseau
+    }
+  }
+
+  // Invitation reçue : on propose de rejoindre l'équipe.
+  async function proposerInvitations() {
+    if (equipe?.role !== 'titulaire' || equipe.membres?.length) return;
+    const { data: invitations, error } = await client.rpc('mes_invitations');
+    if (error || !invitations?.length) return;
+    for (const inv of invitations) {
+      const ok = await ask(
+        `${inv.email_titulaire} vous invite à rejoindre son équipe${inv.entreprise ? ` « ${inv.entreprise} »` : ''} sur Devizo. ` +
+        'Vous travaillerez sur les mêmes devis, factures et clients. Vos propres données sont mises de côté : ' +
+        "vous les retrouverez si vous quittez l'équipe.",
+        "Rejoindre l'équipe", 'Pas maintenant');
+      if (!ok) continue;
+      const { error: err } = await client.rpc('rejoindre_equipe', { proprio: inv.proprietaire });
+      if (err) {
+        await ask(messageErreur(err), "D'accord", false);
+        continue;
+      }
+      await chargerEquipe();
+      return;
+    }
+  }
+
+  // Avec des collègues, on va chercher leurs modifications régulièrement.
+  function suivreEquipe() {
+    clearInterval(minuteurEquipe);
+    minuteurEquipe = null;
+    if (equipe?.role === 'membre' || equipe?.membres?.length) {
+      minuteurEquipe = setInterval(() => {
+        if (document.visibilityState === 'visible') rafraichir();
+      }, 20000);
     }
   }
 
@@ -148,15 +262,22 @@ const Compte = (() => {
 
   async function ouvrirSession(user) {
     utilisateur = user;
+    versionBrute = null;
+    base = null;
     document.body.classList.remove('sans-compte');
     if (/^#(inscription|connexion)?$/.test(location.hash)) history.replaceState(null, '', location.pathname + '#/');
     view.innerHTML = '<div class="card auth-loading">Chargement de vos données…</div>';
+    await chargerEquipe();
+    await proposerInvitations();
     try {
       const ligne = await lireEnLigne();
       if (ligne) {
         remplacerDonnees(ligne.donnees);
-        versionDistante = Date.parse(ligne.mis_a_jour);
+        base = structuredClone(data);
+        versionBrute = ligne.mis_a_jour;
         setEtat('ok');
+      } else if (espaceId !== utilisateur.id) {
+        throw new Error("Espace de l'équipe introuvable");
       } else {
         // Premier passage : s'il y a déjà des données sur cet appareil (utilisées
         // sans compte, ou par quelqu'un d'autre), on demande avant de les reprendre.
@@ -177,14 +298,25 @@ const Compte = (() => {
       console.warn('Lecture des données en ligne impossible', e);
       setEtat('erreur');
     }
-    await Abonnement.charger(client, user);
+    await Abonnement.charger(client, user, equipe);
+    suivreEquipe();
     renderApp();
+  }
+
+  function oublierSession() {
+    utilisateur = null;
+    equipe = null;
+    espaceId = null;
+    versionBrute = null;
+    base = null;
+    clearInterval(minuteurEquipe);
+    minuteurEquipe = null;
   }
 
   async function deconnecter() {
     if (minuteurEnvoi || etat !== 'ok') await envoyer();
     await client.auth.signOut();
-    utilisateur = null;
+    oublierSession();
     // Rien ne reste sur l'appareil après la déconnexion (appareil partagé).
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -202,7 +334,8 @@ const Compte = (() => {
   window.addEventListener('focus', async () => {
     if (!utilisateur) return;
     const avant = Abonnement.etat();
-    await Abonnement.charger(client, utilisateur);
+    await chargerEquipe();
+    await Abonnement.charger(client, utilisateur, equipe);
     if (Abonnement.etat() !== avant) renderApp();
   });
   document.addEventListener('visibilitychange', () => {
@@ -446,6 +579,7 @@ const Compte = (() => {
         </div>
       </section>
       ${Abonnement.resume()}
+      ${carteEquipe()}
       <section class="card">
         <h2>Changer de mot de passe</h2>
         <form id="compte-mdp" novalidate>
@@ -464,6 +598,7 @@ const Compte = (() => {
         <button class="btn btn-danger" id="compte-suppr">Supprimer mon compte</button>
       </section>`;
 
+    brancherEquipe();
     document.getElementById('compte-sync').addEventListener('click', async () => {
       await envoyer();
       page();
@@ -484,7 +619,11 @@ const Compte = (() => {
       if (!error) champ.value = '';
     });
     document.getElementById('compte-suppr').addEventListener('click', async () => {
-      if (!(await ask('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.', 'Supprimer définitivement'))) return;
+      const avecEquipe = equipe?.role === 'titulaire' && equipe.membres?.length;
+      const message = equipe?.role === 'membre'
+        ? "Supprimer définitivement votre compte ? Vous quitterez l'équipe ; ses données restent chez le titulaire. Cette action est irréversible."
+        : `Supprimer définitivement votre compte et toutes vos données ?${avecEquipe ? " Les membres de votre équipe n'y auront plus accès non plus." : ''} Cette action est irréversible.`;
+      if (!(await ask(message, 'Supprimer définitivement'))) return;
       const { error } = await client.rpc('supprimer_mon_compte');
       if (error) {
         await ask(messageErreur(error), "D'accord", false);
@@ -492,7 +631,7 @@ const Compte = (() => {
       }
       clearTimeout(minuteurEnvoi);
       minuteurEnvoi = null;
-      utilisateur = null;
+      oublierSession();
       await client.auth.signOut();
       try {
         localStorage.removeItem(STORAGE_KEY);
@@ -505,5 +644,120 @@ const Compte = (() => {
     });
   }
 
-  return { actif, demarrer, modifie, page, connecte: () => Boolean(utilisateur) };
+  // ------------------------------------------------------------------
+  // Carte « Mon équipe » de la page Mon compte
+  // ------------------------------------------------------------------
+  const MAX_MEMBRES = 4; // + le titulaire = 5 utilisateurs
+
+  function carteEquipe() {
+    if (!equipe) return '';
+    if (equipe.role === 'membre') {
+      return `<section class="card" id="equipe">
+        <h2>Mon équipe</h2>
+        <p>Vous travaillez dans l'équipe de <strong>${esc(equipe.email_titulaire)}</strong> : mêmes devis, factures, clients et dépenses.
+          L'abonnement est géré par cette personne.</p>
+        <button class="btn" id="equipe-quitter">Quitter l'équipe</button>
+      </section>`;
+    }
+    const membres = equipe.membres || [];
+    const peutInviter = Abonnement.aAcces('equipe');
+    if (!peutInviter && !membres.length) {
+      return `<section class="card" id="equipe">
+        <h2>Travailler à plusieurs</h2>
+        <p>Avec la formule Équipe, jusqu'à 4 collègues (salarié, associé, secrétaire…) utilisent Devizo avec vous, chacun avec son compte, sur les mêmes données.</p>
+        <a class="btn" href="#/abonnement">Voir la formule Équipe</a>
+      </section>`;
+    }
+    return `<section class="card" id="equipe">
+      <h2>Mon équipe <small class="hint">${membres.length + 1} / ${MAX_MEMBRES + 1} utilisateurs</small></h2>
+      <ul class="equipe-liste">
+        <li><span><strong>${esc(utilisateur.email)}</strong> (vous, titulaire)</span></li>
+        ${membres.map((m) => `<li>
+          <span>${esc(m.email)} <small class="${m.actif ? 'ok' : 'hint'}">${m.actif ? '✓ a rejoint l’équipe' : 'invitation en attente'}</small></span>
+          <button class="btn btn-sm" data-retirer="${esc(m.email)}">Retirer</button>
+        </li>`).join('')}
+      </ul>
+      ${!peutInviter ? '<p class="status bad">Votre abonnement Équipe n\u2019est plus actif : vos membres ne peuvent plus modifier les données. <a href="#/abonnement">Voir les formules</a></p>' : ''}
+      ${peutInviter && membres.length < MAX_MEMBRES ? `
+        <form id="equipe-inviter" novalidate>
+          <label for="equipe-email">Inviter un collègue</label>
+          <div class="input-row">
+            <input id="equipe-email" type="email" inputmode="email" autocomplete="off" placeholder="adresse e-mail du collègue">
+            <button class="btn btn-primary" type="submit">Inviter</button>
+          </div>
+          <p class="hint" id="equipe-info">Votre collègue crée son compte Devizo avec cette adresse e-mail (ou se connecte s'il en a déjà un) : Devizo lui propose alors de rejoindre votre équipe.</p>
+        </form>
+        <div id="equipe-message" class="equipe-message" hidden>
+          <p>Envoyez-lui ce message (SMS, WhatsApp, e-mail) :</p>
+          <textarea id="equipe-texte" rows="3" readonly></textarea>
+          <button class="btn btn-sm" type="button" id="equipe-copier">Copier le message</button>
+        </div>` : ''}
+    </section>`;  }
+
+  function brancherEquipe() {
+    document.getElementById('equipe-quitter')?.addEventListener('click', async () => {
+      if (!(await ask(`Quitter l'équipe de ${equipe.email_titulaire} ? Vous n'aurez plus accès à ses devis et factures, et vous retrouverez vos propres données.`, "Quitter l'équipe"))) return;
+      if (minuteurEnvoi || etat !== 'ok') await envoyer();
+      const { error } = await client.from('membres').delete().eq('membre', utilisateur.id);
+      if (error) return ask(messageErreur(error), "D'accord", false);
+      history.replaceState(null, '', location.pathname + '#/compte');
+      await ouvrirSession(utilisateur);
+    });
+    view.querySelectorAll('[data-retirer]').forEach((b) => b.addEventListener('click', async () => {
+      const email = b.dataset.retirer;
+      if (!(await ask(`Retirer ${email} de votre équipe ? Cette personne n'aura plus accès à vos données.`, 'Retirer'))) return;
+      const { error } = await client.from('membres').delete().eq('proprietaire', utilisateur.id).eq('email', email);
+      if (error) return ask(messageErreur(error), "D'accord", false);
+      await chargerEquipe();
+      suivreEquipe();
+      page();
+    }));
+    const form = document.getElementById('equipe-inviter');
+    form?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const champ = document.getElementById('equipe-email');
+      const info = document.getElementById('equipe-info');
+      const email = champ.value.trim().toLowerCase();
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        info.textContent = 'Indiquez une adresse e-mail valide.';
+        info.className = 'hint warn';
+        return;
+      }
+      const { error } = await client.rpc('inviter_membre', { adresse: email });
+      if (error) {
+        info.textContent = error.message;
+        info.className = 'hint warn';
+        return;
+      }
+      await chargerEquipe();
+      suivreEquipe();
+      page();
+      const nom = data.entreprise.nom ? ` « ${data.entreprise.nom} »` : '';
+      const texte = `Je t'ai invité dans notre équipe${nom} sur Devizo. Crée ton compte avec l'adresse ${email} ici : ` +
+        `${location.origin + location.pathname}#inscription (ou connecte-toi si tu as déjà un compte), puis accepte l'invitation.`;
+      const boite = document.getElementById('equipe-message');
+      if (boite) {
+        boite.hidden = false;
+        document.getElementById('equipe-texte').value = texte;
+      } else {
+        await ask(texte, "D'accord", false);
+      }
+    });
+    document.getElementById('equipe-copier')?.addEventListener('click', async (e) => {
+      const zone = document.getElementById('equipe-texte');
+      try {
+        await navigator.clipboard.writeText(zone.value);
+      } catch (err) {
+        zone.select();
+        document.execCommand?.('copy');
+      }
+      e.target.textContent = '✓ Copié';
+    });
+  }
+
+  return {
+    actif, demarrer, modifie, page, connecte: () => Boolean(utilisateur),
+    membre: () => equipe?.role === 'membre',
+    titulaireEquipe: () => equipe?.email_titulaire || '',
+  };
 })();

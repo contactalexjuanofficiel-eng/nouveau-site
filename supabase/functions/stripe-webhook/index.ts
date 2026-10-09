@@ -23,13 +23,15 @@ const admin = createClient(
   { auth: { persistSession: false } },
 );
 
-// Produit « Devizo Solo » ou « Devizo Pro » : métadonnée formule=solo|pro,
-// à défaut le nom du produit.
-function formuleDe(sub: Stripe.Subscription): 'solo' | 'pro' {
+// Produit « Devizo Solo », « Devizo Pro » ou « Devizo Équipe » : métadonnée
+// formule=solo|pro|equipe, à défaut le nom du produit.
+type Formule = 'solo' | 'pro' | 'equipe';
+function formuleDe(sub: Stripe.Subscription): Formule {
   const produit = sub.items.data[0]?.price?.product as Stripe.Product | string | undefined;
   if (produit && typeof produit === 'object') {
     const meta = produit.metadata?.formule;
-    if (meta === 'solo' || meta === 'pro') return meta;
+    if (meta === 'solo' || meta === 'pro' || meta === 'equipe') return meta;
+    if (/[ée]quipe/i.test(produit.name ?? '')) return 'equipe';
     if (/solo/i.test(produit.name ?? '')) return 'solo';
   }
   return 'pro';
