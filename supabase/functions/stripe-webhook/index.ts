@@ -101,6 +101,11 @@ Deno.serve(async (req) => {
         break;
     }
   } catch (err) {
+    // Abonnement inexistant (par exemple un « événement de test » envoyé depuis Stripe) : rien à enregistrer.
+    if ((err as { code?: string })?.code === 'resource_missing') {
+      console.log('Abonnement introuvable chez Stripe (événement de test ?) : ignoré.');
+      return new Response(JSON.stringify({ recu: true, ignore: true }), { headers: { 'Content-Type': 'application/json' } });
+    }
     console.error(err);
     // Stripe renverra l'événement plus tard.
     return new Response('Erreur de traitement', { status: 500 });
