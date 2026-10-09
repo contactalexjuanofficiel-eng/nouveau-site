@@ -1,0 +1,16 @@
+<!-- Modèle d'e-mail Supabase (Authentication > Emails > Templates) : Confirm signup.
+     Objet : Confirmez votre adresse e-mail – Devizo -->
+<div style="background:#f4f6fb;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#1c2333">
+  <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;padding:32px 28px">
+    <p style="margin:0 0 24px;font-size:22px;font-weight:bold;color:#1f5eff">Devizo</p>
+    <h1 style="margin:0 0 16px;font-size:20px;color:#1c2333">Bienvenue sur Devizo !</h1>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.5">Il ne reste qu’une étape pour activer votre compte : confirmez votre adresse e-mail. Vos 14 jours d’essai gratuit commencent dès maintenant.</p>
+    <p style="margin:0 0 24px">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#1f5eff;color:#ffffff;text-decoration:none;font-weight:bold;font-size:15px;padding:12px 22px;border-radius:8px">Confirmer mon adresse e-mail</a>
+    </p>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7385;line-height:1.5">Le bouton ne fonctionne pas ? Copiez ce lien dans votre navigateur :<br>
+      <a href="{{ .ConfirmationURL }}" style="color:#1f5eff;word-break:break-all">{{ .ConfirmationURL }}</a></p>
+    <p style="margin:24px 0 0;font-size:13px;color:#6b7385;line-height:1.5">Vous n’avez pas créé de compte sur Devizo ? Ignorez simplement cet e-mail.</p>
+  </div>
+  <p style="max-width:520px;margin:16px auto 0;font-size:12px;color:#8a91a3;text-align:center">Devizo · devis et factures pour artisans · contact@devizo-app.fr</p>
+</div>
