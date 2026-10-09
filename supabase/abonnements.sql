@@ -13,6 +13,9 @@ create table if not exists public.abonnements (
   mis_a_jour timestamptz not null default now()
 );
 
+-- Résiliation demandée : l'abonnement reste actif jusqu'à fin_periode, sans renouvellement.
+alter table public.abonnements add column if not exists fin_prevue boolean not null default false;
+
 alter table public.abonnements enable row level security;
 
 drop policy if exists "Lire son abonnement" on public.abonnements;

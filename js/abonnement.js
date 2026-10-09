@@ -183,7 +183,7 @@ const Abonnement = (() => {
         <p class="hint">Pendant l'essai, vous avez accès à tout. Choisissez une formule quand vous voulez : rien n'est prélevé avant.</p>`;
     }
     if (e === 'solo' || e === 'pro') {
-      const resilie = infos.statut === 'canceled';
+      const resilie = infos.statut === 'canceled' || infos.fin_prevue === true;
       return `<p class="big">Formule ${FORMULES[e].nom} <small>${resilie ? `résiliée, active jusqu'au ${fin}` : fin ? `renouvellement le ${fin}` : 'active'}</small></p>
         ${infos.statut === 'past_due' ? '<p class="status bad">⚠ Le dernier paiement a échoué : mettez à jour votre carte.</p>' : ''}
         ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement (carte, factures, résiliation)</a>` : ''}`;

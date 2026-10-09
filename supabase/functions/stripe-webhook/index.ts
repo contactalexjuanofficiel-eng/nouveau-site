@@ -55,6 +55,8 @@ async function enregistrer(sub: Stripe.Subscription, userId?: string | null) {
     formule: formuleDe(sub),
     statut: sub.status,
     fin_periode: new Date(sub.current_period_end * 1000).toISOString(),
+    // Résilié « à la fin de la période » : reste actif jusque-là, sans renouvellement.
+    fin_prevue: Boolean(sub.cancel_at_period_end || sub.cancel_at),
     stripe_client: typeof sub.customer === 'string' ? sub.customer : sub.customer.id,
     stripe_abonnement: sub.id,
     mis_a_jour: new Date().toISOString(),
