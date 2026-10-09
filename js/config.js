@@ -20,6 +20,6 @@ window.DEVIZO_CONFIG = {
     proAn: 'https://buy.stripe.com/test_14A5kw3dN0jx36h7Cy8Zq03',
     // Espace client Stripe (Paramètres > Facturation > Portail client) : changer de
     // carte, de formule, télécharger les factures, résilier.
-    portail: '',
+    portail: 'https://billing.stripe.com/p/login/test_3cI14gaGf2rFayJ3mi8Zq00',
   },
 };
