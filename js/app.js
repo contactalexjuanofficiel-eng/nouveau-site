@@ -1788,7 +1788,7 @@ function pageNotFound() {
 let lastList = { hash: '#/documents', label: 'Devis & factures' };
 
 function backLink() {
-  return `<a class="back no-print" href="${esc(lastList.hash)}">← Retour : ${esc(lastList.label)}</a>`;
+  return `<a class="back no-print" href="${esc(lastList.hash)}"><span aria-hidden="true">←</span> Retour à ${esc(lastList.label)}</a>`;
 }
 
 const LISTES = {
