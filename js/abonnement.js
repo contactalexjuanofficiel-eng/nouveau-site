@@ -287,6 +287,7 @@ const Abonnement = (() => {
         }).join('')}
       </div>
       <p class="plans-note">Paiement sécurisé par Stripe. Sans engagement : vous résiliez quand vous voulez depuis cette page.
+        En vous abonnant, vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a>.
         ${paiementPret ? '' : '<br>Le paiement en ligne sera ouvert très bientôt.'}</p>
     `;
 

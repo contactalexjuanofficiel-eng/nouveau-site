@@ -407,7 +407,7 @@ const Compte = (() => {
             ${mode === 'connexion' ? '<button type="button" class="link" data-mode="oubli">Mot de passe oublié ?</button>' : ''}
             ${mode === 'oubli' ? '<button type="button" class="link" data-mode="connexion">← Retour à la connexion</button>' : ''}
           </p>
-          ${mode === 'inscription' ? '<p class="auth-legal">En créant un compte, vous acceptez que vos données soient enregistrées pour faire fonctionner le service. Elles ne sont jamais revendues et vous pouvez supprimer votre compte à tout moment.</p>' : ''}
+          ${mode === 'inscription' ? '<p class="auth-legal">En créant un compte, vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Vos données ne sont jamais revendues et vous pouvez supprimer votre compte à tout moment.</p>' : ''}
         </div>
       </div>`;
 
