@@ -6,7 +6,7 @@
  * Utilise data, infosDocument, euro, dateFr, tauxFr... d'app.js.
  */
 const Pdf = (() => {
-  const VERSION = '?v=58';
+  const VERSION = '?v=59';
   const MARGE = 15;
   const BLEU = [31, 94, 255];
   const GRIS = [107, 115, 133];
@@ -93,9 +93,10 @@ const Pdf = (() => {
   }
 
   // Devis ou facture, mis en page comme à l'écran.
-  async function document_(doc) {
+  // sortie : 'enregistrer' (téléchargement) ou 'base64' (pièce jointe d'un e-mail).
+  async function document_(doc, { sortie = 'enregistrer' } = {}) {
     const pdf = await nouveau('portrait');
-    if (!pdf) return;
+    if (!pdf) return null;
     const { e, client, isFacture, t, origine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
     const largeur = pdf.internal.pageSize.getWidth();
     const hauteur = pdf.internal.pageSize.getHeight();
@@ -223,6 +224,16 @@ const Pdf = (() => {
       pdf.setTextColor(...GRIS);
       pdf.text('Bon pour accord : date et signature du client', droite - 82, y + 5);
       pdf.setTextColor(...ENCRE);
+      // Devis signé en ligne : signature, nom et date du client.
+      if (doc.signature?.image) {
+        try {
+          pdf.addImage(doc.signature.image, 'PNG', droite - 80, y + 7, 50, 16);
+        } catch (err) {
+          // image illisible : le nom et la date suffisent
+        }
+        pdf.setFontSize(8);
+        pdf.text(txt(`Signé en ligne par ${doc.signature.nom} le ${new Date(doc.signature.le).toLocaleString('fr-FR')}`), droite - 82, y + 27);
+      }
       y += 36;
     }
 
@@ -238,8 +249,11 @@ const Pdf = (() => {
     pdf.setTextColor(...ENCRE);
 
     numeroterPages(pdf);
-    const nom = docClient(doc)?.nom;
-    pdf.save(nomFichier(`${isFacture ? 'Facture' : 'Devis'} ${doc.numero}${nom ? ' - ' + nom : ''}`));
+    const nomClient = docClient(doc)?.nom;
+    const fichier = nomFichier(`${isFacture ? 'Facture' : 'Devis'} ${doc.numero}${nomClient ? ' - ' + nomClient : ''}`);
+    if (sortie === 'base64') return { nom: fichier, base64: pdf.output('datauristring').split(',')[1] };
+    pdf.save(fichier);
+    return { nom: fichier };
   }
 
   // Journal des ventes ou des dépenses : tableau avec totaux, en paysage.

@@ -1,0 +1,19 @@
+/* Page publique de signature d'un devis (pour le client de l'artisan). */
+.signer { background: var(--bg); color: var(--text); }
+.signer-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--border); }
+.signer-page { max-width: 860px; margin: 0 auto; padding: 20px 16px 40px; }
+.signer-pied { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 32px; }
+.signer-pied a { color: var(--muted); }
+.signer .doc { overflow-x: auto; }
+.signer-statut { margin-bottom: 16px; }
+.signer-bloc h2 { margin-top: 0; }
+.pad-cadre { position: relative; border: 2px dashed var(--border); border-radius: 12px; background: #ffffff; touch-action: none; }
+.pad-cadre canvas { display: block; width: 100%; height: 180px; border-radius: 10px; cursor: crosshair; }
+.pad-indice { position: absolute; inset: 0; display: grid; place-items: center; color: #9aa2b5; pointer-events: none; font-size: .95rem; }
+.pad-actions { display: flex; justify-content: flex-end; margin: 6px 0 12px; }
+.signer-bloc .field { margin-bottom: 12px; }
+.signer-bloc input[type=text] { width: 100%; }
+.signer-ok { text-align: center; }
+.signer-ok .grand { font-size: 2.6rem; margin: 0; }
+.signer-ok img { max-width: 260px; max-height: 90px; background: #fff; border-radius: 6px; margin-top: 8px; }
+@media (max-width: 600px) { .signer .doc { padding: 16px; } .signer .doc table { font-size: .85rem; } }

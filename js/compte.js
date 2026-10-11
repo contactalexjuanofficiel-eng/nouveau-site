@@ -301,6 +301,7 @@ const Compte = (() => {
     await Abonnement.charger(client, user, equipe);
     suivreEquipe();
     renderApp();
+    if (typeof Envoi !== 'undefined') Envoi.synchroniserSignatures();
   }
 
   function oublierSession() {
@@ -337,6 +338,7 @@ const Compte = (() => {
     await chargerEquipe();
     await Abonnement.charger(client, utilisateur, equipe);
     if (Abonnement.etat() !== avant) renderApp();
+    if (typeof Envoi !== 'undefined') Envoi.synchroniserSignatures();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') rafraichir();
@@ -759,5 +761,8 @@ const Compte = (() => {
     actif, demarrer, modifie, page, connecte: () => Boolean(utilisateur),
     membre: () => equipe?.role === 'membre',
     titulaireEquipe: () => equipe?.email_titulaire || '',
+    client: () => client,
+    espace: () => espaceId,
+    utilisateur: () => utilisateur,
   };
 })();

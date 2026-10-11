@@ -571,13 +571,21 @@ function go(hash) {
 // Pages
 // ====================================================================
 
+// Dernier envoi ou signature, affiché sous le nom du client.
+function suiviEnvoi(d) {
+  if (d.signature) return `<small class="suivi suivi-signe">✍ Signé le ${dateFr(d.signature.le.slice(0, 10))}</small>`;
+  const dernier = Envoi.dernierEnvoi(d);
+  if (!dernier) return '';
+  return `<small class="suivi">${dernier.type === 'relance' ? 'Relancé' : 'Envoyé'} le ${dateFr(dernier.le.slice(0, 10))}</small>`;
+}
+
 // L'étape suivante d'un document, faisable directement depuis la liste.
 function actionsRapides(d) {
   const id = esc(d.id);
   if (d.type === 'facture') {
-    return d.statut === 'payee'
-      ? `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`
-      : `<button class="btn btn-sm btn-primary" data-payee="${id}">Marquer payée</button>`;
+    if (d.statut === 'payee') return `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`;
+    return `${Envoi.aRelancer(d) ? `<button class="btn btn-sm" data-relancer="${id}">Relancer</button>` : ''}
+      <button class="btn btn-sm btn-primary" data-payee="${id}">Marquer payée</button>`;
   }
   if (d.statut === 'accepte') {
     const facture = data.documents.find((f) => f.devisOrigine === d.id);
@@ -592,6 +600,10 @@ function actionsRapides(d) {
         <button class="btn btn-sm btn-primary" data-payee="${esc(facture.id)}">Marquer payée</button>`;
   }
   if (d.statut === 'refuse') return '';
+  if (d.statut === 'brouillon') {
+    return `<button class="btn btn-sm btn-primary" data-envoyer="${id}">Envoyer</button>
+      <button class="btn btn-sm" data-statut-doc="${id}" data-valeur="accepte">Accepter</button>`;
+  }
   return `<button class="btn btn-sm btn-primary" data-statut-doc="${id}" data-valeur="accepte">Accepter</button>
     <button class="btn btn-sm" data-statut-doc="${id}" data-valeur="refuse">Refuser</button>`;
 }
@@ -619,7 +631,7 @@ function documentsTable(docs) {
         ${docs.map((d) => `
           <tr data-ouvrir="${esc(d.id)}">
             <td class="dt-num"><span class="dt-type dt-type-${d.type}">${d.type === 'facture' ? 'Facture' : 'Devis'}</span><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
-            <td class="dt-client">${esc(clientName(d))}</td>
+            <td class="dt-client">${esc(clientName(d))}${suiviEnvoi(d)}</td>
             <td class="dt-date">${dateFr(d.date)}</td>
             <td class="dt-statut">${statutCliquable(d)}</td>
             <td class="num dt-total">${euro(computeTotals(d).ttc)}</td>
@@ -628,6 +640,7 @@ function documentsTable(docs) {
               <details class="menu-ligne">
                 <summary class="btn btn-sm" aria-label="Plus d'actions" title="Plus d'actions">⋯</summary>
                 <div class="menu-ligne-liste">
+                  <button data-envoyer="${esc(d.id)}">Envoyer par e-mail</button>
                   <button data-pdf="${esc(d.id)}">Télécharger le PDF</button>
                   <a href="#/modifier/${esc(d.id)}">Modifier</a>
                   <button data-duplicate="${esc(d.id)}">Dupliquer</button>
@@ -1100,10 +1113,16 @@ function pageView(id) {
         <button class="btn" onclick="window.print()">Imprimer</button>
         ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut !== 'payee' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
+        <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e-mail</button>
+        ${Envoi.aRelancer(doc) ? `<button class="btn" data-relancer="${esc(doc.id)}">Relancer</button>` : ''}
         <button class="btn" id="duplicate">Dupliquer</button>
         <button class="btn btn-danger" id="delete">Supprimer</button>
       </div>
     </div>
+    ${(doc.envois || []).length || doc.signature ? `<ul class="historique no-print">
+      ${(doc.envois || []).map((x) => `<li>${x.type === 'relance' ? '🔔 Relance envoyée' : '✉ Envoyé'} à ${esc(x.a)} le ${esc(new Date(x.le).toLocaleString('fr-FR'))}${x.lien ? ' · avec lien de signature' : ''}</li>`).join('')}
+      ${doc.signature ? `<li>✍ Signé en ligne par <strong>${esc(doc.signature.nom)}</strong> le ${esc(new Date(doc.signature.le).toLocaleString('fr-FR'))}</li>` : ''}
+    </ul>` : ''}
 
     <div class="doc">
       <div class="doc-head">
@@ -1160,7 +1179,10 @@ function pageView(id) {
 
       ${doc.notes ? `<p style="margin-top:24px;white-space:pre-line">${esc(doc.notes)}</p>` : ''}
 
-      ${!isFacture ? `<div class="signature">Bon pour accord : date et signature du client</div>` : ''}
+      ${!isFacture ? (doc.signature
+        ? `<div class="signature signature-faite">Bon pour accord : signé en ligne par <strong>${esc(doc.signature.nom)}</strong> le ${esc(new Date(doc.signature.le).toLocaleString('fr-FR'))}
+            ${doc.signature.image ? `<img src="${esc(doc.signature.image)}" alt="Signature de ${esc(doc.signature.nom)}">` : ''}</div>`
+        : `<div class="signature">Bon pour accord : date et signature du client</div>`) : ''}
 
       <div class="doc-mentions">${mentions.map(esc).join('\n')}</div>
     </div>
@@ -1846,6 +1868,7 @@ function render() {
   }
 
   majPastille();
+  if (['', 'documents', 'voir'].includes(parts[0] ?? '')) Envoi.synchroniserSignatures();
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
   const bloque = profilManquant().length > 0;
@@ -1884,7 +1907,7 @@ document.addEventListener('click', async (e) => {
   document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
     if (!m.contains(e.target)) m.open = false;
   });
-  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf]');
+  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf], [data-envoyer], [data-relancer]');
   if (!cible) {
     // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
     const ligne = e.target.closest('tr[data-ouvrir]');
@@ -1892,7 +1915,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
   cible.closest('.menu-ligne')?.removeAttribute('open');
-  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye, pdf } = cible.dataset;
+  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye, pdf, envoyer, relancer } = cible.dataset;
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();
@@ -1901,6 +1924,8 @@ document.addEventListener('click', async (e) => {
   if (statutDoc) changerStatut(getDocument(statutDoc), valeur);
   if (facturer) convertToInvoice(getDocument(facturer));
   if (dejaPaye) devisPaye(getDocument(dejaPaye));
+  if (envoyer) Envoi.ouvrir(getDocument(envoyer), 'envoi');
+  if (relancer) Envoi.ouvrir(getDocument(relancer), 'relance');
   if (pdf && getDocument(pdf)) {
     const texte = cible.textContent;
     cible.disabled = true;

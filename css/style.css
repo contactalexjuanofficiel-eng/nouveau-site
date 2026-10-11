@@ -573,3 +573,16 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 
 /* Fournisseurs habituels (dépenses) */
 .fournisseurs-rapides { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
+
+/* Envoi par e-mail, suivi et signature */
+dialog.envoi { max-width: 560px; }
+dialog.envoi h2 { margin: 0 0 12px; font-size: 1.15rem; }
+dialog.envoi label:not(.checkbox) { display: block; font-weight: 600; margin: 10px 0 4px; font-size: .9rem; }
+dialog.envoi input:not([type=checkbox]), dialog.envoi textarea { width: 100%; }
+dialog.envoi .checkbox { margin-top: 10px; }
+dialog.envoi .actions { margin-top: 14px; }
+.suivi { display: block; font-size: .78rem; color: var(--muted); margin-top: 2px; }
+.suivi-signe { color: var(--success); font-weight: 600; }
+.historique { list-style: none; padding: 0; margin: -6px 0 16px; display: grid; gap: 4px; color: var(--muted); font-size: .88rem; }
+.signature-faite { color: var(--text); }
+.signature-faite img { display: block; max-width: 220px; max-height: 80px; margin-top: 8px; background: #fff; }
