@@ -753,11 +753,11 @@ function pageEdit(id) {
           </div>
           <div>
             <label for="date">Date</label>
-            <input id="date" name="date" type="date" value="${esc(doc.date)}">
+            <input id="date" name="date" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.date)}">
           </div>
           <div>
             <label for="echeance">${isFacture ? "Date d'échéance" : "Valable jusqu'au"}</label>
-            <input id="echeance" name="echeance" type="date" value="${esc(doc.echeance)}">
+            <input id="echeance" name="echeance" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.echeance)}">
           </div>
           <div>
             <label for="statut">Statut</label>
@@ -767,7 +767,7 @@ function pageEdit(id) {
           </div>
           ${isFacture ? `<div id="field-paiement" ${doc.statut === 'payee' ? '' : 'hidden'}>
             <label for="datePaiement">Payée le</label>
-            <input id="datePaiement" name="datePaiement" type="date" value="${esc(doc.datePaiement || '')}">
+            <input id="datePaiement" name="datePaiement" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.datePaiement || '')}">
           </div>` : ''}
           ${!isFacture ? `<div>
             <label for="acompte">Acompte demandé à la commande (%)</label>

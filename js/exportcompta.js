@@ -156,8 +156,8 @@ function pageExport(params) {
         ${periodes.map(([lib, d, f]) => `<a class="btn btn-sm ${d === du && f === au ? 'btn-primary' : ''}" href="#/export?du=${d}&au=${f}">${lib}</a>`).join('')}
       </div>
       <form id="export-form" class="grid-2" novalidate>
-        <div><label for="export-du">Du</label><input id="export-du" name="du" type="date" value="${esc(du)}"></div>
-        <div><label for="export-au">Au</label><input id="export-au" name="au" type="date" value="${esc(au)}"></div>
+        <div><label for="export-du">Du</label><input id="export-du" name="du" type="date" min="2000-01-01" max="2099-12-31" value="${esc(du)}"></div>
+        <div><label for="export-au">Au</label><input id="export-au" name="au" type="date" min="2000-01-01" max="2099-12-31" value="${esc(au)}"></div>
       </form>
     </section>
     <div class="panels">
@@ -185,10 +185,24 @@ function pageExport(params) {
       et s'importe dans la plupart des logiciels comptables.</p>
   `;
 
+  // Dates tapées au clavier : on attend une date complète (année à 4 chiffres)
+  // et une petite pause avant d'actualiser, pour ne pas couper la saisie.
   const form = document.getElementById('export-form');
-  form.addEventListener('change', () => {
+  let attente = null;
+  const appliquer = () => {
     const v = Object.fromEntries(new FormData(form));
-    if (v.du && v.au) go(`#/export?du=${v.du <= v.au ? v.du : v.au}&au=${v.du <= v.au ? v.au : v.du}`);
+    const valide = (d) => /^(20\d\d)-\d\d-\d\d$/.test(d || '');
+    if (!valide(v.du) || !valide(v.au) || (v.du === du && v.au === au)) return;
+    go(`#/export?du=${v.du <= v.au ? v.du : v.au}&au=${v.du <= v.au ? v.au : v.du}`);
+  };
+  form.addEventListener('input', () => {
+    clearTimeout(attente);
+    attente = setTimeout(appliquer, 900);
+  });
+  form.addEventListener('focusout', (e) => {
+    if (form.contains(e.relatedTarget)) return; // on passe juste de « Du » à « Au »
+    clearTimeout(attente);
+    attente = setTimeout(appliquer, 150);
   });
   document.getElementById('export-ventes')?.addEventListener('click', () => telechargerCsv(nomFichier('ventes'), journalVentes(du, au)));
   document.getElementById('export-depenses')?.addEventListener('click', () => telechargerCsv(nomFichier('depenses'), journalDepenses(du, au)));

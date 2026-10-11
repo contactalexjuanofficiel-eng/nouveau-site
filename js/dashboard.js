@@ -526,7 +526,7 @@ function pageDepenses(params) {
     <form id="dep-form" class="card" ${ouvert ? '' : 'hidden'} novalidate>
       <h2>${enEdition ? 'Modifier la dépense' : 'Nouvelle dépense'}</h2>
       <div class="grid-2">
-        <div><label for="dep-date">Date *</label><input id="dep-date" name="date" type="date" value="${esc(dep.date)}" required></div>
+        <div><label for="dep-date">Date *</label><input id="dep-date" name="date" type="date" min="2000-01-01" max="2099-12-31" value="${esc(dep.date)}" required></div>
         <div><label for="dep-fournisseur">Fournisseur</label><input id="dep-fournisseur" name="fournisseur" value="${esc(dep.fournisseur)}" placeholder="Ex : Point P, Total, Leroy Merlin"></div>
         <div><label for="dep-categorie">Catégorie</label>
           <select id="dep-categorie" name="categorie">${CATEGORIES_DEPENSES.map((c) => `<option ${c === dep.categorie ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
