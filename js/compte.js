@@ -7,7 +7,7 @@
  *   Les données de l'artisan sont gardées dans la table « espaces » et
  *   envoyées automatiquement à chaque modification. Une copie reste sur
  *   l'appareil pour un affichage immédiat et le mode hors ligne.
- * - Formule Équipe : les membres travaillent dans l'espace du titulaire.
+ * - Formule Entreprise : les membres travaillent dans l'espace du titulaire.
  *   Chaque envoi ne réussit que si personne n'a écrit entre-temps ; sinon
  *   les deux versions sont fusionnées (fiche par fiche) avant de réessayer.
  *
@@ -28,7 +28,7 @@ const Compte = (() => {
   let minuteurEnvoi = null;
   let envoiEnCours = false;
   let espaceId = null; // compte dont on utilise les données : le sien, ou celui du titulaire de l'équipe
-  let equipe = null; // réponse de mon_equipe() (null si la formule Équipe n'est pas installée)
+  let equipe = null; // réponse de mon_equipe() (null si la formule Entreprise n'est pas installée)
   let versionBrute = null; // « mis_a_jour » exact de la dernière version en ligne connue
   let base = null; // données de cette version, pour fusionner avec celles d'un collègue
   let minuteurEquipe = null;
@@ -192,7 +192,7 @@ const Compte = (() => {
     espaceId = utilisateur.id;
     try {
       const { data: res, error } = await client.rpc('mon_equipe');
-      if (error) return; // formule Équipe pas encore installée dans la base
+      if (error) return; // formule Entreprise pas encore installée dans la base
       equipe = res;
       if (equipe?.role === 'membre') espaceId = equipe.proprietaire;
     } catch (e) {
@@ -664,8 +664,8 @@ const Compte = (() => {
     if (!peutInviter && !membres.length) {
       return `<section class="card" id="equipe">
         <h2>Travailler à plusieurs</h2>
-        <p>Avec la formule Équipe, jusqu'à 4 collègues (salarié, associé, secrétaire…) utilisent Devizo avec vous, chacun avec son compte, sur les mêmes données.</p>
-        <a class="btn" href="#/abonnement">Voir la formule Équipe</a>
+        <p>Avec la formule Entreprise, jusqu'à 4 collègues (salarié, associé, secrétaire…) utilisent Devizo avec vous, chacun avec son compte, sur les mêmes données.</p>
+        <a class="btn" href="#/abonnement">Voir la formule Entreprise</a>
       </section>`;
     }
     return `<section class="card" id="equipe">
@@ -677,7 +677,7 @@ const Compte = (() => {
           <button class="btn btn-sm" data-retirer="${esc(m.email)}">Retirer</button>
         </li>`).join('')}
       </ul>
-      ${!peutInviter ? '<p class="status bad">Votre abonnement Équipe n\u2019est plus actif : vos membres ne peuvent plus modifier les données. <a href="#/abonnement">Voir les formules</a></p>' : ''}
+      ${!peutInviter ? '<p class="status bad">Votre abonnement Entreprise n\u2019est plus actif : vos membres ne peuvent plus modifier les données. <a href="#/abonnement">Voir les formules</a></p>' : ''}
       ${peutInviter && membres.length < MAX_MEMBRES ? `
         <form id="equipe-inviter" novalidate>
           <label for="equipe-email">Inviter un collègue</label>

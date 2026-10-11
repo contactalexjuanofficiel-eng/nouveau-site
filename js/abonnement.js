@@ -5,7 +5,7 @@
  * - Après l'essai sans abonnement : lecture seule (la base de données refuse
  *   aussi toute modification, voir supabase/abonnements.sql).
  * - Solo : devis, factures, clients. Pro : en plus tableau de bord complet,
- *   dépenses, catalogue et logo. Équipe : en plus 5 utilisateurs et export
+ *   dépenses, catalogue et logo. Entreprise : en plus 5 utilisateurs et export
  *   comptable ; les membres d'une équipe dépendent de l'abonnement du titulaire.
  * - Sans comptes en ligne (ou dans l'aperçu), tout reste accessible.
  *
@@ -30,7 +30,7 @@ const Abonnement = (() => {
         'Suivi des dépenses', 'Alertes plafonds micro et TVA', 'Votre logo sur les documents'],
     },
     equipe: {
-      nom: 'Équipe',
+      nom: 'Entreprise',
       pour: 'Pour les entreprises avec salariés',
       inclus: ['Tout ce qui est dans Pro', "Jusqu'à 5 utilisateurs, chacun avec son compte", 'Export pour le comptable (ventes et dépenses)',
         'Assistance prioritaire'],
@@ -120,7 +120,7 @@ const Abonnement = (() => {
     let classe = '';
     if (e === 'expire' && membre()) {
       classe = 'bad';
-      html = `L'abonnement Équipe de ${esc(equipe.email_titulaire)} n'est plus actif : les documents restent consultables, mais plus modifiables.`;
+      html = `L'abonnement Entreprise de ${esc(equipe.email_titulaire)} n'est plus actif : les documents restent consultables, mais plus modifiables.`;
     } else if (e === 'essai') {
       const j = joursEssaiRestants();
       classe = j <= 3 ? 'warn' : '';
@@ -153,7 +153,7 @@ const Abonnement = (() => {
       view.innerHTML = `
         <div class="card gate">
           <h1>Abonnement de l'équipe inactif</h1>
-          <p>L'abonnement Équipe de ${esc(equipe.email_titulaire)} n'est plus actif. Les devis, factures et clients restent consultables ;
+          <p>L'abonnement Entreprise de ${esc(equipe.email_titulaire)} n'est plus actif. Les devis, factures et clients restent consultables ;
             pour les modifier, demandez-lui de renouveler l'abonnement.</p>
           <div class="actions"><a class="btn" href="#/documents">Voir les documents</a></div>
         </div>`;
@@ -174,7 +174,7 @@ const Abonnement = (() => {
   // Appelé quand une modification est refusée (fin d'essai).
   async function refuserModification() {
     if (membre()) {
-      await ask(`L'abonnement Équipe de ${equipe.email_titulaire} n'est plus actif : les documents restent consultables, mais plus modifiables.`, "D'accord", false);
+      await ask(`L'abonnement Entreprise de ${equipe.email_titulaire} n'est plus actif : les documents restent consultables, mais plus modifiables.`, "D'accord", false);
       return;
     }
     const ok = await ask("Votre essai gratuit est terminé : vos documents restent consultables, mais pour créer ou modifier il faut choisir une formule.", 'Voir les formules', 'Plus tard');
@@ -323,7 +323,7 @@ const Abonnement = (() => {
       essai: `Essai gratuit, encore ${joursEssaiRestants()} jour${joursEssaiRestants() > 1 ? 's' : ''}`,
       solo: 'Formule Solo',
       pro: 'Formule Pro',
-      equipe: 'Formule Équipe',
+      equipe: 'Formule Entreprise',
       expire: 'Essai terminé',
     }[e];
     return `<section class="card"><h2>Abonnement</h2><p><strong>${libelle}</strong></p>

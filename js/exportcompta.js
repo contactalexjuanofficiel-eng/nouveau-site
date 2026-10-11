@@ -1,5 +1,5 @@
 /*
- * Export pour le comptable (formule Équipe) : journal des ventes (factures)
+ * Export pour le comptable (formule Entreprise) : journal des ventes (factures)
  * et liste des dépenses sur une période, en fichiers CSV lisibles par Excel
  * et LibreOffice (séparateur « ; », virgule décimale, dates JJ/MM/AAAA).
  *

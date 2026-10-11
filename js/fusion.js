@@ -1,5 +1,5 @@
 /*
- * Fusion de deux versions des données (formule Équipe, ou deux appareils).
+ * Fusion de deux versions des données (formule Entreprise, ou deux appareils).
  *
  * base : dernière version en ligne connue ; local : données d'ici (avec les
  * modifications pas encore envoyées) ; serveur : version en ligne actuelle,
