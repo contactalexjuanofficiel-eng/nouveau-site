@@ -3,28 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Devizo · Devis, factures et gestion pour artisans</title>
+  <title data-i18n="meta.titre">Devizo · Devis, factures et gestion pour artisans</title>
   <meta name="description" content="Devis et factures conformes en 2 minutes, suivi des dépenses et tableau de bord qui vous dit combien il vous reste après charges et impôts. Pour les artisans. Essai gratuit 14 jours.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=39">
-  <link rel="stylesheet" href="css/landing.css?v=39">
+  <link rel="stylesheet" href="css/style.css?v=40">
+  <link rel="stylesheet" href="css/landing.css?v=40">
 </head>
 <body class="landing">
   <header class="l-header">
     <div class="l-wrap l-header-inner">
       <a class="logo" href="#top">Devizo</a>
       <nav class="l-nav" aria-label="Navigation principale">
-        <a href="#pilotage">Pilotage</a>
-        <a href="#fonctionnalites">Fonctionnalités</a>
-        <a href="#tarifs">Tarifs</a>
-        <a href="#faq">Questions</a>
+        <a href="#pilotage" data-i18n="nav.pilotage">Pilotage</a>
+        <a href="#fonctionnalites" data-i18n="nav.fonctions">Fonctionnalités</a>
+        <a href="#tarifs" data-i18n="nav.tarifs">Tarifs</a>
+        <a href="#faq" data-i18n="nav.questions">Questions</a>
       </nav>
       <div class="l-actions">
-        <a class="l-login" href="app.html#connexion">Connexion</a>
-        <a class="l-pill l-pill-plein" href="app.html#inscription">Essai gratuit 14 jours</a>
-        <a class="l-pill l-pill-contour" href="#comment">Démo</a>
+        <details class="l-langue" id="langue">
+          <summary aria-label="Langue / Language">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+            <span class="l-langue-code">FR</span>
+          </summary>
+          <ul class="l-langue-liste"></ul>
+        </details>
+        <a class="l-login" href="app.html#connexion" data-i18n="nav.connexion">Connexion</a>
+        <a class="l-pill l-pill-plein l-pill-long" href="app.html#inscription" data-i18n="nav.essai">Essai gratuit 14 jours</a>
+        <a class="l-pill l-pill-plein l-pill-court" href="app.html#inscription" data-i18n="nav.essaiCourt">Essai gratuit</a>
+        <a class="l-pill l-pill-contour" href="#comment" data-i18n="nav.demo">Démo</a>
       </div>
     </div>
   </header>
@@ -34,17 +42,17 @@
     <section class="hero">
       <div class="l-wrap hero-grid">
         <div class="hero-text">
-          <p class="eyebrow">Pour plombiers, électriciens, peintres, maçons, menuisiers…</p>
-          <h1>Le devis part du chantier.<br><span class="accent">La facture suit en un clic.</span></h1>
-          <p class="lead">Devis et factures conformes en 2 minutes depuis votre téléphone, suivi de vos dépenses, et un tableau de bord qui vous dit enfin <strong>combien il vous reste</strong> après charges et impôts.</p>
+          <p class="eyebrow" data-i18n="hero.eyebrow">Pour plombiers, électriciens, peintres, maçons, menuisiers…</p>
+          <h1 data-i18n="hero.titre">Le devis part du chantier.<br><span class="accent">La facture suit en un clic.</span></h1>
+          <p class="lead" data-i18n="hero.lead">Devis et factures conformes en 2 minutes depuis votre téléphone, suivi de vos dépenses, et un tableau de bord qui vous dit enfin <strong>combien il vous reste</strong> après charges et impôts.</p>
           <div class="hero-cta">
-            <a class="btn btn-primary btn-lg" href="app.html#inscription">Commencer l'essai gratuit</a>
-            <a class="btn btn-lg" href="#comment">Voir comment ça marche</a>
+            <a class="btn btn-primary btn-lg" href="app.html#inscription" data-i18n="cta.essai">Commencer l'essai gratuit</a>
+            <a class="btn btn-lg" href="#comment" data-i18n="hero.comment">Voir comment ça marche</a>
           </div>
           <ul class="trust">
-            <li>14 jours gratuits</li>
-            <li>Sans carte bancaire</li>
-            <li>Sans engagement</li>
+            <li data-i18n="trust.1">14 jours gratuits</li>
+            <li data-i18n="trust.2">Sans carte bancaire</li>
+            <li data-i18n="trust.3">Sans engagement</li>
           </ul>
         </div>
 
@@ -75,15 +83,15 @@
             </div>
             <p class="mock-legal" data-tour="mentions">Assurance décennale MAAF Pro · Devis gratuit · Valable 30 jours</p>
             <div class="mock-actions">
-              <span class="mock-btn" data-tour="pdf">Télécharger le PDF</span>
-              <span class="mock-btn mock-btn-primary" data-tour="facture">Transformer en facture</span>
+              <span class="mock-btn" data-tour="pdf" data-i18n="mock.pdf">Télécharger le PDF</span>
+              <span class="mock-btn mock-btn-primary" data-tour="facture" data-i18n="mock.facture">Transformer en facture</span>
             </div>
           </div>
           <div class="tour-cursor" hidden>
             <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2l16 9.5-7 1.6-3.6 6.9z" fill="#ffffff" stroke="#0f1b3d" stroke-width="1.6" stroke-linejoin="round"/></svg>
           </div>
           <div class="tour-bubble" hidden></div>
-          <div class="mock-badge">
+          <div class="mock-badge" data-i18n="mock.badge">
             <span class="dot"></span> Devis accepté · facture F-2026-009 créée
           </div>
         </div>
@@ -93,10 +101,10 @@
     <!-- Chiffres -->
     <section class="stats-band">
       <div class="l-wrap stats-grid">
-        <div class="big-stat"><span class="num" data-count="2">2</span><span class="unit">min</span><p>pour faire un devis complet</p></div>
-        <div class="big-stat"><span class="num" data-count="1">1</span><span class="unit">clic</span><p>pour transformer le devis en facture</p></div>
-        <div class="big-stat"><span class="num" data-count="12">12</span><span class="unit">mois</span><p>d'activité en graphiques : chiffre d'affaires, dépenses, ce qu'il reste</p></div>
-        <div class="big-stat"><span class="num" data-count="14">14</span><span class="unit">jours</span><p>d'essai gratuit, sans carte bancaire</p></div>
+        <div class="big-stat"><span class="num" data-count="2">2</span><span class="unit">min</span><p data-i18n="stat.1">pour faire un devis complet</p></div>
+        <div class="big-stat"><span class="num" data-count="1">1</span><span class="unit" data-i18n="stat.clic">clic</span><p data-i18n="stat.2">pour transformer le devis en facture</p></div>
+        <div class="big-stat"><span class="num" data-count="12">12</span><span class="unit" data-i18n="stat.mois">mois</span><p data-i18n="stat.3">d'activité en graphiques : chiffre d'affaires, dépenses, ce qu'il reste</p></div>
+        <div class="big-stat"><span class="num" data-count="14">14</span><span class="unit" data-i18n="stat.jours">jours</span><p data-i18n="stat.4">d'essai gratuit, sans carte bancaire</p></div>
       </div>
     </section>
 
@@ -104,35 +112,35 @@
     <section class="section" id="pilotage">
       <div class="l-wrap pilot-grid">
         <div class="pilot-text">
-          <p class="eyebrow">Pilotage</p>
-          <h2 class="section-title">Sachez enfin combien il vous reste.</h2>
-          <p class="lead">Chaque facture payée et chaque dépense alimentent votre tableau de bord. Devizo calcule vos cotisations et vos impôts selon votre statut, et vous montre ce qui vous revient vraiment.</p>
+          <p class="eyebrow" data-i18n="nav.pilotage">Pilotage</p>
+          <h2 class="section-title" data-i18n="pilot.titre">Sachez enfin combien il vous reste.</h2>
+          <p class="lead" data-i18n="pilot.lead">Chaque facture payée et chaque dépense alimentent votre tableau de bord. Devizo calcule vos cotisations et vos impôts selon votre statut, et vous montre ce qui vous revient vraiment.</p>
           <ul class="pilot-points">
-            <li><strong>Ce qu'il vous reste</strong> après dépenses, cotisations et impôts, ce mois-ci, ce trimestre ou cette année.</li>
-            <li><strong>Mois par mois, jour par jour</strong> : votre chiffre d'affaires face à vos dépenses, en graphiques.</li>
-            <li><strong>Les factures en retard</strong> signalées, avec le nombre de jours.</li>
-            <li><strong>Les plafonds</strong> de la micro-entreprise et de la franchise de TVA, avec une alerte avant de les dépasser.</li>
-            <li><strong>Micro-entreprise, société à l'IS ou réel</strong> : les taux 2026 sont déjà réglés.</li>
+            <li data-i18n="pilot.1"><strong>Ce qu'il vous reste</strong> après dépenses, cotisations et impôts, ce mois-ci, ce trimestre ou cette année.</li>
+            <li data-i18n="pilot.2"><strong>Mois par mois, jour par jour</strong> : votre chiffre d'affaires face à vos dépenses, en graphiques.</li>
+            <li data-i18n="pilot.3"><strong>Les factures en retard</strong> signalées, avec le nombre de jours.</li>
+            <li data-i18n="pilot.4"><strong>Les plafonds</strong> de la micro-entreprise et de la franchise de TVA, avec une alerte avant de les dépasser.</li>
+            <li data-i18n="pilot.5"><strong>Micro-entreprise, société à l'IS ou réel</strong> : les taux 2026 sont déjà réglés.</li>
           </ul>
         </div>
 
         <!-- Exemple de tableau de bord -->
         <div class="dash-mock reveal" aria-hidden="true">
-          <p class="dm-tag">Exemple</p>
-          <p class="dm-label">Il vous reste · cette année</p>
-          <p class="dm-value"><span data-euro="6537">6 537</span> €</p>
-          <p class="dm-delta">▲ 18 % par rapport à l'an dernier</p>
-          <div class="dm-split">
+          <p class="dm-tag" data-i18n="dash.exemple">Exemple</p>
+          <p class="dm-label" data-i18n="dash.label">Il vous reste · cette année</p>
+          <p class="dm-value" data-tour="dvaleur"><span data-euro="6537">6 537</span> €</p>
+          <p class="dm-delta" data-tour="ddelta" data-i18n="dash.delta">▲ 18 % par rapport à l'an dernier</p>
+          <div class="dm-split" data-tour="dsplit">
             <span style="flex:5090;background:var(--s2)"></span>
             <span style="flex:1154;background:var(--s3)"></span>
             <span style="flex:6537;background:var(--s1)"></span>
           </div>
           <ul class="dm-legend">
-            <li><i style="background:var(--s2)"></i>Dépenses <b>5 090 €</b></li>
-            <li><i style="background:var(--s3)"></i>Impôts <b>1 154 €</b></li>
-            <li><i style="background:var(--s1)"></i>Il vous reste <b>6 537 €</b></li>
+            <li data-i18n="dash.depenses"><i style="background:var(--s2)"></i>Dépenses <b>5 090 €</b></li>
+            <li data-i18n="dash.impots"><i style="background:var(--s3)"></i>Impôts <b>1 154 €</b></li>
+            <li data-i18n="dash.reste"><i style="background:var(--s1)"></i>Il vous reste <b>6 537 €</b></li>
           </ul>
-          <div class="dm-chart">
+          <div class="dm-chart" data-tour="dchart">
             <div class="mcol" style="--i:0"><span class="mbar" style="height:2%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>N</em></div>
             <div class="mcol" style="--i:1"><span class="mbar" style="height:2%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>D</em></div>
             <div class="mcol" style="--i:2"><span class="mbar" style="height:28%;background:var(--s1)"></span><span class="mbar" style="height:10%;background:var(--s2)"></span><em>J</em></div>
@@ -147,9 +155,13 @@
             <div class="mcol" style="--i:11"><span class="mbar" style="height:68%;background:var(--s1)"></span><span class="mbar" style="height:2%;background:var(--s2)"></span><em>O</em></div>
           </div>
           <div class="dm-alerts">
-            <span class="dm-pill bad">⚠ 1 facture en retard · 1 168 €</span>
-            <span class="dm-pill">Plafond micro : 15 %</span>
+            <span class="dm-pill bad" data-tour="dretard" data-i18n="dash.retard">⚠ 1 facture en retard · 1 168 €</span>
+            <span class="dm-pill" data-tour="dplafond" data-i18n="dash.plafond">Plafond micro : 15 %</span>
           </div>
+          <div class="tour-cursor" hidden>
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2l16 9.5-7 1.6-3.6 6.9z" fill="#ffffff" stroke="#0f1b3d" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="tour-bubble" hidden></div>
         </div>
       </div>
     </section>
@@ -157,44 +169,44 @@
     <!-- Fonctionnalités -->
     <section class="section" id="fonctionnalites">
       <div class="l-wrap">
-        <p class="eyebrow">Fonctionnalités</p>
-        <h2 class="section-title">Tout pour être payé et gérer votre activité, rien de compliqué.</h2>
+        <p class="eyebrow" data-i18n="nav.fonctions">Fonctionnalités</p>
+        <h2 class="section-title" data-i18n="fonc.titre">Tout pour être payé et gérer votre activité, rien de compliqué.</h2>
         <div class="features-grid">
           <article class="feat reveal">
-            <h3>Devis express avec votre catalogue</h3>
-            <p>Tapez « wc » ou « peinture » : vos prestations enregistrées s'affichent avec leur prix. Les totaux HT, TVA et TTC se calculent pendant que vous tapez.</p>
+            <h3 data-i18n="f1.t">Devis express avec votre catalogue</h3>
+            <p data-i18n="f1.p">Tapez « wc » ou « peinture » : vos prestations enregistrées s'affichent avec leur prix. Les totaux HT, TVA et TTC se calculent pendant que vous tapez.</p>
           </article>
           <article class="feat reveal">
-            <h3>Devis → facture en 1 clic</h3>
-            <p>Le client a signé ? La facture reprend le devis, avec un numéro qui se suit sans trou, comme l'exige la loi.</p>
+            <h3 data-i18n="f2.t">Devis → facture en 1 clic</h3>
+            <p data-i18n="f2.p">Le client a signé ? La facture reprend le devis, avec un numéro qui se suit sans trou, comme l'exige la loi.</p>
           </article>
           <article class="feat reveal">
-            <h3>La bonne TVA</h3>
-            <p>10 % pour l'amélioration d'un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, 20 % pour le neuf. Ou la franchise en base pour les micro-entrepreneurs.</p>
+            <h3 data-i18n="f3.t">La bonne TVA</h3>
+            <p data-i18n="f3.p">10 % pour l'amélioration d'un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, 20 % pour le neuf. Ou la franchise en base pour les micro-entrepreneurs.</p>
           </article>
           <article class="feat reveal">
-            <h3>Mentions légales automatiques</h3>
-            <p>Assurance décennale, médiateur de la consommation, pénalités de retard, indemnité de 40 €, mention « EI » : tout est ajouté selon votre situation.</p>
+            <h3 data-i18n="f4.t">Mentions légales automatiques</h3>
+            <p data-i18n="f4.p">Assurance décennale, médiateur de la consommation, pénalités de retard, indemnité de 40 €, mention « EI » : tout est ajouté selon votre situation.</p>
           </article>
           <article class="feat reveal">
-            <h3>Acompte et paiement</h3>
-            <p>Acompte en pourcentage sur le devis, délai de paiement, IBAN vérifié et moyens de paiement acceptés sur chaque facture.</p>
+            <h3 data-i18n="f5.t">Acompte et paiement</h3>
+            <p data-i18n="f5.p">Acompte en pourcentage sur le devis, délai de paiement, IBAN vérifié et moyens de paiement acceptés sur chaque facture.</p>
           </article>
           <article class="feat reveal">
-            <h3>Tableau de bord</h3>
-            <p>Ce qu'il vous reste après charges et impôts, vos encaissements, les devis en attente et les factures en retard, en un coup d'œil.</p>
+            <h3 data-i18n="f6.t">Tableau de bord</h3>
+            <p data-i18n="f6.p">Ce qu'il vous reste après charges et impôts, vos encaissements, les devis en attente et les factures en retard, en un coup d'œil.</p>
           </article>
           <article class="feat reveal">
-            <h3>Suivi des dépenses</h3>
-            <p>Matériaux, carburant, assurance, outillage : saisissez le montant TTC, le HT et la TVA déductible se calculent tout seuls.</p>
+            <h3 data-i18n="f7.t">Suivi des dépenses</h3>
+            <p data-i18n="f7.p">Matériaux, carburant, assurance, outillage : saisissez le montant TTC, le HT et la TVA déductible se calculent tout seuls.</p>
           </article>
           <article class="feat reveal">
-            <h3>Carnet de clients</h3>
-            <p>Vos clients et leurs coordonnées au même endroit. Un clic pour les retrouver sur un nouveau devis, et leurs anciens documents restent intacts.</p>
+            <h3 data-i18n="f8.t">Carnet de clients</h3>
+            <p data-i18n="f8.p">Vos clients et leurs coordonnées au même endroit. Un clic pour les retrouver sur un nouveau devis, et leurs anciens documents restent intacts.</p>
           </article>
           <article class="feat reveal">
-            <h3>Saisie express</h3>
-            <p>Votre SIRET est vérifié dans l'annuaire officiel des entreprises et remplit votre profil. Les adresses sont suggérées pendant la saisie.</p>
+            <h3 data-i18n="f9.t">Saisie express</h3>
+            <p data-i18n="f9.p">Votre SIRET est vérifié dans l'annuaire officiel des entreprises et remplit votre profil. Les adresses sont suggérées pendant la saisie.</p>
           </article>
         </div>
       </div>
@@ -203,23 +215,23 @@
     <!-- Comment ça marche -->
     <section class="section section-alt" id="comment">
       <div class="l-wrap">
-        <p class="eyebrow">Comment ça marche</p>
-        <h2 class="section-title">Trois étapes, la première ne se fait qu'une fois.</h2>
+        <p class="eyebrow" data-i18n="comment.eyebrow">Comment ça marche</p>
+        <h2 class="section-title" data-i18n="comment.titre">Trois étapes, la première ne se fait qu'une fois.</h2>
         <ol class="steps">
           <li class="reveal">
             <span class="step-num">1</span>
-            <h3>Renseignez votre entreprise</h3>
-            <p>SIRET, assurance, TVA, logo. Le SIRET et l'IBAN sont vérifiés, le numéro de TVA se calcule tout seul.</p>
+            <h3 data-i18n="e1.t">Renseignez votre entreprise</h3>
+            <p data-i18n="e1.p">SIRET, assurance, TVA, logo. Le SIRET et l'IBAN sont vérifiés, le numéro de TVA se calcule tout seul.</p>
           </li>
           <li class="reveal">
             <span class="step-num">2</span>
-            <h3>Faites le devis sur place</h3>
-            <p>Ajoutez vos lignes depuis le téléphone, devant le client. Téléchargez le PDF et envoyez-le.</p>
+            <h3 data-i18n="e2.t">Faites le devis sur place</h3>
+            <p data-i18n="e2.p">Ajoutez vos lignes depuis le téléphone, devant le client. Téléchargez le PDF et envoyez-le.</p>
           </li>
           <li class="reveal">
             <span class="step-num">3</span>
-            <h3>Facturez et pilotez</h3>
-            <p>Transformez le devis accepté en facture, marquez-la payée, ajoutez vos dépenses : le tableau de bord vous dit combien il vous reste.</p>
+            <h3 data-i18n="e3.t">Facturez et pilotez</h3>
+            <p data-i18n="e3.p">Transformez le devis accepté en facture, marquez-la payée, ajoutez vos dépenses : le tableau de bord vous dit combien il vous reste.</p>
           </li>
         </ol>
       </div>
@@ -228,101 +240,105 @@
     <!-- Tarifs -->
     <section class="section" id="tarifs">
       <div class="l-wrap">
-        <p class="eyebrow">Tarifs</p>
-        <h2 class="section-title">Un prix simple. 14 jours pour essayer.</h2>
+        <p class="eyebrow" data-i18n="nav.tarifs">Tarifs</p>
+        <h2 class="section-title" data-i18n="tarifs.titre">Un prix simple. 14 jours pour essayer.</h2>
 
         <div class="billing-toggle" role="group" aria-label="Période de facturation">
-          <button type="button" class="active" data-period="mois">Mensuel</button>
-          <button type="button" data-period="an">Annuel <span class="save">2 mois offerts</span></button>
+          <button type="button" class="active" data-period="mois" data-i18n="tarifs.mensuel">Mensuel</button>
+          <button type="button" data-period="an" data-i18n="tarifs.annuel">Annuel <span class="save">2 mois offerts</span></button>
         </div>
 
         <div class="plans">
           <article class="plan reveal">
             <h3>Solo</h3>
-            <p class="plan-for">Pour démarrer en micro-entreprise</p>
+            <p class="plan-for" data-i18n="solo.pour">Pour démarrer en micro-entreprise</p>
             <p class="price"><span class="amount" data-mois="9" data-an="90">9</span> € <small class="per">HT / mois</small></p>
             <p class="price-ttc">soit <span class="ttc">10,80 €</span> TTC <span class="per-ttc">/ mois</span></p>
             <ul>
-              <li>Devis et factures illimités</li>
-              <li>Clients illimités</li>
-              <li>Export PDF</li>
-              <li>Mentions légales automatiques</li>
-              <li>Franchise de TVA ou TVA multi-taux</li>
+              <li data-i18n="s.1">Devis et factures illimités</li>
+              <li data-i18n="s.2">Clients illimités</li>
+              <li data-i18n="s.3">Export PDF</li>
+              <li data-i18n="f4.t">Mentions légales automatiques</li>
+              <li data-i18n="s.5">Franchise de TVA ou TVA multi-taux</li>
             </ul>
-            <a class="btn btn-lg plan-cta" href="app.html#inscription">Essayer 14 jours gratuits</a>
+            <a class="btn btn-lg plan-cta" href="app.html#inscription" data-i18n="cta.essayer">Essayer 14 jours gratuits</a>
           </article>
 
           <article class="plan plan-featured reveal">
-            <p class="plan-tag">Le plus choisi</p>
+            <p class="plan-tag" data-i18n="p.0">Le plus choisi</p>
             <h3>Pro</h3>
-            <p class="plan-for">Pour gérer toute votre activité</p>
+            <p class="plan-for" data-i18n="pro.pour">Pour gérer toute votre activité</p>
             <p class="price"><span class="amount" data-mois="19" data-an="190">19</span> € <small class="per">HT / mois</small></p>
             <p class="price-ttc">soit <span class="ttc">22,80 €</span> TTC <span class="per-ttc">/ mois</span></p>
             <ul>
-              <li>Tout ce qui est dans Solo</li>
-              <li>Catalogue de vos prestations et de vos prix</li>
-              <li>Tableau de bord complet : ce qu'il vous reste, graphiques</li>
-              <li>Suivi des dépenses</li>
-              <li>Alertes plafonds micro et TVA</li>
-              <li>Votre logo sur les documents</li>
-              <li>Envoi des devis par email <span class="soon">bientôt</span></li>
-              <li>Signature en ligne du client <span class="soon">bientôt</span></li>
-              <li>Relance des factures impayées <span class="soon">bientôt</span></li>
+              <li data-i18n="p.1">Tout ce qui est dans Solo</li>
+              <li data-i18n="p.2">Catalogue de vos prestations et de vos prix</li>
+              <li data-i18n="p.3">Tableau de bord complet : ce qu'il vous reste, graphiques</li>
+              <li data-i18n="f7.t">Suivi des dépenses</li>
+              <li data-i18n="p.5">Alertes plafonds micro et TVA</li>
+              <li data-i18n="p.6">Votre logo sur les documents</li>
+              <li data-i18n="p.7">Envoi des devis par email <span class="soon">bientôt</span></li>
+              <li data-i18n="p.8">Signature en ligne du client <span class="soon">bientôt</span></li>
+              <li data-i18n="p.9">Relance des factures impayées <span class="soon">bientôt</span></li>
             </ul>
-            <a class="btn btn-primary btn-lg plan-cta" href="app.html#inscription">Essayer 14 jours gratuits</a>
+            <a class="btn btn-primary btn-lg plan-cta" href="app.html#inscription" data-i18n="cta.essayer">Essayer 14 jours gratuits</a>
           </article>
 
           <article class="plan reveal">
-            <h3>Entreprise</h3>
-            <p class="plan-for">Pour les entreprises avec salariés</p>
+            <h3 data-i18n="ent.nom">Entreprise</h3>
+            <p class="plan-for" data-i18n="ent.pour">Pour les entreprises avec salariés</p>
             <p class="price"><span class="amount" data-mois="39" data-an="390">39</span> € <small class="per">HT / mois</small></p>
             <p class="price-ttc">soit <span class="ttc">46,80 €</span> TTC <span class="per-ttc">/ mois</span></p>
             <ul>
-              <li>Tout ce qui est dans Pro</li>
-              <li>Jusqu'à 5 utilisateurs, chacun avec son compte</li>
-              <li>Export pour le comptable (ventes et dépenses)</li>
-              <li>Assistance prioritaire</li>
+              <li data-i18n="ent.1">Tout ce qui est dans Pro</li>
+              <li data-i18n="ent.2">Jusqu'à 5 utilisateurs, chacun avec son compte</li>
+              <li data-i18n="ent.3">Export pour le comptable (ventes et dépenses)</li>
+              <li data-i18n="ent.4">Assistance prioritaire</li>
             </ul>
-            <a class="btn btn-lg plan-cta" href="app.html#inscription">Essayer 14 jours gratuits</a>
+            <a class="btn btn-lg plan-cta" href="app.html#inscription" data-i18n="cta.essayer">Essayer 14 jours gratuits</a>
           </article>
         </div>
-        <p class="plans-note">Aucune carte bancaire demandée pendant l'essai. Sans engagement : vous arrêtez quand vous voulez.</p>
+        <p class="plans-note" data-i18n="tarifs.note">Aucune carte bancaire demandée pendant l'essai. Sans engagement : vous arrêtez quand vous voulez.</p>
       </div>
     </section>
 
     <!-- Questions fréquentes -->
     <section class="section section-alt" id="faq">
       <div class="l-wrap l-narrow">
-        <p class="eyebrow">Questions fréquentes</p>
-        <h2 class="section-title">Vous vous demandez sûrement…</h2>
+        <p class="eyebrow" data-i18n="faq.eyebrow">Questions fréquentes</p>
+        <h2 class="section-title" data-i18n="faq.titre">Vous vous demandez sûrement…</h2>
         <div class="faq">
           <details>
-            <summary>Comment fonctionne l'essai gratuit ?</summary>
-            <p>Vous avez accès à tout pendant 14 jours, sans carte bancaire. À la fin de l'essai, vous choisissez une formule ou vous arrêtez, sans frais.</p>
+            <summary data-i18n="q1">Comment fonctionne l'essai gratuit ?</summary>
+            <p data-i18n="r1">Vous avez accès à tout pendant 14 jours, sans carte bancaire. À la fin de l'essai, vous choisissez une formule ou vous arrêtez, sans frais.</p>
           </details>
           <details>
-            <summary>Mes factures sont-elles conformes ?</summary>
-            <p>Devizo ajoute les mentions obligatoires : numéro qui se suit sans trou, SIRET, TVA ou mention « TVA non applicable, art. 293 B du CGI », date d'échéance, pénalités de retard, indemnité de 40 € pour les clients professionnels, assurance décennale et médiateur de la consommation.</p>
+            <summary data-i18n="q2">Mes factures sont-elles conformes ?</summary>
+            <p data-i18n="r2">Devizo ajoute les mentions obligatoires : numéro qui se suit sans trou, SIRET, TVA ou mention « TVA non applicable, art. 293 B du CGI », date d'échéance, pénalités de retard, indemnité de 40 € pour les clients professionnels, assurance décennale et médiateur de la consommation.</p>
           </details>
           <details>
-            <summary>Je suis micro-entrepreneur, ça marche pour moi ?</summary>
-            <p>Oui. Cochez « Je ne facture pas la TVA » : les montants s'affichent sans TVA avec la bonne mention, et « EI » est ajouté à côté de votre nom.</p>
+            <summary data-i18n="q3">Je suis micro-entrepreneur, ça marche pour moi ?</summary>
+            <p data-i18n="r3">Oui. Cochez « Je ne facture pas la TVA » : les montants s'affichent sans TVA avec la bonne mention, et « EI » est ajouté à côté de votre nom.</p>
           </details>
           <details>
-            <summary>Le calcul de ce qu'il me reste est-il fiable ?</summary>
-            <p>C'est une estimation faite avec les taux 2026 de votre statut : cotisations de la micro-entreprise, impôt sur les sociétés ou charges au réel. Elle vous donne un ordre d'idée fiable au quotidien, mais ne remplace ni votre comptable ni vos déclarations. L'impôt sur le revenu, qui dépend de votre foyer, n'est pas calculé.</p>
+            <summary data-i18n="q4">Le calcul de ce qu'il me reste est-il fiable ?</summary>
+            <p data-i18n="r4">C'est une estimation faite avec les taux 2026 de votre statut : cotisations de la micro-entreprise, impôt sur les sociétés ou charges au réel. Elle vous donne un ordre d'idée fiable au quotidien, mais ne remplace ni votre comptable ni vos déclarations. L'impôt sur le revenu, qui dépend de votre foyer, n'est pas calculé.</p>
           </details>
           <details>
-            <summary>Où sont enregistrées mes données ?</summary>
-            <p>Pour l'instant, vos devis, factures et clients sont enregistrés sur votre appareil. Vous pouvez télécharger une sauvegarde à tout moment depuis « Mon entreprise » et la restaurer sur un autre appareil.</p>
+            <summary data-i18n="q5">Où sont enregistrées mes données ?</summary>
+            <p data-i18n="r5">Dans votre compte, en ligne et en sécurité : vous les retrouvez sur tous vos appareils. Vous pouvez aussi télécharger une sauvegarde à tout moment depuis « Mon entreprise ».</p>
           </details>
           <details>
-            <summary>Je peux l'utiliser sur mon téléphone ?</summary>
-            <p>Oui, Devizo fonctionne sur téléphone, tablette et ordinateur, sans rien installer.</p>
+            <summary data-i18n="q6">Dans quelle langue sont mes devis et factures ?</summary>
+            <p data-i18n="r6">Toujours en français, comme l'exige la loi en France. Le site est disponible en plusieurs langues pour vous aider à comprendre l'outil, mais les documents envoyés à vos clients restent en français.</p>
           </details>
           <details>
-            <summary>Comment j'arrête mon abonnement ?</summary>
-            <p>Il n'y a pas d'engagement. Vous pouvez arrêter à tout moment, l'abonnement s'arrête à la fin du mois en cours.</p>
+            <summary data-i18n="q7">Je peux l'utiliser sur mon téléphone ?</summary>
+            <p data-i18n="r7">Oui, Devizo fonctionne sur téléphone, tablette et ordinateur, sans rien installer.</p>
+          </details>
+          <details>
+            <summary data-i18n="q8">Comment j'arrête mon abonnement ?</summary>
+            <p data-i18n="r8">Il n'y a pas d'engagement. Vous arrêtez quand vous voulez depuis l'application : l'abonnement s'arrête à la fin de la période déjà payée.</p>
           </details>
         </div>
       </div>
@@ -331,9 +347,9 @@
     <!-- Appel final -->
     <section class="final-cta">
       <div class="l-wrap">
-        <h2>Vos devis en 2 minutes. Votre activité en un coup d'œil.</h2>
-        <p>14 jours gratuits, sans carte bancaire.</p>
-        <a class="btn btn-lg btn-light" href="app.html#inscription">Commencer l'essai gratuit</a>
+        <h2 data-i18n="final.titre">Vos devis en 2 minutes. Votre activité en un coup d'œil.</h2>
+        <p data-i18n="final.p">14 jours gratuits, sans carte bancaire.</p>
+        <a class="btn btn-lg btn-light" href="app.html#inscription" data-i18n="cta.essai">Commencer l'essai gratuit</a>
       </div>
     </section>
   </main>
@@ -342,21 +358,22 @@
     <div class="l-wrap l-footer-inner">
       <a class="logo" href="#top">Devizo</a>
       <nav aria-label="Pied de page">
-        <a href="#pilotage">Pilotage</a>
-        <a href="#fonctionnalites">Fonctionnalités</a>
-        <a href="#tarifs">Tarifs</a>
-        <a href="#faq">Questions</a>
-        <a href="app.html#connexion">Se connecter</a>
+        <a href="#pilotage" data-i18n="nav.pilotage">Pilotage</a>
+        <a href="#fonctionnalites" data-i18n="nav.fonctions">Fonctionnalités</a>
+        <a href="#tarifs" data-i18n="nav.tarifs">Tarifs</a>
+        <a href="#faq" data-i18n="nav.questions">Questions</a>
+        <a href="app.html#connexion" data-i18n="nav.seConnecter">Se connecter</a>
       </nav>
       <nav aria-label="Informations légales" class="l-footer-legal">
-        <a href="mentions-legales.html">Mentions légales</a>
-        <a href="cgv.html">Conditions générales</a>
-        <a href="confidentialite.html">Confidentialité</a>
+        <a href="mentions-legales.html" data-i18n="pied.mentions">Mentions légales</a>
+        <a href="cgv.html" data-i18n="pied.cg">Conditions générales</a>
+        <a href="confidentialite.html" data-i18n="pied.conf">Confidentialité</a>
       </nav>
       <p>© 2026 Devizo</p>
     </div>
   </footer>
 
-  <script src="js/landing.js?v=39"></script>
+  <script src="js/i18n.js?v=40"></script>
+  <script src="js/landing.js?v=40"></script>
 </body>
 </html>
