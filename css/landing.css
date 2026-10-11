@@ -49,12 +49,13 @@
 .l-pill:hover { transform: translateY(-1px); }
 .l-pill-plein { background: var(--bandeau-ink); color: var(--bandeau); }
 .l-pill-contour { background: transparent; color: var(--bandeau-ink); }
-@media (max-width: 1099px) {
+@media (max-width: 1239px) {
   .l-header-inner { gap: 24px; }
   .l-nav { gap: 18px; }
   .l-pill-contour { display: none; }
 }
-@media (max-width: 860px) { .l-nav { display: none; } }
+@media (max-width: 960px) { .l-nav { display: none; } }
+@media (max-width: 360px) { .l-header .logo-texte { display: none; } }
 .l-pill-court { display: none; }
 @media (max-width: 560px) {
   .l-header-inner { gap: 10px; }
@@ -350,7 +351,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .dm-pill.pressed { transform: scale(.94); }
 
 /* Grands écrans : bandeau plus aéré. */
-@media (min-width: 1100px) {
+@media (min-width: 1240px) {
   .l-header .logo { font-size: 1.8rem; }
   .l-nav { gap: 32px; }
   .l-nav a { font-size: 1.05rem; }

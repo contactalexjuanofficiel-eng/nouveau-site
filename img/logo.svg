@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Devizo">
+  <defs>
+    <linearGradient id="fond" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b74ff"/>
+      <stop offset="1" stop-color="#1745d6"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#fond)"/>
+  <path d="M21 13h16.5L47 22.5V47a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4V17a4 4 0 0 1 4-4z" fill="#ffffff"/>
+  <path d="M37.5 13v6.5a3 3 0 0 0 3 3H47z" fill="#c7d6ff"/>
+  <path d="M24.5 34.5l5.5 5.5 10-10.5" fill="none" stroke="#1f5eff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

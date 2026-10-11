@@ -67,6 +67,8 @@ a { color: var(--primary); }
   border-bottom: 1px solid var(--border);
 }
 .logo { font-weight: 800; font-size: 1.4rem; color: var(--primary); text-decoration: none; }
+.logo { display: inline-flex; align-items: center; gap: .35em; }
+.logo-icone { width: 1.2em; height: 1.2em; flex: none; display: block; }
 .nav { display: flex; flex-wrap: wrap; gap: 4px; }
 .nav a { padding: 6px 12px; border-radius: 6px; color: var(--text); text-decoration: none; }
 .nav a.active, .nav a:hover { background: var(--bg); color: var(--primary); }
