@@ -561,3 +561,16 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 @media (max-width: 640px) {
   .menu-statut .menu-ligne-liste { inset-inline-start: auto; inset-inline-end: 0; }
 }
+
+/* Journal des ventes / dépenses imprimé en PDF */
+#rapport { display: none; }
+@media print {
+  body.impression-rapport > *:not(#rapport) { display: none !important; }
+  body.impression-rapport #rapport { display: block; color: #000; font-size: 10pt; }
+  .rapport-tete { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
+  .rapport-titre { text-align: right; }
+  .rapport-titre strong { font-size: 14pt; }
+  .rapport-table th, .rapport-table td { padding: 5px 6px; border-bottom: 1px solid #ccc; color: #000; }
+  .rapport-table th { font-size: 9pt; }
+  .rapport-table tfoot td { border-top: 2px solid #000; border-bottom: 0; }
+}
