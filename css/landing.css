@@ -32,7 +32,9 @@
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
   background: var(--bandeau); color: var(--bandeau-ink);
 }
-.l-header-inner { display: flex; align-items: center; gap: 32px; padding-block: 12px; }
+.l-header-inner { display: flex; align-items: center; gap: 40px; padding-block: 14px; }
+/* Le bandeau occupe toute la largeur de l'écran, comme sur les grands sites. */
+.l-header .l-wrap { max-width: none; padding-inline: clamp(20px, 3.5vw, 64px); }
 .l-header .logo { color: var(--primary-dark); font-size: 1.6rem; font-weight: 800; text-decoration: none; letter-spacing: -.01em; }
 .l-nav { display: flex; gap: 24px; }
 .l-nav a { color: var(--bandeau-ink); text-decoration: none; font-weight: 500; }
@@ -47,6 +49,11 @@
 .l-pill:hover { transform: translateY(-1px); }
 .l-pill-plein { background: var(--bandeau-ink); color: var(--bandeau); }
 .l-pill-contour { background: transparent; color: var(--bandeau-ink); }
+@media (max-width: 1099px) {
+  .l-header-inner { gap: 24px; }
+  .l-nav { gap: 18px; }
+  .l-pill-contour { display: none; }
+}
 @media (max-width: 860px) { .l-nav { display: none; } }
 .l-pill-court { display: none; }
 @media (max-width: 560px) {
@@ -341,3 +348,15 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 @media (max-width: 560px) { .l-langue-code { display: none; } }
 .dm-pill { display: inline-block; transition: transform .15s, box-shadow .3s; }
 .dm-pill.pressed { transform: scale(.94); }
+
+/* Grands écrans : bandeau plus aéré. */
+@media (min-width: 1100px) {
+  .l-header .logo { font-size: 1.8rem; }
+  .l-nav { gap: 32px; }
+  .l-nav a { font-size: 1.05rem; }
+  .l-pill { padding: 11px 20px; font-size: 1rem; }
+  .l-actions { gap: 16px; }
+}
+
+/* En alternance : le devis à droite en haut, le tableau de bord à gauche ensuite. */
+@media (min-width: 861px) { .pilot-grid .dash-mock { order: -1; } }
