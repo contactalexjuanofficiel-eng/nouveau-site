@@ -14,14 +14,14 @@ window.DEVIZO_CONFIG = {
   // Liens de paiement Stripe (Stripe > Liens de paiement), un par formule.
   // Vides : le paiement est affiché « bientôt disponible ».
   stripe: {
-    soloMois: 'https://buy.stripe.com/test_3cI14gaGf2rFayJ3mi8Zq00',
-    soloAn: 'https://buy.stripe.com/test_28E4gs3dNgivgX7cWS8Zq01',
-    proMois: 'https://buy.stripe.com/test_3cI4gsdSr6HV8qB4qm8Zq02',
-    proAn: 'https://buy.stripe.com/test_14A5kw3dN0jx36h7Cy8Zq03',
-    equipeMois: 'https://buy.stripe.com/test_7sY8wI3dN7LZ6itbSO8Zq04',
-    equipeAn: 'https://buy.stripe.com/test_7sY5kw3dN6HVgX73mi8Zq05',
+    soloMois: 'https://buy.stripe.com/4gM5kvdJOgj5fb0a7N2ZO00',
+    soloAn: 'https://buy.stripe.com/8x28wH5dieaXbYOeo32ZO01',
+    proMois: 'https://buy.stripe.com/eVq5kv5di3wje6W93J2ZO02',
+    proAn: 'https://buy.stripe.com/14A9AL5di2sfbYO2Fl2ZO03',
+    equipeMois: 'https://buy.stripe.com/8x200b0X27Mz9QG7ZF2ZO04',
+    equipeAn: 'https://buy.stripe.com/6oUeV5bBG6Ive6W7ZF2ZO05',
     // Espace client Stripe (Paramètres > Facturation > Portail client) : changer de
     // carte, de formule, télécharger les factures, résilier.
-    portail: 'https://billing.stripe.com/p/login/test_3cI14gaGf2rFayJ3mi8Zq00',
+    portail: '',
   },
 };
