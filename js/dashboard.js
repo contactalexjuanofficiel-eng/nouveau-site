@@ -501,6 +501,20 @@ window.addEventListener('resize', () => {
 // Dépenses
 // ====================================================================
 
+// Fournisseurs déjà utilisés, du plus fréquent au moins fréquent, avec la
+// catégorie et la TVA de leur dernière dépense (pour pré-remplir la suivante).
+function fournisseursConnus() {
+  const parNom = new Map();
+  (data.depenses || []).slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).forEach((d) => {
+    const nom = String(d.fournisseur || '').trim();
+    if (!nom) return;
+    const cle = nom.toLowerCase();
+    const f = parNom.get(cle) || { nom, n: 0 };
+    parNom.set(cle, { nom, n: f.n + 1, categorie: d.categorie, tva: d.tva });
+  });
+  return [...parNom.values()].sort((a, b) => b.n - a.n || a.nom.localeCompare(b.nom, 'fr'));
+}
+
 function pageDepenses(params) {
   if (!data.depenses) data.depenses = [];
   const enEdition = params?.get('modifier') ? data.depenses.find((d) => d.id === params.get('modifier')) : null;
@@ -517,6 +531,8 @@ function pageDepenses(params) {
   });
   const cats = Object.entries(parCat).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value).slice(0, 6);
 
+  const fournisseurs = fournisseursConnus();
+
   view.innerHTML = `
     <div class="page-head">
       <h1>Dépenses</h1>
@@ -525,9 +541,15 @@ function pageDepenses(params) {
 
     <form id="dep-form" class="card" ${ouvert ? '' : 'hidden'} novalidate>
       <h2>${enEdition ? 'Modifier la dépense' : 'Nouvelle dépense'}</h2>
+      ${!enEdition && fournisseurs.length ? `
+        <div class="fournisseurs-rapides">
+          <span class="hint">Vos fournisseurs :</span>
+          ${fournisseurs.slice(0, 8).map((f) => `<button type="button" class="btn btn-sm" data-fournisseur="${esc(f.nom)}">${esc(f.nom)}</button>`).join('')}
+        </div>` : ''}
+      <datalist id="dep-fournisseurs">${fournisseurs.map((f) => `<option value="${esc(f.nom)}"></option>`).join('')}</datalist>
       <div class="grid-2">
         <div><label for="dep-date">Date *</label><input id="dep-date" name="date" type="date" min="2000-01-01" max="2099-12-31" value="${esc(dep.date)}" required></div>
-        <div><label for="dep-fournisseur">Fournisseur</label><input id="dep-fournisseur" name="fournisseur" value="${esc(dep.fournisseur)}" placeholder="Ex : Point P, Total, Leroy Merlin"></div>
+        <div><label for="dep-fournisseur">Fournisseur</label><input id="dep-fournisseur" name="fournisseur" list="dep-fournisseurs" autocomplete="off" value="${esc(dep.fournisseur)}" placeholder="Ex : Point P, Total, Leroy Merlin"></div>
         <div><label for="dep-categorie">Catégorie</label>
           <select id="dep-categorie" name="categorie">${CATEGORIES_DEPENSES.map((c) => `<option ${c === dep.categorie ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
         <div><label for="dep-montant">Montant TTC payé (€) *</label><input id="dep-montant" name="montantTTC" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(dep.montantTTC)}" required></div>
@@ -569,6 +591,19 @@ function pageDepenses(params) {
   };
   form.addEventListener('input', majHT);
   majHT();
+
+  // Fournisseur déjà connu : sa catégorie et sa TVA habituelles sont reprises.
+  const choisirFournisseur = (nom, focusMontant) => {
+    const f = fournisseurs.find((x) => x.nom.toLowerCase() === String(nom).trim().toLowerCase());
+    if (!f) return;
+    form.fournisseur.value = f.nom;
+    if (CATEGORIES_DEPENSES.includes(f.categorie)) form.categorie.value = f.categorie;
+    if (f.tva !== undefined) form.tva.value = String(Number(f.tva));
+    majHT();
+    if (focusMontant) form.montantTTC.focus();
+  };
+  if (!enEdition) form.fournisseur.addEventListener('change', () => choisirFournisseur(form.fournisseur.value, true));
+  form.querySelectorAll('[data-fournisseur]').forEach((b) => b.addEventListener('click', () => choisirFournisseur(b.dataset.fournisseur, true)));
   document.getElementById('dep-ajout').addEventListener('click', () => go('#/depenses?ajout=1'));
   if (ouvert) setTimeout(() => form.montantTTC.focus(), 50);
 

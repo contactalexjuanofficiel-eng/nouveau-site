@@ -568,3 +568,6 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .dt-type-devis { color: var(--primary); }
 .dt-type-facture { color: var(--success); }
 .legende-numeros { margin: 12px 0 0; font-size: .85rem; line-height: 1.5; }
+
+/* Fournisseurs habituels (dépenses) */
+.fournisseurs-rapides { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
