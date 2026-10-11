@@ -525,7 +525,15 @@ const STATUTS = {
   facture: { 'a-payer': 'À payer', payee: 'Payée' },
 };
 
+// Facture non payée dont l'échéance est passée : nombre de jours de retard, sinon 0.
+function joursDeRetard(doc) {
+  if (doc.type !== 'facture' || doc.statut === 'payee' || !doc.echeance) return 0;
+  return Math.max(0, Math.floor((Date.parse(today()) - Date.parse(doc.echeance)) / 86400000));
+}
+
 function badge(doc) {
+  const retard = joursDeRetard(doc);
+  if (retard) return `<span class="badge badge-retard">En retard · ${retard} j</span>`;
   return `<span class="badge badge-${esc(doc.statut)}">${esc(STATUTS[doc.type][doc.statut] || doc.statut)}</span>`;
 }
 
@@ -563,29 +571,91 @@ function go(hash) {
 // Pages
 // ====================================================================
 
+// L'étape suivante d'un document, faisable directement depuis la liste.
+function actionsRapides(d) {
+  const id = esc(d.id);
+  if (d.type === 'facture') {
+    return d.statut === 'payee'
+      ? `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`
+      : `<button class="btn btn-sm btn-ok" data-payee="${id}">✓ Payée</button>`;
+  }
+  if (d.statut === 'accepte') {
+    const facture = data.documents.find((f) => f.devisOrigine === d.id);
+    return facture
+      ? `<a class="btn btn-sm" href="#/voir/${esc(facture.id)}">Facture ${esc(facture.numero)}</a>`
+      : `<button class="btn btn-sm btn-primary" data-facturer="${id}">Facturer →</button>`;
+  }
+  if (d.statut === 'refuse') return '';
+  return `<button class="btn btn-sm btn-ok" data-statut-doc="${id}" data-valeur="accepte">✓ Accepté</button>
+    <button class="btn btn-sm" data-statut-doc="${id}" data-valeur="refuse" aria-label="Refusé" title="Refusé">✗</button>`;
+}
+
 function documentsTable(docs) {
   if (!docs.length) {
     return `<p class="empty">Aucun document pour l'instant. Créez votre premier devis !</p>`;
   }
   return `
-    <div class="table-wrap"><table>
+    <div class="table-wrap"><table class="docs-table">
       <thead><tr><th>Numéro</th><th>Client</th><th>Date</th><th>Statut</th><th class="num">Total TTC</th><th class="num">Actions</th></tr></thead>
       <tbody>
         ${docs.map((d) => `
-          <tr>
-            <td><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
-            <td>${esc(clientName(d))}</td>
-            <td>${dateFr(d.date)}</td>
-            <td>${badge(d)}</td>
-            <td class="num">${euro(computeTotals(d).ttc)}</td>
-            <td><div class="row-actions">
-              <a class="btn btn-sm" href="#/modifier/${esc(d.id)}">Modifier</a>
-              <button class="btn btn-sm" data-duplicate="${esc(d.id)}">Dupliquer</button>
-              <button class="btn btn-sm btn-danger" data-delete="${esc(d.id)}">Supprimer</button>
+          <tr data-ouvrir="${esc(d.id)}">
+            <td class="dt-num"><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
+            <td class="dt-client">${esc(clientName(d))}</td>
+            <td class="dt-date">${dateFr(d.date)}</td>
+            <td class="dt-statut">${badge(d)}</td>
+            <td class="num dt-total">${euro(computeTotals(d).ttc)}</td>
+            <td class="dt-actions"><div class="row-actions">
+              ${actionsRapides(d)}
+              <details class="menu-ligne">
+                <summary class="btn btn-sm" aria-label="Plus d'actions" title="Plus d'actions">⋯</summary>
+                <div class="menu-ligne-liste">
+                  <a href="#/voir/${esc(d.id)}?pdf=1">Télécharger le PDF</a>
+                  <a href="#/modifier/${esc(d.id)}">Modifier</a>
+                  ${d.type === 'facture' && d.statut === 'payee' ? `<button data-statut-doc="${esc(d.id)}" data-valeur="a-payer">Remettre « à payer »</button>` : ''}
+                  ${d.type === 'devis' && d.statut !== 'brouillon' && d.statut !== 'envoye' && !data.documents.some((f) => f.devisOrigine === d.id) ? `<button data-statut-doc="${esc(d.id)}" data-valeur="envoye">Remettre « en attente »</button>` : ''}
+                  <button data-duplicate="${esc(d.id)}">Dupliquer</button>
+                  <button class="danger" data-delete="${esc(d.id)}">Supprimer</button>
+                </div>
+              </details>
             </div></td>
           </tr>`).join('')}
       </tbody>
     </table></div>`;
+}
+
+// Petit message en bas de l'écran, avec un bouton « Annuler » pour revenir en arrière.
+function toast(message, annuler) {
+  document.querySelector('.toast')?.remove();
+  const el = document.createElement('div');
+  el.className = 'toast no-print';
+  el.setAttribute('role', 'status');
+  el.innerHTML = `<span>${esc(message)}</span>${annuler ? '<button type="button">Annuler</button>' : ''}`;
+  el.querySelector('button')?.addEventListener('click', () => {
+    el.remove();
+    annuler();
+  });
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
+// Change le statut d'un document depuis la liste, avec possibilité d'annuler.
+function changerStatut(doc, statut) {
+  if (!doc) return;
+  const avant = { statut: doc.statut, datePaiement: doc.datePaiement };
+  doc.statut = statut;
+  if (statut === 'payee') doc.datePaiement = doc.datePaiement || today();
+  if (statut === 'a-payer') delete doc.datePaiement;
+  saveData();
+  render();
+  const libelle = { payee: 'marquée payée', 'a-payer': 'remise à payer', accepte: 'marqué accepté', refuse: 'marqué refusé', envoye: 'remis en attente' }[statut];
+  toast(`${doc.type === 'facture' ? 'Facture' : 'Devis'} ${doc.numero} ${libelle}`, () => {
+    doc.statut = avant.statut;
+    if (avant.datePaiement) doc.datePaiement = avant.datePaiement;
+    else delete doc.datePaiement;
+    saveData();
+    render();
+  });
 }
 
 function pageDocuments(filtre) {
@@ -1026,6 +1096,11 @@ function pageView(id) {
   `;
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
+  // Arrivée depuis « Télécharger le PDF » de la liste : on ouvre directement l'impression.
+  if (/[?&]pdf=1/.test(location.hash) && !window.DEVIZO_DEMO) {
+    history.replaceState(null, '', location.pathname + '#/voir/' + doc.id);
+    setTimeout(() => window.print(), 300);
+  }
   document.getElementById('print')?.addEventListener('click', () => {
     ask("Dans l'aperçu, le téléchargement est bloqué. Sur le vrai site, ce bouton enregistre le document en PDF.", "D'accord");
   });
@@ -1741,11 +1816,27 @@ function render() {
 }
 
 document.addEventListener('click', async (e) => {
-  const { new: type, duplicate, delete: del, deleteClient: delClient } = e.target.dataset || {};
+  if (!(e.target instanceof Element)) return;
+  // Un clic ailleurs ferme les menus « ⋯ » ouverts.
+  document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
+    if (!m.contains(e.target)) m.open = false;
+  });
+  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer]');
+  if (!cible) {
+    // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
+    const ligne = e.target.closest('tr[data-ouvrir]');
+    if (ligne && !e.target.closest('a, button, details')) go('#/voir/' + ligne.dataset.ouvrir);
+    return;
+  }
+  cible.closest('.menu-ligne')?.removeAttribute('open');
+  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer } = cible.dataset;
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();
   if (delClient && (await deleteClient(getClient(delClient)))) render();
+  if (payee) changerStatut(getDocument(payee), 'payee');
+  if (statutDoc) changerStatut(getDocument(statutDoc), valeur);
+  if (facturer) convertToInvoice(getDocument(facturer));
 });
 
 // Menu burger sur téléphone.

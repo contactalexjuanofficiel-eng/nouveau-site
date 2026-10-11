@@ -489,3 +489,59 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .equipe-message { margin-top: 12px; display: grid; gap: 8px; }
 .equipe-message textarea { width: 100%; }
 .equipe-message .btn { justify-self: start; }
+
+/* ---------- Liste des devis et factures : actions rapides ---------- */
+.btn-ok { color: var(--success); border-color: color-mix(in srgb, var(--success) 45%, var(--border)); font-weight: 600; }
+.btn-ok:hover { background: var(--success-soft); }
+.badge-retard { color: var(--danger); background: var(--danger-soft); }
+.docs-table tr[data-ouvrir] { cursor: pointer; }
+.docs-table tbody tr[data-ouvrir]:hover { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+.docs-table .row-actions { align-items: center; }
+.docs-table .hint { white-space: nowrap; font-size: .85rem; }
+
+.menu-ligne { position: relative; }
+.menu-ligne summary { list-style: none; cursor: pointer; min-width: 36px; text-align: center; }
+.menu-ligne summary::-webkit-details-marker { display: none; }
+.menu-ligne-liste {
+  position: absolute; inset-inline-end: 0; top: calc(100% + 4px); z-index: 30;
+  display: grid; min-width: 210px; padding: 6px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 12px 30px var(--shadow);
+}
+.menu-ligne-liste a, .menu-ligne-liste button {
+  display: block; text-align: start; padding: 9px 12px; border: 0; border-radius: 6px;
+  background: none; color: var(--text); font: inherit; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.menu-ligne-liste a:hover, .menu-ligne-liste button:hover { background: var(--primary-soft); }
+.menu-ligne-liste .danger { color: var(--danger); }
+.table-wrap:has(.menu-ligne[open]) { overflow: visible; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 50;
+  display: flex; align-items: center; gap: 16px; max-width: calc(100vw - 32px);
+  padding: 12px 16px; border-radius: 12px; background: #1c2333; color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35); animation: toast-in .25s ease;
+}
+.toast button { background: none; border: 0; color: #8eadff; font: inherit; font-weight: 700; cursor: pointer; padding: 4px; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 10px); } }
+
+/* Sur téléphone : chaque document devient une carte, actions bien visibles. */
+@media (max-width: 640px) {
+  .docs-table thead { display: none; }
+  .docs-table, .docs-table tbody { display: block; }
+  .docs-table tr {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px;
+    grid-template-areas: "num total" "client statut" "actions actions";
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .docs-table td { border: 0; padding: 0; }
+  .docs-table .dt-num { grid-area: num; font-weight: 600; }
+  .docs-table .dt-total { grid-area: total; font-weight: 700; }
+  .docs-table .dt-client { grid-area: client; color: var(--muted); overflow-wrap: anywhere; }
+  .docs-table .dt-statut { grid-area: statut; text-align: end; }
+  .docs-table .dt-date { display: none; }
+  .docs-table .dt-actions { grid-area: actions; padding-top: 6px; }
+  .docs-table .row-actions { justify-content: flex-start; }
+  .docs-table .row-actions .btn { padding: 8px 14px; }
+  .docs-table .menu-ligne { margin-inline-start: auto; }
+}
