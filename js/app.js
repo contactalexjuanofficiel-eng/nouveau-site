@@ -1896,4 +1896,21 @@ window.addEventListener('hashchange', () => {
   render();
   window.scrollTo(0, 0);
 });
+// Mise à jour automatique : si une version plus récente du site est en ligne
+// (le navigateur garde l'ancienne page en mémoire quelques minutes), on recharge.
+(async () => {
+  try {
+    const actuelle = document.querySelector('script[src*="js/app.js"]')?.src.match(/[?&]v=(\d+)/)?.[1];
+    const page = await (await fetch(location.pathname, { cache: 'no-store' })).text();
+    const enLigne = page.match(/js\/app\.js\?v=(\d+)/)?.[1];
+    const cle = 'devizo-maj-' + enLigne;
+    if (actuelle && enLigne && Number(enLigne) > Number(actuelle) && !sessionStorage.getItem(cle)) {
+      sessionStorage.setItem(cle, '1'); // une seule tentative, pour ne jamais boucler
+      location.reload();
+    }
+  } catch (e) {
+    // hors ligne : on garde la version actuelle
+  }
+})();
+
 Compte.demarrer(render);
