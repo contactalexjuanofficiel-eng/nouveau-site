@@ -156,13 +156,26 @@ const Envoi = (() => {
           },
         });
         if (error) {
+          // Message clair de la fonction, sinon la cause technique (pour le dépannage).
           let detail = '';
+          let technique = error.message || '';
           try {
-            detail = (await error.context?.json?.())?.erreur || '';
+            const r = error.context;
+            if (r && typeof r.text === 'function') {
+              const texte = await r.text();
+              let j = null;
+              try {
+                j = JSON.parse(texte);
+              } catch (e) {
+                // pas du JSON
+              }
+              detail = j?.erreur || '';
+              technique = `${r.status} ${j?.message || j?.msg || texte}`.slice(0, 160);
+            }
           } catch (e) {
             // réponse illisible
           }
-          throw new Error(detail || "L'e-mail n'a pas pu partir. Vérifiez votre connexion et réessayez.");
+          throw new Error(detail || `L'e-mail n'a pas pu partir. Réessayez dans un instant. (Détail : ${technique})`);
         }
         // Historique sur le document, et statut mis à jour.
         doc.envois = [...(doc.envois || []), { le: new Date().toISOString(), a, type: mode, lien: Boolean(res?.lien) }];
