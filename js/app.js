@@ -577,7 +577,7 @@ function actionsRapides(d) {
   if (d.type === 'facture') {
     return d.statut === 'payee'
       ? `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`
-      : `<button class="btn btn-sm btn-ok" data-payee="${id}">✓ Payée</button>`;
+      : `<button class="btn btn-sm btn-primary" data-payee="${id}">Marquer payée</button>`;
   }
   if (d.statut === 'accepte') {
     const facture = data.documents.find((f) => f.devisOrigine === d.id);
@@ -586,8 +586,20 @@ function actionsRapides(d) {
       : `<button class="btn btn-sm btn-primary" data-facturer="${id}">Facturer →</button>`;
   }
   if (d.statut === 'refuse') return '';
-  return `<button class="btn btn-sm btn-ok" data-statut-doc="${id}" data-valeur="accepte">✓ Accepté</button>
-    <button class="btn btn-sm" data-statut-doc="${id}" data-valeur="refuse" aria-label="Refusé" title="Refusé">✗</button>`;
+  return `<button class="btn btn-sm btn-primary" data-statut-doc="${id}" data-valeur="accepte">Accepter</button>
+    <button class="btn btn-sm" data-statut-doc="${id}" data-valeur="refuse">Refuser</button>`;
+}
+
+// Le statut est cliquable : on le change directement depuis la liste.
+function statutCliquable(d) {
+  const options = Object.entries(STATUTS[d.type]).filter(([k]) => k !== d.statut);
+  return `<details class="menu-ligne menu-statut">
+    <summary title="Changer le statut">${badge(d)}<span class="chevron" aria-hidden="true">▾</span></summary>
+    <div class="menu-ligne-liste">
+      <p class="menu-titre">Changer le statut</p>
+      ${options.map(([k, v]) => `<button data-statut-doc="${esc(d.id)}" data-valeur="${k}"><span class="badge badge-${k}">${esc(v)}</span></button>`).join('')}
+    </div>
+  </details>`;
 }
 
 function documentsTable(docs) {
@@ -603,7 +615,7 @@ function documentsTable(docs) {
             <td class="dt-num"><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
             <td class="dt-client">${esc(clientName(d))}</td>
             <td class="dt-date">${dateFr(d.date)}</td>
-            <td class="dt-statut">${badge(d)}</td>
+            <td class="dt-statut">${statutCliquable(d)}</td>
             <td class="num dt-total">${euro(computeTotals(d).ttc)}</td>
             <td class="dt-actions"><div class="row-actions">
               ${actionsRapides(d)}
@@ -612,8 +624,6 @@ function documentsTable(docs) {
                 <div class="menu-ligne-liste">
                   <a href="#/voir/${esc(d.id)}?pdf=1">Télécharger le PDF</a>
                   <a href="#/modifier/${esc(d.id)}">Modifier</a>
-                  ${d.type === 'facture' && d.statut === 'payee' ? `<button data-statut-doc="${esc(d.id)}" data-valeur="a-payer">Remettre « à payer »</button>` : ''}
-                  ${d.type === 'devis' && d.statut !== 'brouillon' && d.statut !== 'envoye' && !data.documents.some((f) => f.devisOrigine === d.id) ? `<button data-statut-doc="${esc(d.id)}" data-valeur="envoye">Remettre « en attente »</button>` : ''}
                   <button data-duplicate="${esc(d.id)}">Dupliquer</button>
                   <button class="danger" data-delete="${esc(d.id)}">Supprimer</button>
                 </div>
@@ -648,7 +658,7 @@ function changerStatut(doc, statut) {
   if (statut === 'a-payer') delete doc.datePaiement;
   saveData();
   render();
-  const libelle = { payee: 'marquée payée', 'a-payer': 'remise à payer', accepte: 'marqué accepté', refuse: 'marqué refusé', envoye: 'remis en attente' }[statut];
+  const libelle = { payee: 'marquée payée', 'a-payer': 'remise à payer', accepte: 'marqué accepté', refuse: 'marqué refusé', envoye: 'marqué envoyé', brouillon: 'remis en brouillon' }[statut];
   toast(`${doc.type === 'facture' ? 'Facture' : 'Devis'} ${doc.numero} ${libelle}`, () => {
     doc.statut = avant.statut;
     if (avant.datePaiement) doc.datePaiement = avant.datePaiement;

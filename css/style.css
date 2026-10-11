@@ -504,7 +504,7 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .menu-ligne summary::-webkit-details-marker { display: none; }
 .menu-ligne-liste {
   position: absolute; inset-inline-end: 0; top: calc(100% + 4px); z-index: 30;
-  display: grid; min-width: 210px; padding: 6px;
+  display: grid; min-width: 210px; padding: 6px; text-align: start;
   background: var(--card); border: 1px solid var(--border); border-radius: 10px;
   box-shadow: 0 12px 30px var(--shadow);
 }
@@ -544,4 +544,15 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
   .docs-table .row-actions { justify-content: flex-start; }
   .docs-table .row-actions .btn { padding: 8px 14px; }
   .docs-table .menu-ligne { margin-inline-start: auto; }
+}
+
+/* Statut cliquable dans la liste */
+.menu-statut summary { display: inline-flex; align-items: center; gap: 4px; list-style: none; cursor: pointer; border-radius: 999px; }
+.menu-statut summary::-webkit-details-marker { display: none; }
+.menu-statut .chevron { font-size: .7rem; color: var(--muted); }
+.menu-statut summary:hover .badge, .menu-statut[open] .badge { box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent); }
+.menu-statut .menu-ligne-liste { inset-inline-end: auto; inset-inline-start: 0; min-width: 180px; }
+.menu-titre { margin: 4px 12px 6px; font-size: .78rem; color: var(--muted); font-weight: 600; }
+@media (max-width: 640px) {
+  .menu-statut .menu-ligne-liste { inset-inline-start: auto; inset-inline-end: 0; }
 }
