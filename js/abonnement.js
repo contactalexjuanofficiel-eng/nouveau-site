@@ -27,7 +27,8 @@ const Abonnement = (() => {
       nom: 'Pro',
       pour: 'Pour gérer toute votre activité',
       inclus: ['Tout ce qui est dans Solo', 'Catalogue de vos prestations et de vos prix', "Tableau de bord complet : ce qu'il vous reste, graphiques",
-        'Suivi des dépenses', 'Alertes plafonds micro et TVA', 'Votre logo sur les documents'],
+        'Suivi des dépenses', 'Alertes plafonds micro et TVA', 'Votre logo sur les documents',
+        'Envoi des devis et factures par e-mail', 'Signature en ligne du client', 'Relance des factures impayées'],
     },
     equipe: {
       nom: 'Entreprise',
