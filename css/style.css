@@ -562,3 +562,9 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
   .menu-statut .menu-ligne-liste { inset-inline-start: auto; inset-inline-end: 0; }
 }
 
+
+/* Type de document dans la liste */
+.dt-type { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.dt-type-devis { color: var(--primary); }
+.dt-type-facture { color: var(--success); }
+.legende-numeros { margin: 12px 0 0; font-size: .85rem; line-height: 1.5; }

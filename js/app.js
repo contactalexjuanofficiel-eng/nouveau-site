@@ -618,7 +618,7 @@ function documentsTable(docs) {
       <tbody>
         ${docs.map((d) => `
           <tr data-ouvrir="${esc(d.id)}">
-            <td class="dt-num"><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
+            <td class="dt-num"><span class="dt-type dt-type-${d.type}">${d.type === 'facture' ? 'Facture' : 'Devis'}</span><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
             <td class="dt-client">${esc(clientName(d))}</td>
             <td class="dt-date">${dateFr(d.date)}</td>
             <td class="dt-statut">${statutCliquable(d)}</td>
@@ -637,7 +637,10 @@ function documentsTable(docs) {
             </div></td>
           </tr>`).join('')}
       </tbody>
-    </table></div>`;
+    </table></div>
+    <p class="hint legende-numeros">Comment lire les numéros : <strong>D-2026-001</strong> = devis n° 1 de 2026,
+      <strong>F-2026-001</strong> = facture n° 1 de 2026. Devis et factures ont chacun leur propre suite de numéros,
+      qui se suivent sans trou comme l'exige la loi. Une facture créée depuis un devis prend le numéro de facture suivant.</p>`;
 }
 
 // Petit message en bas de l'écran, avec un bouton « Annuler » pour revenir en arrière.
@@ -794,6 +797,20 @@ function pageEdit(id) {
         <div class="totals" id="totals" style="margin-top:16px"></div>
       </div>
 
+      <div class="card" id="motif-tva0" hidden>
+        <label for="motifTva0">Pourquoi la TVA est à 0 % ?</label>
+        <select id="motifTva0" name="motifTva0">
+          <option value="" ${!doc.motifTva0 ? 'selected' : ''}>— Choisir le motif —</option>
+          <option value="autoliquidation" ${doc.motifTva0 === 'autoliquidation' ? 'selected' : ''}>Sous-traitance dans le bâtiment (autoliquidation)</option>
+          <option value="autre" ${doc.motifTva0 === 'autre' ? 'selected' : ''}>Autre motif (je l'écris moi-même)</option>
+        </select>
+        <div id="mention-tva0-champ" hidden style="margin-top:8px">
+          <label for="mentionTva0">Mention à afficher sur le document</label>
+          <input id="mentionTva0" name="mentionTva0" value="${esc(doc.mentionTva0 || '')}" placeholder="Ex : Exonération de TVA, article … du CGI">
+        </div>
+        <p class="hint warn" id="motif-tva0-alerte">La loi impose d'indiquer sur la facture pourquoi aucune TVA n'est facturée.</p>
+      </div>
+
       <div class="card">
         <label for="notes">Notes (conditions, délais, acompte...)</label>
         <textarea id="notes" name="notes" rows="3">${esc(doc.notes)}</textarea>
@@ -830,16 +847,26 @@ function pageEdit(id) {
     renderTotals();
   }
 
-  // Taux activés dans « Mon entreprise », plus celui déjà choisi sur la ligne.
+  // Taux activés dans « Mon entreprise », 0 % (toujours possible) et celui déjà choisi sur la ligne.
   function tauxProposes(actuel) {
     const liste = (data.entreprise.tauxActifs || []).map(Number);
-    if (!liste.includes(Number(actuel))) liste.push(Number(actuel));
+    for (const t of [0, Number(actuel)]) if (!liste.includes(t)) liste.push(t);
     return liste.sort((a, b) => b - a);
   }
 
   function renderTotals() {
     const t = computeTotals(doc);
     document.getElementById('totals').innerHTML = totalsHtml(t, doc);
+    majMotifTva0();
+  }
+
+  // Une ligne à 0 % de TVA doit être justifiée par une mention sur le document.
+  function majMotifTva0() {
+    const bloc = document.getElementById('motif-tva0');
+    if (!bloc) return;
+    bloc.hidden = franchise || !doc.lignes.some((l) => Number(l.tva) === 0);
+    document.getElementById('mention-tva0-champ').hidden = doc.motifTva0 !== 'autre';
+    document.getElementById('motif-tva0-alerte').hidden = Boolean(doc.motifTva0);
   }
 
   linesEl.addEventListener('input', (e) => {
@@ -874,7 +901,7 @@ function pageEdit(id) {
       // Un autre client est choisi : la copie de l'ancien client n'est plus utile.
       if (e.target.name === 'clientId' && e.target.value !== doc.clientId) delete doc.clientArchive;
       doc[e.target.name] = e.target.value;
-      if (e.target.name === 'acompte') renderTotals();
+      if (e.target.name === 'acompte' || e.target.name === 'motifTva0') renderTotals();
       if (e.target.name === 'statut') {
         // La date de paiement sert au calcul du chiffre d'affaires encaissé.
         if (e.target.value === 'payee' && !doc.datePaiement) doc.datePaiement = today();
@@ -1043,6 +1070,10 @@ function infosDocument(doc) {
   }
   if (e.mediateur && !clientPro) {
     mentions.push(`En cas de litige, le client consommateur peut recourir gratuitement au médiateur de la consommation : ${e.mediateur}.`);
+  }
+  if (!e.franchiseTva && doc.lignes.some((l) => Number(l.tva) === 0)) {
+    if (doc.motifTva0 === 'autoliquidation') mentions.push('Autoliquidation : TVA due par le preneur (article 283-2 nonies du CGI).');
+    else if (doc.motifTva0 === 'autre' && doc.mentionTva0) mentions.push(doc.mentionTva0);
   }
   if (e.mentions) mentions.push(e.mentions);
 
