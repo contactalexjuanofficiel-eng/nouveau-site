@@ -581,9 +581,15 @@ function actionsRapides(d) {
   }
   if (d.statut === 'accepte') {
     const facture = data.documents.find((f) => f.devisOrigine === d.id);
-    return facture
-      ? `<a class="btn btn-sm" href="#/voir/${esc(facture.id)}">Facture ${esc(facture.numero)}</a>`
-      : `<button class="btn btn-sm btn-primary" data-facturer="${id}">Facturer →</button>`;
+    if (!facture) {
+      return `<button class="btn btn-sm btn-primary" data-facturer="${id}">Facturer →</button>
+        <button class="btn btn-sm" data-devis-paye="${id}" title="Crée la facture et la marque payée">Déjà payé</button>`;
+    }
+    // Le devis a sa facture : on agit directement sur elle.
+    return facture.statut === 'payee'
+      ? `<a class="hint" href="#/voir/${esc(facture.id)}">Facture ${esc(facture.numero)} payée</a>`
+      : `<a class="btn btn-sm" href="#/voir/${esc(facture.id)}">${esc(facture.numero)}</a>
+        <button class="btn btn-sm btn-primary" data-payee="${esc(facture.id)}">Marquer payée</button>`;
   }
   if (d.statut === 'refuse') return '';
   return `<button class="btn btn-sm btn-primary" data-statut-doc="${id}" data-valeur="accepte">Accepter</button>
@@ -957,8 +963,9 @@ function incrementNumber(numero) {
   return numero.replace(/(\d+)$/, (n) => String(Number(n) + 1).padStart(n.length, '0'));
 }
 
-async function convertToInvoice(devis) {
-  if (!(await profilPret())) return;
+// Crée la facture d'un devis. ouvrir=false : reste sur la page (actions rapides de la liste).
+async function convertToInvoice(devis, ouvrir = true) {
+  if (!(await profilPret())) return null;
   const deja = data.documents.find((d) => d.devisOrigine === devis.id);
   if (deja) {
     if (await ask(`Ce devis a déjà été transformé en facture (${deja.numero}). L'ouvrir ?`, 'Ouvrir la facture')) {
@@ -980,7 +987,25 @@ async function convertToInvoice(devis) {
   devis.statut = 'accepte';
   data.documents.push(facture);
   saveData();
-  go('#/voir/' + facture.id);
+  if (ouvrir) go('#/voir/' + facture.id);
+  return facture;
+}
+
+// Devis payé sur place : la facture est créée et marquée payée d'un coup.
+async function devisPaye(devis) {
+  const statutAvant = devis.statut;
+  const facture = await convertToInvoice(devis, false);
+  if (!facture) return;
+  facture.statut = 'payee';
+  facture.datePaiement = today();
+  saveData();
+  render();
+  toast(`Facture ${facture.numero} créée et marquée payée`, () => {
+    data.documents = data.documents.filter((d) => d.id !== facture.id);
+    devis.statut = statutAvant;
+    saveData();
+    render();
+  });
 }
 
 function pageView(id) {
@@ -1831,7 +1856,7 @@ document.addEventListener('click', async (e) => {
   document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
     if (!m.contains(e.target)) m.open = false;
   });
-  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer]');
+  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye]');
   if (!cible) {
     // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
     const ligne = e.target.closest('tr[data-ouvrir]');
@@ -1839,7 +1864,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
   cible.closest('.menu-ligne')?.removeAttribute('open');
-  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer } = cible.dataset;
+  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye } = cible.dataset;
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();
@@ -1847,6 +1872,7 @@ document.addEventListener('click', async (e) => {
   if (payee) changerStatut(getDocument(payee), 'payee');
   if (statutDoc) changerStatut(getDocument(statutDoc), valeur);
   if (facturer) convertToInvoice(getDocument(facturer));
+  if (dejaPaye) devisPaye(getDocument(dejaPaye));
 });
 
 // Menu burger sur téléphone.
