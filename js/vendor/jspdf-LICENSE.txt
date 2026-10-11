@@ -1,0 +1,2 @@
+jsPDF 2.5.2 (MIT) — https://github.com/parallax/jsPDF
+jspdf-autotable 3.8.4 (MIT) — https://github.com/simonbengtsson/jsPDF-AutoTable

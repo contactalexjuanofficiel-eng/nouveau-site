@@ -628,7 +628,7 @@ function documentsTable(docs) {
               <details class="menu-ligne">
                 <summary class="btn btn-sm" aria-label="Plus d'actions" title="Plus d'actions">⋯</summary>
                 <div class="menu-ligne-liste">
-                  <a href="#/voir/${esc(d.id)}?pdf=1">Télécharger le PDF</a>
+                  <button data-pdf="${esc(d.id)}">Télécharger le PDF</button>
                   <a href="#/modifier/${esc(d.id)}">Modifier</a>
                   <button data-duplicate="${esc(d.id)}">Dupliquer</button>
                   <button class="danger" data-delete="${esc(d.id)}">Supprimer</button>
@@ -1008,9 +1008,8 @@ async function devisPaye(devis) {
   });
 }
 
-function pageView(id) {
-  const doc = getDocument(id);
-  if (!doc) return pageNotFound();
+// Tout ce qui figure sur un devis ou une facture (écran et PDF).
+function infosDocument(doc) {
   const e = data.entreprise;
   const client = docClient(doc) || {};
   const isFacture = doc.type === 'facture';
@@ -1052,6 +1051,13 @@ function pageView(id) {
   const formeAffichee = !isIndividuel(e) && e.formeJuridique !== 'autre'
     ? FORMES[e.formeJuridique] + (e.capital ? ` au capital de ${new Intl.NumberFormat('fr-FR').format(Number(String(e.capital).replace(/\s/g, '').replace(',', '.')) || 0)} €` : '')
     : '';
+  return { e, client, isFacture, t, origine, clientPro, mentions, nomAffiche, formeAffichee };
+}
+
+function pageView(id) {
+  const doc = getDocument(id);
+  if (!doc) return pageNotFound();
+  const { e, client, isFacture, t, origine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
 
   view.innerHTML = `
     ${backLink()}
@@ -1059,9 +1065,8 @@ function pageView(id) {
       <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
         <a class="btn" href="#/modifier/${esc(doc.id)}">Modifier</a>
-        ${window.DEVIZO_DEMO
-          ? `<button class="btn btn-primary" id="print">Télécharger en PDF</button>`
-          : `<button class="btn btn-primary" onclick="window.print()">Télécharger / Imprimer (PDF)</button>`}
+        <button class="btn btn-primary" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
+        <button class="btn" onclick="window.print()">Imprimer</button>
         ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut !== 'payee' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
         <button class="btn" id="duplicate">Dupliquer</button>
@@ -1131,14 +1136,6 @@ function pageView(id) {
   `;
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
-  // Arrivée depuis « Télécharger le PDF » de la liste : on ouvre directement l'impression.
-  if (/[?&]pdf=1/.test(location.hash) && !window.DEVIZO_DEMO) {
-    history.replaceState(null, '', location.pathname + '#/voir/' + doc.id);
-    setTimeout(() => window.print(), 300);
-  }
-  document.getElementById('print')?.addEventListener('click', () => {
-    ask("Dans l'aperçu, le téléchargement est bloqué. Sur le vrai site, ce bouton enregistre le document en PDF.", "D'accord");
-  });
   document.getElementById('mark-paid')?.addEventListener('click', () => {
     doc.statut = 'payee';
     doc.datePaiement = today();
@@ -1856,7 +1853,7 @@ document.addEventListener('click', async (e) => {
   document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
     if (!m.contains(e.target)) m.open = false;
   });
-  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye]');
+  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf]');
   if (!cible) {
     // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
     const ligne = e.target.closest('tr[data-ouvrir]');
@@ -1864,7 +1861,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
   cible.closest('.menu-ligne')?.removeAttribute('open');
-  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye } = cible.dataset;
+  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye, pdf } = cible.dataset;
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();
@@ -1873,6 +1870,14 @@ document.addEventListener('click', async (e) => {
   if (statutDoc) changerStatut(getDocument(statutDoc), valeur);
   if (facturer) convertToInvoice(getDocument(facturer));
   if (dejaPaye) devisPaye(getDocument(dejaPaye));
+  if (pdf && getDocument(pdf)) {
+    const texte = cible.textContent;
+    cible.disabled = true;
+    cible.textContent = 'Création du PDF…';
+    await Pdf.document(getDocument(pdf));
+    cible.disabled = false;
+    cible.textContent = texte;
+  }
 });
 
 // Menu burger sur téléphone.

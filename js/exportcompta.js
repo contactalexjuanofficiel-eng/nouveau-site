@@ -34,42 +34,6 @@ function telechargerCsv(nom, lignes) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Journal en PDF : le tableau est mis en page comme un document et envoyé à
-// l'impression (« Enregistrer au format PDF »), au format paysage.
-function imprimerJournal(titre, lignes, du, au) {
-  const e = data.entreprise;
-  const [entetes, ...corps] = lignes;
-  const montant = /^-?\d+,\d{2}$/;
-  const totaux = entetes.map((_, i) => (corps.length && corps.every((l) => montant.test(l[i]))
-    ? corps.reduce((s, l) => s + Number(l[i].replace(',', '.')), 0) : null));
-  const lisible = (v) => (montant.test(v) ? Number(v.replace(',', '.')).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : v);
-  let zone = document.getElementById('rapport');
-  if (!zone) {
-    zone = document.createElement('div');
-    zone.id = 'rapport';
-    document.body.appendChild(zone);
-  }
-  zone.innerHTML = `
-    <style>@page { size: A4 landscape; margin: 12mm; }</style>
-    <div class="rapport-tete">
-      <div><strong>${esc(e.nom || '')}</strong><br>${esc(e.adresse || '').replace(/\n/g, '<br>')}
-        ${e.siret ? `<br>SIRET : ${esc(e.siret)}` : ''}${e.numeroTva && !e.franchiseTva ? `<br>N° TVA : ${esc(e.numeroTva)}` : ''}</div>
-      <div class="rapport-titre"><strong>${esc(titre)}</strong><br>Du ${dateFr(du)} au ${dateFr(au)}<br><small>Édité le ${dateFr(today())}</small></div>
-    </div>
-    <table class="rapport-table">
-      <thead><tr>${entetes.map((h, i) => `<th class="${totaux[i] !== null ? 'num' : ''}">${esc(h)}</th>`).join('')}</tr></thead>
-      <tbody>${corps.map((l) => `<tr>${l.map((v, i) => `<td class="${totaux[i] !== null ? 'num' : ''}">${esc(lisible(v))}</td>`).join('')}</tr>`).join('')}</tbody>
-      <tfoot><tr>${totaux.map((t, i) => `<td class="num">${i === 0 ? `<strong>Total (${corps.length})</strong>` : t !== null ? `<strong>${esc(lisible(csvNombre(t)))}</strong>` : ''}</td>`).join('')}</tr></tfoot>
-    </table>`;
-  document.body.classList.add('impression-rapport');
-  const fin = () => {
-    document.body.classList.remove('impression-rapport');
-    window.removeEventListener('afterprint', fin);
-  };
-  window.addEventListener('afterprint', fin);
-  setTimeout(() => window.print(), 50);
-}
-
 function dansPeriode(date, du, au) {
   const d = String(date || '').slice(0, 10);
   return d && d >= du && d <= au;
@@ -166,19 +130,20 @@ function pageExport(params) {
         <p><strong>${factures.length}</strong> facture${factures.length > 1 ? 's' : ''} du ${dateFr(du)} au ${dateFr(au)}</p>
         <p>${data.entreprise.franchiseTva ? `Total : <strong>${euro(ventes.ht)}</strong>`
           : `Total HT : <strong>${euro(ventes.ht)}</strong> · TVA : <strong>${euro(ventes.tva)}</strong> · TTC : <strong>${euro(ventes.ttc)}</strong>`}</p>
-        ${factures.length ? `<div class="actions">
+        <div class="actions">
           <button class="btn btn-primary" id="export-ventes-pdf">Télécharger en PDF</button>
-          <button class="btn" id="export-ventes">Fichier Excel (CSV)</button>
-        </div>` : `<p class="hint">Aucune facture sur cette période. Choisissez une autre période ci-dessus.</p>`}
+          ${factures.length ? '<button class="btn" id="export-ventes">Fichier Excel (CSV)</button>' : ''}
+        </div>
       </section>
       <section class="card">
         <h2>Dépenses</h2>
         <p><strong>${depenses.length}</strong> dépense${depenses.length > 1 ? 's' : ''} du ${dateFr(du)} au ${dateFr(au)}</p>
         <p>Total TTC : <strong>${euro(totalDepenses)}</strong></p>
-        ${depenses.length ? `<div class="actions">
+        <div class="actions">
           <button class="btn btn-primary" id="export-depenses-pdf">Télécharger en PDF</button>
-          <button class="btn" id="export-depenses">Fichier Excel (CSV)</button>
-        </div>` : `<p class="hint">Aucune dépense enregistrée sur cette période. Ajoutez vos achats dans <a href="#/depenses">Dépenses</a> pour les retrouver ici.</p>`}
+          ${depenses.length ? '<button class="btn" id="export-depenses">Fichier Excel (CSV)</button>' : ''}
+        </div>
+        ${depenses.length ? '' : '<p class="hint">Aucune dépense enregistrée sur cette période : le PDF l\u2019indiquera. Ajoutez vos achats dans <a href="#/depenses">Dépenses</a>.</p>'}
       </section>
     </div>
     <p class="hint">Le PDF est prêt à envoyer à votre comptable. Le fichier Excel (CSV) s'ouvre avec Excel, LibreOffice ou Google Sheets
@@ -206,6 +171,15 @@ function pageExport(params) {
   });
   document.getElementById('export-ventes')?.addEventListener('click', () => telechargerCsv(nomFichier('ventes'), journalVentes(du, au)));
   document.getElementById('export-depenses')?.addEventListener('click', () => telechargerCsv(nomFichier('depenses'), journalDepenses(du, au)));
-  document.getElementById('export-ventes-pdf')?.addEventListener('click', () => imprimerJournal('Journal des ventes', journalVentes(du, au), du, au));
-  document.getElementById('export-depenses-pdf')?.addEventListener('click', () => imprimerJournal('Journal des dépenses', journalDepenses(du, au), du, au));
+  const pdfJournal = (bouton, titre, lignes, fichier, vide) => bouton?.addEventListener('click', async () => {
+    bouton.disabled = true;
+    bouton.textContent = 'Création du PDF…';
+    await Pdf.journal(titre, lignes, du, au, fichier, vide);
+    bouton.disabled = false;
+    bouton.textContent = 'Télécharger en PDF';
+  });
+  pdfJournal(document.getElementById('export-ventes-pdf'), 'Journal des ventes', journalVentes(du, au),
+    `Journal des ventes ${dateFr(du)} au ${dateFr(au)}`.replace(/\//g, '-'), 'Aucune facture sur cette période');
+  pdfJournal(document.getElementById('export-depenses-pdf'), 'Journal des dépenses', journalDepenses(du, au),
+    `Journal des dépenses ${dateFr(du)} au ${dateFr(au)}`.replace(/\//g, '-'), 'Aucune dépense sur cette période');
 }
