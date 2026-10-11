@@ -184,7 +184,7 @@ const Envoi = (() => {
         saveData();
         dialog.close();
         render();
-        toast(mode === 'relance' ? `Relance envoyée à ${a}` : `${doc.type === 'facture' ? 'Facture' : 'Devis'} ${doc.numero} envoyé à ${a}`);
+        toast(mode === 'relance' ? `Relance envoyée à ${a}` : (doc.type === 'facture' ? `Facture ${doc.numero} envoyée à ${a}` : `Devis ${doc.numero} envoyé à ${a}`));
       } catch (err) {
         montrer(err.message);
         bouton.disabled = false;
