@@ -31,7 +31,7 @@ const Installer = (() => {
 
   const ETAPES_IOS = `
     <ol class="installer-etapes">
-      <li>Touchez le bouton <strong>Partager</strong> <span class="installer-icone" aria-hidden="true">⬆︎</span> en bas de Safari.</li>
+      <li>Dans Safari, touchez <strong>Partager</strong> <span class="installer-icone" aria-hidden="true">⬆︎</span> (sur les iPhone récents, il est dans le menu <strong>« ⋯ »</strong> en bas à droite).</li>
       <li>Choisissez <strong>« Sur l'écran d'accueil »</strong>.</li>
       <li>Touchez <strong>Ajouter</strong> : l'icône Devizo apparaît avec vos autres applis.</li>
     </ol>`;
