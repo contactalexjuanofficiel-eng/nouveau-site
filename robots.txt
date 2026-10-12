@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /signer.html
+Disallow: /supabase/
+
+Sitemap: https://devizo-app.fr/sitemap.xml

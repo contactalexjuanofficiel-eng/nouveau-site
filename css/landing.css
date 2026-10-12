@@ -361,3 +361,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 
 /* En alternance : le devis à droite en haut, le tableau de bord à gauche ensuite. */
 @media (min-width: 861px) { .pilot-grid .dash-mock { order: -1; } }
+
+/* Liens vers les pages métiers et les guides (référencement) */
+.l-footer .l-footer-metiers, .l-footer .l-footer-guides { flex-basis: 100%; gap: 6px 14px; font-size: .88rem; }
+.l-footer-metiers span, .l-footer-guides span { color: var(--text); font-weight: 600; }

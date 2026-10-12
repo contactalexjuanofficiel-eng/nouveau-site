@@ -1,0 +1,80 @@
+/* Pages de référencement : métiers et guides (chargé après landing.css). */
+.seo-fil { font-size: .88rem; color: var(--muted); margin: 0 0 20px; }
+.seo-fil a { color: var(--muted); }
+.seo-fil a:hover { color: var(--primary); }
+.seo-hero { padding-top: 32px; }
+.seo-hero h1 { font-size: clamp(2rem, 4.4vw, 3.2rem); }
+
+/* Exemple de devis */
+.seo-devis {
+  margin: 0; background: var(--paper); color: var(--paper-ink); border-radius: 14px; padding: 22px;
+  box-shadow: 0 24px 60px rgba(15, 27, 61, .14); border: 1px solid var(--paper-line); min-width: 0; font-size: .9rem;
+}
+.seo-devis-tete { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.seo-devis-tete small { display: block; color: var(--paper-muted); font-size: .75rem; }
+.seo-devis-titre { text-align: right; }
+.seo-devis-titre span { display: block; font-family: var(--display); font-weight: 800; color: #1f5eff; font-size: 1.4rem; line-height: 1.1; }
+.seo-devis-objet { margin: 0 0 10px; }
+.seo-devis table { font-size: .82rem; }
+.seo-devis th, .seo-devis td { padding: 7px 6px; border-color: var(--paper-line); color: var(--paper-ink); }
+.seo-devis th { color: var(--paper-muted); }
+.seo-totaux { margin: 12px 0 0 auto; max-width: 260px; }
+.seo-totaux div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.seo-totaux .seo-total { border-top: 2px solid var(--paper-ink); margin-top: 4px; padding-top: 6px; font-size: 1rem; }
+.seo-mention { margin: 6px 0 0; color: var(--paper-muted); font-size: .78rem; text-align: right; }
+.seo-devis figcaption { margin-top: 12px; color: var(--paper-muted); font-size: .75rem; }
+
+/* Atouts et listes */
+.seo-atouts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.seo-atouts .card { margin: 0; }
+.seo-atouts h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.seo-atouts p { margin: 0; color: var(--muted); }
+.seo-liste { padding-left: 0; list-style: none; display: grid; gap: 10px; margin: 0 0 24px; }
+.seo-liste li { position: relative; padding-left: 30px; }
+.seo-liste li::before { content: "✓"; position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--success-soft); color: var(--success); font-weight: 700; font-size: .8rem; }
+.seo-autres h2 { font-size: 1.2rem; margin: 0 0 16px; }
+.seo-autres ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.seo-autres a { display: inline-block; padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--card);
+  color: var(--text); text-decoration: none; font-size: .92rem; }
+.seo-autres a:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Guides */
+.seo-guide { padding-top: 32px; }
+.seo-guide > .l-wrap { padding-bottom: 56px; line-height: 1.7; }
+.seo-guide h1 { font-family: var(--display); font-size: clamp(1.9rem, 4.2vw, 2.8rem); line-height: 1.12; margin: 0 0 16px; letter-spacing: -.01em; }
+.seo-guide h2 { font-size: 1.35rem; margin: 40px 0 10px; scroll-margin-top: 90px; }
+.seo-guide ul { padding-left: 1.2em; }
+.seo-guide li { margin-bottom: 6px; }
+.seo-guide a { color: var(--primary); }
+.seo-guide .btn-primary { color: #fff; }
+.seo-encart { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  background: var(--primary-soft); border-radius: 14px; padding: 16px 20px; margin: 8px 0 24px; }
+.seo-encart p { margin: 0; flex: 1 1 280px; }
+.seo-sommaire { border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; background: var(--card); }
+.seo-sommaire p { margin: 0 0 4px; font-weight: 700; }
+.seo-sommaire ol { margin: 0; padding-left: 1.2em; }
+.seo-avertissement { margin-top: 40px; color: var(--muted); font-size: .88rem; }
+
+/* Pied de page enrichi */
+.seo-pied-grille { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; }
+.seo-pied h2 { font-size: .95rem; color: var(--text); margin: 0 0 10px; }
+.seo-pied h2:not(:first-child) { margin-top: 20px; }
+.seo-pied ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.seo-pied ul a { color: var(--muted); text-decoration: none; }
+.seo-pied ul a:hover { color: var(--primary); }
+.seo-pied p { margin: 10px 0 14px; }
+.seo-pied .seo-copy { margin: 24px 0 0; font-size: .85rem; }
+.seo-pied .btn-primary { color: #fff; }
+
+@media (max-width: 960px) {
+  .seo-atouts { grid-template-columns: 1fr 1fr; }
+  .seo-pied-grille { grid-template-columns: 1fr 1fr; }
+  .seo-pied-grille > div:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .seo-atouts { grid-template-columns: 1fr; }
+  .seo-pied-grille { grid-template-columns: 1fr; }
+  .seo-devis { padding: 16px; }
+  .seo-devis th:nth-child(4), .seo-devis td:nth-child(4) { display: none; }
+}

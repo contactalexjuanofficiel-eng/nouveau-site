@@ -28,6 +28,8 @@ const I18n = (() => {
     } catch (e) {
       // stockage indisponible : langue du navigateur
     }
+    // Les robots des moteurs de recherche (Google…) voient toujours la page en français.
+    if (navigator.webdriver || /bot|crawl|spider|slurp|google|bing|yandex|baidu|duckduck|facebookexternalhit|lighthouse|headless/i.test(navigator.userAgent)) return 'fr';
     const nav = (navigator.languages || [navigator.language || 'fr']).map((l) => String(l).slice(0, 2).toLowerCase());
     return nav.find((c) => CODES.has(c)) || 'fr';
   }
