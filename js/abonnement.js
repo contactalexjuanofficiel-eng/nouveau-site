@@ -16,7 +16,6 @@ const Abonnement = (() => {
   const STATUTS_ACTIFS = ['active', 'trialing', 'past_due'];
   const PRIX = { solo: { mois: 9, an: 90 }, pro: { mois: 19, an: 190 }, equipe: { mois: 39, an: 390 } };
   const NIVEAU = { solo: 1, pro: 2, equipe: 3 };
-  const CONTACT = 'devizocontact@gmail.com';
   const FORMULES = {
     solo: {
       nom: 'Solo',
@@ -239,14 +238,14 @@ const Abonnement = (() => {
     if (estAbonne(e) && offert() === 'cadeau') {
       return `<p class="big">Formule ${FORMULES[e].nom} offerte 🎁 <small>${fin ? `jusqu'au ${fin}` : 'sans limite de durée'}</small></p>
         <p class="hint">Cette formule vous est offerte par Devizo${fin ? ` : rien ne sera prélevé. Pour continuer après le ${fin}, choisissez une formule ci-dessous` : ''}.</p>
-        ${e === 'equipe' ? `<p class="hint">Assistance prioritaire : écrivez à <a href="mailto:${CONTACT}">${CONTACT}</a>, votre demande est traitée en premier.</p>` : ''}`;
+        ${e === 'equipe' ? '<p class="hint">⚡ Assistance prioritaire : <a href="#/assistance">écrivez-nous depuis la page Assistance</a>, votre demande est traitée en premier.</p>' : ''}`;
     }
     if (estAbonne(e)) {
       const resilie = infos.statut === 'canceled' || infos.fin_prevue === true;
       return `<p class="big">Formule ${FORMULES[e].nom} <small>${resilie ? `résiliée, active jusqu'au ${fin}` : fin ? `renouvellement le ${fin}` : 'active'}</small></p>
         ${infos.statut === 'past_due' ? '<p class="status bad">⚠ Le dernier paiement a échoué : mettez à jour votre carte.</p>' : ''}
         ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement (carte, factures, résiliation)</a>` : ''}
-        ${e === 'equipe' ? `<p class="hint">Assistance prioritaire : écrivez à <a href="mailto:${CONTACT}">${CONTACT}</a>, votre demande est traitée en premier.</p>` : ''}`;
+        ${e === 'equipe' ? '<p class="hint">⚡ Assistance prioritaire : <a href="#/assistance">écrivez-nous depuis la page Assistance</a>, votre demande est traitée en premier.</p>' : ''}`;
     }
     if (e === 'expire') {
       return `<p class="big">Essai terminé</p>

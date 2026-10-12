@@ -30,6 +30,7 @@
 
   let stats = null;
   let utilisateurs = [];
+  let demandes = null; // demandes d'assistance (null si la table n'existe pas encore)
   let filtre = { texte: '', type: 'tous' };
 
   function message(titre, texte, bouton = '') {
@@ -349,6 +350,51 @@
         <span class="admin-rep-n">${nb(n)} <small>${pourcent(n, total)}</small></span></li>`).join('')}</ul>`;
   }
 
+  // ------------------------------------------------------------------
+  // Demandes d'assistance
+  // ------------------------------------------------------------------
+  const CATEGORIES = { question: 'Question', probleme: 'Problème', abonnement: 'Abonnement', suggestion: 'Suggestion' };
+
+  function carteDemande(d) {
+    const lien = `mailto:${encodeURIComponent(d.email)}?subject=${encodeURIComponent('Re: ' + d.sujet)}&body=${encodeURIComponent(`Bonjour,\n\n\n\nBonne journée,\nL'équipe Devizo\n\n---\nVotre message :\n${d.message}`)}`;
+    const contexte = d.contexte ? Object.entries(d.contexte).map(([k, v]) => `<li><strong>${esc(k)}</strong> : ${esc(v)}</li>`).join('') : '';
+    return `<article class="demande${d.prioritaire ? ' demande-prio' : ''}${d.traitee_le ? ' demande-traitee' : ''}">
+      <div class="demande-tete">
+        <span class="badges">${d.prioritaire ? '<span class="badge badge-retard">⚡ Prioritaire</span>' : ''}
+          <span class="badge">${esc(CATEGORIES[d.categorie] || d.categorie)}</span>
+          <span class="badge">${esc((d.formule || '—').replace('equipe', 'Entreprise').replace('pro', 'Pro').replace('solo', 'Solo'))}</span></span>
+        <small>${new Date(d.cree_le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small>
+      </div>
+      <p class="demande-sujet">${esc(d.sujet)}</p>
+      <p class="demande-de">${esc(d.email)}</p>
+      <p class="demande-message">${esc(d.message)}</p>
+      ${contexte ? `<details><summary>Informations techniques</summary><ul>${contexte}</ul></details>` : ''}
+      <div class="actions">
+        <a class="btn btn-sm btn-primary" href="${lien}">Répondre par e-mail</a>
+        <button type="button" class="btn btn-sm" data-traiter="${d.id}" data-etat="${d.traitee_le ? 'rouvrir' : 'traiter'}">${d.traitee_le ? 'Rouvrir' : '✓ Marquer traitée'}</button>
+      </div>
+    </article>`;
+  }
+
+  function blocAssistance() {
+    if (!demandes) return '';
+    const ouvertes = demandes.filter((d) => !d.traitee_le);
+    const traitees = demandes.filter((d) => d.traitee_le).slice(0, 20);
+    return `<h2 class="admin-section-titre">Assistance</h2>
+      <section class="card">
+        <p class="admin-graph-titre">${ouvertes.length ? `${nb(ouvertes.length)} demande(s) à traiter` : 'Aucune demande en attente 👍'}
+          <span>${nb(ouvertes.filter((d) => d.prioritaire).length)} prioritaire(s)</span></p>
+        ${ouvertes.map(carteDemande).join('')}
+        ${traitees.length ? `<details class="demandes-traitees"><summary>Demandes traitées (${traitees.length})</summary>${traitees.map(carteDemande).join('')}</details>` : ''}
+      </section>`;
+  }
+
+  async function chargerDemandes() {
+    const { data, error } = await client.from('demandes_assistance').select('*')
+      .order('prioritaire', { ascending: false }).order('cree_le', { ascending: false }).limit(200);
+    demandes = error ? null : data;
+  }
+
   function afficher() {
     const s = stats;
     const parFormule = s.abonnes_par_formule || {};
@@ -359,6 +405,7 @@
         <h1>Tableau de bord admin</h1>
         <button class="btn" id="admin-rafraichir">↻ Actualiser</button>
       </div>
+      ${blocAssistance()}
 
       <h2 class="admin-section-titre">Argent</h2>
       <div class="admin-kpis">
@@ -428,6 +475,17 @@
         Les montants exacts sont dans votre tableau de bord Stripe.</p>`;
 
     lignesUtilisateurs();
+    zone.querySelectorAll('[data-traiter]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      const { error } = await client.from('demandes_assistance')
+        .update({ traitee_le: b.dataset.etat === 'traiter' ? new Date().toISOString() : null }).eq('id', Number(b.dataset.traiter));
+      if (error) {
+        b.disabled = false;
+        alert(error.message);
+        return;
+      }
+      await charger(true);
+    }));
     document.getElementById('admin-lignes').addEventListener('click', (ev) => {
       const b = ev.target.closest('[data-gerer]');
       if (b) ouvrirActions(b.dataset.gerer);
@@ -448,7 +506,7 @@
   }
 
   async function charger(discret = false) {
-    const [a, b] = await Promise.all([client.rpc('admin_stats'), client.rpc('admin_utilisateurs')]);
+    const [a, b] = await Promise.all([client.rpc('admin_stats'), client.rpc('admin_utilisateurs'), chargerDemandes()]);
     if (a.error || b.error) {
       if (discret) return;
       message('Impossible de charger les statistiques', esc((a.error || b.error).message)

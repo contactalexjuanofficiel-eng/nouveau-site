@@ -1823,7 +1823,7 @@ function majPastille() {
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
   // Les autres pages sont verrouillées tant que le profil est incomplet.
-  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"])').forEach((a) => a.classList.toggle('locked', nb > 0));
+  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"])').forEach((a) => a.classList.toggle('locked', nb > 0));
 }
 
 function pageNotFound() {
@@ -1868,11 +1868,12 @@ function render() {
   }
 
   majPastille();
+  if (parts[0] !== 'assistance') window.dernierePageAssistance = location.hash || '#/';
   if (['', 'documents', 'voir'].includes(parts[0] ?? '')) Envoi.synchroniserSignatures();
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
   const bloque = profilManquant().length > 0;
-  if (bloque && !['parametres', 'compte', 'abonnement'].includes(parts[0])) return pageBloquee();
+  if (bloque && !['parametres', 'compte', 'abonnement', 'assistance'].includes(parts[0])) return pageBloquee();
 
   // Abonnement : lecture seule après l'essai, fonctions réservées à la formule Pro.
   if (!Abonnement.peutModifier() && (parts[0] === 'modifier' || (parts[0] === 'clients' && parts[1]))) {
@@ -1895,6 +1896,7 @@ function render() {
     case 'export': return pageExport(params);
     case 'compte': return Compte.page();
     case 'abonnement': return Abonnement.page(params);
+    case 'assistance': return Assistance.page();
     case 'inscription':
     case 'connexion': return go('#/');
     default: return pageNotFound();

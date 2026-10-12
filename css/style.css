@@ -586,3 +586,14 @@ dialog.envoi .actions { margin-top: 14px; }
 .historique { list-style: none; padding: 0; margin: -6px 0 16px; display: grid; gap: 4px; color: var(--muted); font-size: .88rem; }
 .signature-faite { color: var(--text); }
 .signature-faite img { display: block; max-width: 220px; max-height: 80px; margin-top: 8px; background: #fff; }
+
+/* ---------- Assistance ---------- */
+.assist-ok { border-color: var(--success); }
+.assist-ok .big { color: var(--success); margin: 0 0 6px; }
+.assist-prio { margin: 0 0 4px; padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); color: var(--text); }
+.assist-liste { list-style: none; margin: 0; padding: 0; }
+.assist-liste li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.assist-liste li:last-child { border-bottom: 0; }
+.assist-liste small { display: block; color: var(--muted); font-size: .82rem; }
+#assist-form textarea { width: 100%; }
+#assist-form .actions { margin-top: 14px; }

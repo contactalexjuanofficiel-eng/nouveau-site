@@ -1,10 +1,14 @@
 // Fonction Supabase « admin » : actions du panel d'administration qui
-// demandent une clé secrète. Réservée aux comptes de la table « admins ».
+// demandent une clé secrète. Réservée aux comptes de la table « admins »,
+// sauf l'action « assistance » ouverte à tout utilisateur connecté.
 //
 //   { action: 'email', a: 'client@exemple.fr', objet, message }
 //       envoie un e-mail à un utilisateur depuis contact@devizo-app.fr (Brevo)
 //   { action: 'revenus' }
 //       chiffre d'affaires encaissé par mois sur 12 mois (factures Stripe payées)
+//   { action: 'assistance', id }
+//       (tout utilisateur connecté) prévient l'équipe Devizo par e-mail d'une
+//       demande d'assistance qu'il vient d'enregistrer
 //
 // Secrets déjà en place : BREVO_API_KEY, STRIPE_SECRET_KEY.
 // Facultatif : EXPEDITEUR (par défaut contact@devizo-app.fr), REPONDRE_A.
@@ -75,6 +79,51 @@ async function envoyerEmail(corps: Record<string, unknown>, expediteurId: string
   return reponse(200, { envoye: true });
 }
 
+const CATEGORIES: Record<string, string> = {
+  question: 'Question', probleme: 'Problème / bug', abonnement: 'Abonnement / paiement', suggestion: 'Suggestion',
+};
+
+// Nouvelle demande d'assistance : e-mail à l'équipe, réponse directe à l'utilisateur.
+async function notifierAssistance(corps: Record<string, unknown>, userId: string) {
+  const id = Number(corps.id);
+  if (!Number.isInteger(id) || id < 1) return reponse(400, { erreur: 'Demande inconnue' });
+  const { data: d } = await admin.from('demandes_assistance').select('*').eq('id', id).eq('user_id', userId).maybeSingle();
+  if (!d) return reponse(404, { erreur: 'Demande introuvable' });
+  if (d.notifiee) return reponse(200, { envoye: false });
+  const cle = Deno.env.get('BREVO_API_KEY');
+  if (!cle) return reponse(500, { erreur: 'Clé Brevo manquante (secret BREVO_API_KEY).' });
+  const { data: espace } = await admin.from('espaces').select('donnees').eq('user_id', userId).maybeSingle();
+  const entreprise = String(espace?.donnees?.entreprise?.nom ?? '');
+  const contexte = d.contexte ? Object.entries(d.contexte).map(([k, v]) => `${k} : ${v}`).join('\n') : '';
+  const lignes = [
+    `${d.prioritaire ? '⚡ DEMANDE PRIORITAIRE (formule Entreprise)\n\n' : ''}De : ${d.email}${entreprise ? ` (${entreprise})` : ''}`,
+    `Formule : ${d.formule ?? '—'}`,
+    `Catégorie : ${CATEGORIES[d.categorie] ?? d.categorie}`,
+    `Sujet : ${d.sujet}`,
+    `Message :\n${d.message}`,
+    contexte ? `Informations techniques :\n${contexte}` : '',
+    `Répondez simplement à cet e-mail : la réponse part directement à ${d.email}.\nToutes les demandes : https://devizo-app.fr/admin.html`,
+  ].filter(Boolean);
+  const envoi = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': cle, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      sender: { name: 'Assistance Devizo', email: EXPEDITEUR },
+      to: [{ email: REPONDRE_A }],
+      replyTo: emailValide(d.email) ? { email: d.email } : undefined,
+      subject: `${d.prioritaire ? '⚡ [PRIORITAIRE] ' : ''}Assistance : ${d.sujet}`.slice(0, 200),
+      htmlContent: corpsHtml(lignes.join('\n\n')),
+      textContent: lignes.join('\n\n'),
+    }),
+  });
+  if (!envoi.ok) {
+    console.error('Brevo', envoi.status, await envoi.text());
+    return reponse(502, { erreur: "La notification n'a pas pu partir." });
+  }
+  await admin.from('demandes_assistance').update({ notifiee: true }).eq('id', id);
+  return reponse(200, { envoye: true });
+}
+
 // Factures Stripe payées sur les 12 derniers mois, regroupées par mois.
 async function revenus() {
   const cle = Deno.env.get('STRIPE_SECRET_KEY');
@@ -122,8 +171,6 @@ Deno.serve(async (req) => {
   const { data: auth } = await admin.auth.getUser(jeton);
   const user = auth?.user;
   if (!user) return reponse(401, { erreur: 'Connexion requise' });
-  const { data: estAdmin } = await admin.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
-  if (!estAdmin) return reponse(403, { erreur: 'Accès réservé aux administrateurs' });
 
   let corps: Record<string, unknown>;
   try {
@@ -131,6 +178,12 @@ Deno.serve(async (req) => {
   } catch {
     return reponse(400, { erreur: 'Demande illisible' });
   }
+  // Seule action ouverte à tous les utilisateurs connectés.
+  if (corps.action === 'assistance') return notifierAssistance(corps, user.id);
+
+  const { data: estAdmin } = await admin.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+  if (!estAdmin) return reponse(403, { erreur: 'Accès réservé aux administrateurs' });
+
   if (corps.action === 'email') return envoyerEmail(corps, user.id);
   if (corps.action === 'revenus') return revenus();
   return reponse(400, { erreur: 'Action inconnue' });
