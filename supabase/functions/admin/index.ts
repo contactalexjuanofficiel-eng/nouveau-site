@@ -40,7 +40,7 @@ const emailValide = (e: unknown) => typeof e === 'string' && e.length <= 254 && 
 
 function corpsHtml(message: string) {
   const paragraphes = echapper(message).split(/\n{2,}/).map((p) => `<p style="margin:0 0 14px;line-height:1.55">${p.replace(/\n/g, '<br>')}</p>`).join('');
-  return `<div style="background:#f4f6fb;padding:28px 14px;font-family:Arial,Helvetica,sans-serif;color:#1c2333;font-size:15px">
+  return `<div lang="fr" style="background:#f4f6fb;padding:28px 14px;font-family:Arial,Helvetica,sans-serif;color:#1c2333;font-size:15px">
   <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:12px;padding:28px 26px">
     <p style="margin:0 0 20px;font-weight:bold;font-size:18px;color:#1f5eff">Devizo</p>
     ${paragraphes}
@@ -97,7 +97,7 @@ async function notifierAssistance(corps: Record<string, unknown>, userId: string
   const contexte = d.contexte ? Object.entries(d.contexte).map(([k, v]) => `${k} : ${v}`).join('\n') : '';
   const lignes = [
     `${d.prioritaire ? '⚡ DEMANDE PRIORITAIRE (formule Entreprise)\n\n' : ''}De : ${d.email}${entreprise ? ` (${entreprise})` : ''}`,
-    `Formule : ${d.formule ?? '—'}`,
+    `Formule : ${String(d.formule ?? '—').replace('equipe', 'Entreprise').replace('pro', 'Pro').replace('solo', 'Solo')}`,
     `Catégorie : ${CATEGORIES[d.categorie] ?? d.categorie}`,
     `Sujet : ${d.sujet}`,
     `Message :\n${d.message}`,
