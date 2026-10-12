@@ -75,7 +75,7 @@
       const x = i * pas;
       const jour = new Date(j.jour + 'T12:00:00');
       const etiquette = i % 7 === 1 || i === jours.length - 1
-        ? `<text class="axe" x="${x + pas / 2}" y="${H - 6}" text-anchor="middle">${jour.getDate()}/${jour.getMonth() + 1}</text>`
+        ? `<text class="axe" x="${i === jours.length - 1 ? L : x + pas / 2}" y="${H - 6}" text-anchor="${i === jours.length - 1 ? 'end' : 'middle'}">${jour.getDate()}/${jour.getMonth() + 1}</text>`
         : '';
       return `<g><title>${jour.toLocaleDateString('fr-FR')} : ${v} ${libelle}</title>
         <rect class="barre" x="${x + 1.5}" y="${H - bas - h}" width="${pas - 3}" height="${h}" rx="2"></rect>${etiquette}</g>`;
