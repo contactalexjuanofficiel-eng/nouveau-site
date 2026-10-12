@@ -361,6 +361,7 @@
     return `<article class="demande${d.prioritaire ? ' demande-prio' : ''}${d.traitee_le ? ' demande-traitee' : ''}">
       <div class="demande-tete">
         <span class="badges">${d.prioritaire ? '<span class="badge badge-retard">⚡ Prioritaire</span>' : ''}
+          ${d.notifiee ? '' : '<span class="badge badge-fin" title="L\'e-mail de notification n\'a pas pu partir : voir les Logs de la fonction « admin » dans Supabase">✉ E-mail non envoyé</span>'}
           <span class="badge">${esc(CATEGORIES[d.categorie] || d.categorie)}</span>
           <span class="badge">${esc((d.formule || '—').replace('equipe', 'Entreprise').replace('pro', 'Pro').replace('solo', 'Solo'))}</span></span>
         <small>${new Date(d.cree_le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small>
