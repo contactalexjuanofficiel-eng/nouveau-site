@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr" data-page="admin">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/logo-180.png">
+  <title>Devizo · Administration</title>
+  <link rel="stylesheet" href="css/style.css?v=63">
+  <link rel="stylesheet" href="css/admin.css?v=63">
+</head>
+<body class="app">
+  <header class="topbar">
+    <a class="logo" href="app.html"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32">Devizo <span class="admin-tag">Admin</span></a>
+    <nav class="nav admin-nav">
+      <a href="app.html">← Retour à l'appli</a>
+      <button type="button" class="btn btn-sm" id="admin-deco" hidden>Se déconnecter</button>
+    </nav>
+  </header>
+
+  <main id="admin" class="container admin-container">
+    <p class="hint">Chargement…</p>
+  </main>
+
+  <script src="js/config.js?v=63"></script>
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/admin.js?v=63"></script>
+</body>
+</html>

@@ -578,6 +578,7 @@ const Compte = (() => {
         <div class="actions">
           <button class="btn" id="compte-sync">Sauvegarder maintenant</button>
           <button class="btn" id="compte-deco">Se déconnecter</button>
+          <a class="btn" id="compte-admin" href="admin.html" style="display:none">⚙ Administration</a>
         </div>
       </section>
       ${Abonnement.resume()}
@@ -606,6 +607,11 @@ const Compte = (() => {
       page();
     });
     document.getElementById('compte-deco').addEventListener('click', deconnecter);
+    // Lien vers le panel d'administration, seulement pour les administrateurs.
+    client.rpc('est_admin').then(({ data: admin }) => {
+      const lien = document.getElementById('compte-admin');
+      if (lien && admin === true) lien.style.display = '';
+    }, () => {});
     document.getElementById('compte-mdp').addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const champ = document.getElementById('compte-mdp-nouveau');

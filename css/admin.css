@@ -1,0 +1,55 @@
+/* Panel d'administration (admin.html) */
+.admin-container { max-width: 1200px; }
+.admin-tag { margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; color: #fff; background: var(--primary); vertical-align: middle; }
+.admin-nav { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.admin-nav[hidden] { display: none; }
+.admin-connexion { max-width: 420px; margin: 40px auto; }
+.admin-connexion .btn { width: 100%; margin-top: 16px; }
+
+.admin-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.admin-kpis .stat .value { font-size: 1.7rem; }
+.admin-kpis .stat .sous { color: var(--muted); font-size: .85rem; margin-top: 4px; }
+.admin-kpis .stat.fort { border-color: var(--primary); }
+.admin-section-titre { font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 28px 0 10px; }
+
+.admin-graphs { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.admin-graph-titre { margin: 0 0 8px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.admin-graph-titre span { color: var(--muted); font-weight: 400; font-size: .85rem; }
+.admin-graph { width: 100%; height: auto; display: block; }
+.admin-graph .barre { fill: var(--primary); }
+.admin-graph-bloc:first-child .barre { opacity: .55; }
+.admin-graph .axe { fill: var(--muted); font-size: 13px; }
+.admin-graph .grille { stroke: var(--border); stroke-width: 1; }
+
+.admin-outils { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.admin-outils input { flex: 1 1 220px; }
+.admin-outils select { flex: 0 1 220px; }
+.admin-table td { font-size: .92rem; }
+.admin-table td small { color: var(--muted); display: block; }
+.admin-table .email { word-break: break-all; font-weight: 600; }
+.badge-abonne { color: var(--success); background: var(--success-soft); }
+.badge-essai { color: var(--primary); background: var(--primary-soft); }
+.badge-fin { color: var(--warning); background: var(--warning-soft); }
+.badge-retard { color: var(--danger); background: var(--danger-soft); }
+.badge-admin { color: #fff; background: var(--primary); }
+.badges { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+
+@media (max-width: 760px) {
+  .topbar .admin-nav { display: flex; position: static; flex-direction: row; padding: 0; background: none; border: 0; box-shadow: none; }
+  .topbar .admin-nav a { padding: 6px 4px; font-size: .9rem; }
+  .admin-graphs { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .admin-table, .admin-table tbody { display: block; width: 100%; }
+  .admin-table thead { display: none; }
+  .admin-table tr { display: block; border-bottom: 1px solid var(--border); padding: 10px 0; }
+  .admin-table td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 3px 0; text-align: right; }
+  .admin-table td::before { content: attr(data-label); color: var(--muted); font-size: .85rem; text-align: left; }
+  .admin-table td.email-cell { display: block; text-align: left; }
+  .admin-table td.email-cell::before { content: none; }
+  .admin-table td > span { min-width: 0; }
+  .admin-table .badges { justify-content: flex-end; }
+  .admin-table td small { display: inline; }
+  .admin-kpis { grid-template-columns: 1fr 1fr; }
+  .admin-kpis .stat .value { font-size: 1.3rem; }
+}
