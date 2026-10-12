@@ -1,0 +1,23 @@
+{
+  "name": "Devizo · Devis et factures",
+  "short_name": "Devizo",
+  "description": "Devis, factures et gestion pour les artisans.",
+  "lang": "fr",
+  "start_url": "/app.html?source=appli",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1f5eff",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    { "src": "/img/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/img/logo-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/img/logo-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nouveau devis", "url": "/app.html#/documents", "icons": [{ "src": "/img/logo-192.png", "sizes": "192x192" }] },
+    { "name": "Tableau de bord", "url": "/app.html#/", "icons": [{ "src": "/img/logo-192.png", "sizes": "192x192" }] }
+  ]
+}

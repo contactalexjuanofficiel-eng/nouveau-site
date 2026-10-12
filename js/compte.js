@@ -590,6 +590,7 @@ const Compte = (() => {
         </div>
       </section>
       ${Abonnement.resume()}
+      ${typeof Installer !== 'undefined' ? Installer.carte() : ''}
       ${carteEquipe()}
       <section class="card">
         <h2>Changer de mot de passe</h2>

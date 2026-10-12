@@ -607,3 +607,17 @@ dialog.envoi .actions { margin-top: 14px; }
 .choix-option { display: grid; gap: 2px; text-align: left; padding: 12px 14px; height: auto; white-space: normal; }
 .choix-option small { color: var(--muted); font-weight: 400; }
 .choix-option:hover { border-color: var(--primary); }
+
+/* ---------- Installer l'appli ---------- */
+.installer-bandeau {
+  position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 55;
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px;
+  background: var(--card); color: var(--text); border: 1px solid var(--border); box-shadow: 0 14px 36px var(--shadow);
+  max-width: 520px; margin: 0 auto;
+}
+.installer-bandeau img { border-radius: 10px; flex: none; }
+.installer-bandeau span { flex: 1; min-width: 0; line-height: 1.3; }
+.installer-bandeau small { display: block; color: var(--muted); font-size: .82rem; }
+.installer-fermer { background: none; border: 0; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 6px; }
+.installer-etapes { margin: 8px 0; padding-left: 1.3em; line-height: 1.6; }
+.installer-icone { display: inline-block; padding: 0 6px; border: 1px solid var(--border); border-radius: 6px; font-size: .85em; }
