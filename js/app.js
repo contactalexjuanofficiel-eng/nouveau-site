@@ -127,6 +127,31 @@ function ask(message, okLabel = 'Confirmer', withCancel = true) {
   });
 }
 
+// Fenêtre de choix entre plusieurs boutons. Renvoie la valeur choisie, ou null.
+function choisir(message, options, details = '') {
+  return new Promise((resolve) => {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'ask';
+    dialog.innerHTML = `
+      <p>${esc(message)}</p>
+      ${details ? `<p class="hint">${esc(details)}</p>` : ''}
+      <div class="choix">
+        ${options.map(([v, titre, aide]) => `<button class="btn choix-option" value="${esc(v)}"><strong>${esc(titre)}</strong>${aide ? `<small>${esc(aide)}</small>` : ''}</button>`).join('')}
+      </div>
+      <div class="actions"><button class="btn" value="">Annuler</button></div>`;
+    dialog.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (b) dialog.close(b.value);
+    });
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      resolve(dialog.returnValue || null);
+    });
+    document.body.appendChild(dialog);
+    dialog.showModal();
+  });
+}
+
 function getClient(id) {
   return data.clients.find((c) => c.id === id);
 }
@@ -135,10 +160,10 @@ function getDocument(id) {
   return data.documents.find((d) => d.id === id);
 }
 
-// Numérotation chronologique et sans trou : D-2026-001, F-2026-001...
+// Numérotation chronologique et sans trou : D-2026-001, F-2026-001, A-2026-001 (avoirs)...
 function nextNumber(type) {
   const e = data.entreprise;
-  const base = (type === 'facture' ? e.prefixeFacture : e.prefixeDevis) || (type === 'facture' ? 'F' : 'D');
+  const base = type === 'avoir' ? 'A' : (type === 'facture' ? e.prefixeFacture : e.prefixeDevis) || (type === 'facture' ? 'F' : 'D');
   const prefix = base + '-' + new Date().getFullYear() + '-';
   const max = data.documents
     .filter((d) => d.type === type && d.numero.startsWith(prefix))
@@ -523,12 +548,18 @@ function addDays(iso, days) {
 
 const STATUTS = {
   devis: { brouillon: 'Brouillon', envoye: 'Envoyé', accepte: 'Accepté', refuse: 'Refusé' },
-  facture: { 'a-payer': 'À payer', payee: 'Payée' },
+  facture: { 'a-payer': 'À payer', payee: 'Payée', annulee: 'Annulée (avoir)' },
+  avoir: { 'a-rembourser': 'À rembourser', rembourse: 'Remboursé', deduit: 'Déduit' },
 };
+const TYPES = { devis: 'Devis', facture: 'Facture', avoir: 'Avoir' };
+const libelleType = (doc) => TYPES[doc.type] || 'Document';
+
+// Avoirs émis sur une facture.
+const avoirsDe = (facture) => data.documents.filter((d) => d.type === 'avoir' && d.factureOrigine === facture.id);
 
 // Facture non payée dont l'échéance est passée : nombre de jours de retard, sinon 0.
 function joursDeRetard(doc) {
-  if (doc.type !== 'facture' || doc.statut === 'payee' || !doc.echeance) return 0;
+  if (doc.type !== 'facture' || doc.statut === 'payee' || doc.statut === 'annulee' || !doc.echeance) return 0;
   return Math.max(0, Math.floor((Date.parse(today()) - Date.parse(doc.echeance)) / 86400000));
 }
 
@@ -583,6 +614,16 @@ function suiviEnvoi(d) {
 // L'étape suivante d'un document, faisable directement depuis la liste.
 function actionsRapides(d) {
   const id = esc(d.id);
+  if (d.type === 'avoir') {
+    const f = getDocument(d.factureOrigine);
+    const lien = f ? `<a class="hint" href="#/voir/${esc(f.id)}">sur ${esc(f.numero)}</a>` : '';
+    if (d.statut === 'a-rembourser') return `${lien} <button class="btn btn-sm btn-primary" data-statut-doc="${id}" data-valeur="rembourse">Marquer remboursé</button>`;
+    return lien;
+  }
+  if (d.type === 'facture' && d.statut === 'annulee') {
+    const a = avoirsDe(d)[0];
+    return a ? `<a class="hint" href="#/voir/${esc(a.id)}">Annulée par ${esc(a.numero)}</a>` : '';
+  }
   if (d.type === 'facture') {
     if (d.statut === 'payee') return `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`;
     return `${Envoi.aRelancer(d) ? `<button class="btn btn-sm" data-relancer="${id}">Relancer</button>` : ''}
@@ -611,7 +652,7 @@ function actionsRapides(d) {
 
 // Le statut est cliquable : on le change directement depuis la liste.
 function statutCliquable(d) {
-  const options = Object.entries(STATUTS[d.type]).filter(([k]) => k !== d.statut);
+  const options = Object.entries(STATUTS[d.type]).filter(([k]) => k !== d.statut && k !== 'annulee');
   return `<details class="menu-ligne menu-statut">
     <summary title="Changer le statut">${badge(d)}<span class="chevron" aria-hidden="true">▾</span></summary>
     <div class="menu-ligne-liste">
@@ -631,11 +672,11 @@ function documentsTable(docs) {
       <tbody>
         ${docs.map((d) => `
           <tr data-ouvrir="${esc(d.id)}">
-            <td class="dt-num"><span class="dt-type dt-type-${d.type}">${d.type === 'facture' ? 'Facture' : 'Devis'}</span><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
+            <td class="dt-num"><span class="dt-type dt-type-${d.type}">${libelleType(d)}</span><a href="#/voir/${esc(d.id)}">${esc(d.numero)}</a></td>
             <td class="dt-client">${esc(clientName(d))}${suiviEnvoi(d)}</td>
             <td class="dt-date">${dateFr(d.date)}</td>
             <td class="dt-statut">${statutCliquable(d)}</td>
-            <td class="num dt-total">${euro(computeTotals(d).ttc)}</td>
+            <td class="num dt-total">${d.type === 'avoir' ? '−' : ''}${euro(computeTotals(d).ttc)}</td>
             <td class="dt-actions"><div class="row-actions">
               ${actionsRapides(d)}
               <details class="menu-ligne">
@@ -644,7 +685,8 @@ function documentsTable(docs) {
                   <button data-envoyer="${esc(d.id)}">Envoyer par e-mail</button>
                   <button data-pdf="${esc(d.id)}">Télécharger le PDF</button>
                   <a href="#/modifier/${esc(d.id)}">Modifier</a>
-                  <button data-duplicate="${esc(d.id)}">Dupliquer</button>
+                  ${d.type === 'facture' && d.statut !== 'annulee' ? `<button data-avoir="${esc(d.id)}">Faire un avoir</button>` : ''}
+                  ${d.type !== 'avoir' ? `<button data-duplicate="${esc(d.id)}">Dupliquer</button>` : ''}
                   <button class="danger" data-delete="${esc(d.id)}">Supprimer</button>
                 </div>
               </details>
@@ -653,7 +695,7 @@ function documentsTable(docs) {
       </tbody>
     </table></div>
     <p class="hint legende-numeros">Comment lire les numéros : <strong>D-2026-001</strong> = devis n° 1 de 2026,
-      <strong>F-2026-001</strong> = facture n° 1 de 2026. Devis et factures ont chacun leur propre suite de numéros,
+      <strong>F-2026-001</strong> = facture n° 1 de 2026, <strong>A-2026-001</strong> = avoir n° 1 de 2026. Chaque type a sa propre suite de numéros,
       qui se suivent sans trou comme l'exige la loi. Une facture créée depuis un devis prend le numéro de facture suivant.</p>`;
 }
 
@@ -677,12 +719,13 @@ function changerStatut(doc, statut) {
   if (!doc) return;
   const avant = { statut: doc.statut, datePaiement: doc.datePaiement };
   doc.statut = statut;
-  if (statut === 'payee') doc.datePaiement = doc.datePaiement || today();
-  if (statut === 'a-payer') delete doc.datePaiement;
+  if (statut === 'payee' || statut === 'rembourse') doc.datePaiement = doc.datePaiement || today();
+  if (statut === 'a-payer' || statut === 'a-rembourser') delete doc.datePaiement;
   saveData();
   render();
-  const libelle = { payee: 'marquée payée', 'a-payer': 'remise à payer', accepte: 'marqué accepté', refuse: 'marqué refusé', envoye: 'marqué envoyé', brouillon: 'remis en brouillon' }[statut];
-  toast(`${doc.type === 'facture' ? 'Facture' : 'Devis'} ${doc.numero} ${libelle}`, () => {
+  const libelle = { payee: 'marquée payée', 'a-payer': 'remise à payer', accepte: 'marqué accepté', refuse: 'marqué refusé', envoye: 'marqué envoyé', brouillon: 'remis en brouillon',
+    rembourse: 'marqué remboursé', 'a-rembourser': 'remis à rembourser', deduit: 'marqué déduit' }[statut];
+  toast(`${libelleType(doc)} ${doc.numero} ${libelle}`, () => {
     doc.statut = avant.statut;
     if (avant.datePaiement) doc.datePaiement = avant.datePaiement;
     else delete doc.datePaiement;
@@ -692,7 +735,7 @@ function changerStatut(doc, statut) {
 }
 
 function pageDocuments(filtre) {
-  const type = filtre === 'factures' ? 'facture' : filtre === 'devis' ? 'devis' : null;
+  const type = { factures: 'facture', devis: 'devis', avoirs: 'avoir' }[filtre] || null;
   const docs = data.documents
     .filter((d) => !type || d.type === type)
     .sort((a, b) => b.creeLe - a.creeLe);
@@ -710,6 +753,7 @@ function pageDocuments(filtre) {
       <a class="btn btn-sm ${!type ? 'btn-primary' : ''}" href="#/documents">Tous</a>
       <a class="btn btn-sm ${type === 'devis' ? 'btn-primary' : ''}" href="#/documents/devis">Devis</a>
       <a class="btn btn-sm ${type === 'facture' ? 'btn-primary' : ''}" href="#/documents/factures">Factures</a>
+      ${data.documents.some((d) => d.type === 'avoir') ? `<a class="btn btn-sm ${type === 'avoir' ? 'btn-primary' : ''}" href="#/documents/avoirs">Avoirs</a>` : ''}
     </div>
     <div class="card">${documentsTable(docs)}</div>
   `;
@@ -742,11 +786,14 @@ function pageEdit(id) {
   if (!doc) return pageNotFound();
   const franchise = data.entreprise.franchiseTva;
   const isFacture = doc.type === 'facture';
+  const isAvoir = doc.type === 'avoir';
+  const isDevis = doc.type === 'devis';
+  const champPaye = isAvoir ? 'rembourse' : 'payee';
 
   view.innerHTML = `
     ${backLink()}
     <div class="page-head">
-      <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)}</h1>
+      <h1>${libelleType(doc)} ${esc(doc.numero)}</h1>
       <div class="actions">
         <a class="btn" href="#/voir/${esc(doc.id)}">Aperçu / PDF</a>
       </div>
@@ -772,21 +819,21 @@ function pageEdit(id) {
             <label for="date">Date</label>
             <input id="date" name="date" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.date)}">
           </div>
-          <div>
+          ${isAvoir ? '' : `<div>
             <label for="echeance">${isFacture ? "Date d'échéance" : "Valable jusqu'au"}</label>
             <input id="echeance" name="echeance" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.echeance)}">
-          </div>
+          </div>`}
           <div>
             <label for="statut">Statut</label>
             <select id="statut" name="statut">
-              ${Object.entries(STATUTS[doc.type]).map(([k, v]) => `<option value="${k}" ${k === doc.statut ? 'selected' : ''}>${v}</option>`).join('')}
+              ${Object.entries(STATUTS[doc.type]).filter(([k]) => k !== 'annulee' || doc.statut === 'annulee').map(([k, v]) => `<option value="${k}" ${k === doc.statut ? 'selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
-          ${isFacture ? `<div id="field-paiement" ${doc.statut === 'payee' ? '' : 'hidden'}>
-            <label for="datePaiement">Payée le</label>
+          ${isFacture || isAvoir ? `<div id="field-paiement" ${doc.statut === champPaye ? '' : 'hidden'}>
+            <label for="datePaiement">${isAvoir ? 'Remboursé le' : 'Payée le'}</label>
             <input id="datePaiement" name="datePaiement" type="date" min="2000-01-01" max="2099-12-31" value="${esc(doc.datePaiement || '')}">
           </div>` : ''}
-          ${!isFacture ? `<div>
+          ${isDevis ? `<div>
             <label for="acompte">Acompte demandé à la commande (%)</label>
             <input id="acompte" name="acompte" type="number" min="0" max="100" step="1" value="${esc(doc.acompte || 0)}">
           </div>` : ''}
@@ -833,8 +880,8 @@ function pageEdit(id) {
 
     <div class="actions">
       <a class="btn btn-primary" href="#/voir/${esc(doc.id)}">Terminer</a>
-      ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
-      <button class="btn" id="duplicate">Dupliquer</button>
+      ${isDevis ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
+      ${isAvoir ? '' : '<button class="btn" id="duplicate">Dupliquer</button>'}
       <button class="btn btn-danger" id="delete">Supprimer</button>
     </div>
   `;
@@ -918,10 +965,10 @@ function pageEdit(id) {
       if (e.target.name === 'acompte' || e.target.name === 'motifTva0') renderTotals();
       if (e.target.name === 'statut') {
         // La date de paiement sert au calcul du chiffre d'affaires encaissé.
-        if (e.target.value === 'payee' && !doc.datePaiement) doc.datePaiement = today();
+        if (e.target.value === champPaye && !doc.datePaiement) doc.datePaiement = today();
         const champ = document.getElementById('field-paiement');
         if (champ) {
-          champ.hidden = e.target.value !== 'payee';
+          champ.hidden = e.target.value !== champPaye;
           document.getElementById('datePaiement').value = doc.datePaiement || '';
         }
       }
@@ -931,7 +978,7 @@ function pageEdit(id) {
   form.addEventListener('submit', (e) => e.preventDefault());
 
   document.getElementById('to-invoice')?.addEventListener('click', () => convertToInvoice(doc));
-  document.getElementById('duplicate').addEventListener('click', () => duplicateDocument(doc));
+  document.getElementById('duplicate')?.addEventListener('click', () => duplicateDocument(doc));
   document.getElementById('delete').addEventListener('click', async () => {
     if (await deleteDocument(doc)) go('#/documents');
   });
@@ -945,19 +992,21 @@ function totalsHtml(t, doc) {
   const ligneAcompte = acompte > 0
     ? `<div class="acompte"><span>Acompte à la commande (${tauxFr(acompte)} %)</span><span>${euro((t.ttc * acompte) / 100)}</span></div>`
     : '';
+  const avoir = doc?.type === 'avoir';
   if (data.entreprise.franchiseTva) {
-    return `<div class="grand"><span>Total</span><span>${euro(t.ht)}</span></div>${ligneAcompte}`;
+    return `<div class="grand"><span>${avoir ? "Montant de l'avoir" : 'Total'}</span><span>${euro(t.ht)}</span></div>${ligneAcompte}`;
   }
   return `
     <div><span>Total HT</span><span>${euro(t.ht)}</span></div>
     ${Object.entries(t.tvaParTaux).filter(([, v]) => v).map(([taux, v]) =>
       `<div><span>TVA ${tauxFr(taux)} %</span><span>${euro(v)}</span></div>`).join('')}
-    <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>
+    <div class="grand"><span>${avoir ? "Montant de l'avoir TTC" : 'Total TTC'}</span><span>${euro(t.ttc)}</span></div>
     ${ligneAcompte}`;
 }
 
 // Crée une copie du document avec un nouveau numéro, puis l'ouvre.
 async function duplicateDocument(doc) {
+  if (!doc || doc.type === 'avoir') return;
   if (!(await profilPret())) return;
   const copie = {
     ...structuredClone(doc),
@@ -974,8 +1023,69 @@ async function duplicateDocument(doc) {
   go('#/modifier/' + copie.id);
 }
 
+// Avoir sur une facture : total (annule la facture) ou partiel (montants à ajuster).
+async function faireAvoir(facture) {
+  if (!facture || facture.type !== 'facture' || facture.statut === 'annulee') return;
+  if (!(await profilPret())) return;
+  const paye = facture.statut === 'payee';
+  const choix = await choisir(`Faire un avoir sur la facture ${facture.numero} ?`, [
+    ['total', 'Avoir total', paye ? 'Toute la facture est remboursée au client.' : 'La facture est annulée en entier.'],
+    ['partiel', 'Avoir partiel', 'Une partie seulement : vous ajustez les lignes et les montants.'],
+  ], "Une facture envoyée ne se supprime pas : l'avoir l'annule ou la corrige, avec son propre numéro.");
+  if (!choix) return;
+  const avoir = {
+    id: newId(),
+    type: 'avoir',
+    numero: nextNumber('avoir'),
+    clientId: facture.clientId,
+    ...(facture.clientArchive ? { clientArchive: structuredClone(facture.clientArchive) } : {}),
+    date: today(),
+    echeance: today(),
+    objet: `Avoir sur la facture ${facture.numero}${facture.objet ? ' – ' + facture.objet : ''}`,
+    lignes: structuredClone(facture.lignes),
+    motifTva0: facture.motifTva0 || '',
+    mentionTva0: facture.mentionTva0 || '',
+    notes: '',
+    // Facture déjà payée : l'avoir est à rembourser. Sinon il vient en déduction.
+    statut: paye ? 'a-rembourser' : 'deduit',
+    factureOrigine: facture.id,
+    numeroFactureOrigine: facture.numero,
+    dateFactureOrigine: facture.date,
+    avoirTotal: choix === 'total',
+    creeLe: Date.now(),
+  };
+  data.documents.push(avoir);
+  if (choix === 'total' && !paye) facture.statut = 'annulee';
+  saveData();
+  if (choix === 'total') {
+    go('#/voir/' + avoir.id);
+    toast(paye ? `Avoir ${avoir.numero} créé : pensez à rembourser le client` : `Avoir ${avoir.numero} créé, facture ${facture.numero} annulée`);
+  } else {
+    go('#/modifier/' + avoir.id);
+    toast(`Avoir ${avoir.numero} créé : gardez seulement les lignes et les montants à ${paye ? 'rembourser' : 'déduire'}`);
+  }
+}
+
 // Supprime un document après confirmation. Renvoie true si supprimé.
 async function deleteDocument(doc) {
+  if (doc.type === 'facture' && avoirsDe(doc).length) {
+    await ask(`La facture ${doc.numero} a un avoir (${avoirsDe(doc).map((a) => a.numero).join(', ')}) : elle ne peut plus être supprimée.`, "D'accord", false);
+    return false;
+  }
+  if (doc.type === 'avoir') {
+    const derniere = nextNumber('avoir') === incrementNumber(doc.numero);
+    if (!derniere) {
+      await ask(`Pour respecter la numérotation (sans trou), seul le dernier avoir peut être supprimé.`, "D'accord", false);
+      return false;
+    }
+    if (!(await ask(`Supprimer l'avoir ${doc.numero} ? Ne le supprimez que s'il n'a pas encore été envoyé au client.`, 'Supprimer'))) return false;
+    // La facture annulée par cet avoir redevient à payer.
+    const f = getDocument(doc.factureOrigine);
+    if (f && f.statut === 'annulee' && avoirsDe(f).length === 1) f.statut = 'a-payer';
+    data.documents = data.documents.filter((d) => d.id !== doc.id);
+    saveData();
+    return true;
+  }
   if (doc.type === 'facture') {
     // La numérotation des factures doit rester continue : on ne peut
     // supprimer que la dernière facture de sa série.
@@ -1054,8 +1164,11 @@ function infosDocument(doc) {
   const e = data.entreprise;
   const client = docClient(doc) || {};
   const isFacture = doc.type === 'facture';
+  const isAvoir = doc.type === 'avoir';
+  const isDevis = doc.type === 'devis';
   const t = computeTotals(doc);
   const origine = doc.devisOrigine ? getDocument(doc.devisOrigine) : null;
+  const factureOrigine = isAvoir && doc.factureOrigine ? getDocument(doc.factureOrigine) : null;
 
   const clientPro = Boolean(client.siret);
   const mentions = [];
@@ -1073,6 +1186,11 @@ function infosDocument(doc) {
     }
     mentions.push(e.penalites || PENALITES_DEFAUT);
     if (clientPro) mentions.push('Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.');
+  } else if (isAvoir) {
+    const f = factureOrigine || { numero: doc.numeroFactureOrigine, date: doc.dateFactureOrigine };
+    if (f.numero) mentions.push(`Avoir sur la facture n° ${f.numero}${f.date ? ` du ${dateFr(f.date)}` : ''}.`);
+    if (doc.statut === 'rembourse') mentions.push(`Montant remboursé${doc.datePaiement ? ` le ${dateFr(doc.datePaiement)}` : ''}.`);
+    else if (doc.statut === 'deduit') mentions.push('Montant déduit de la somme due au titre de la facture.');
   } else {
     mentions.push(`Devis valable jusqu'au ${dateFr(doc.echeance)}.`);
     if (e.devisGratuit) mentions.push('Devis gratuit.');
@@ -1096,30 +1214,35 @@ function infosDocument(doc) {
   const formeAffichee = !isIndividuel(e) && e.formeJuridique !== 'autre'
     ? FORMES[e.formeJuridique] + (e.capital ? ` au capital de ${new Intl.NumberFormat('fr-FR').format(Number(String(e.capital).replace(/\s/g, '').replace(',', '.')) || 0)} €` : '')
     : '';
-  return { e, client, isFacture, t, origine, clientPro, mentions, nomAffiche, formeAffichee };
+  return { e, client, isFacture, isAvoir, isDevis, t, origine, factureOrigine, clientPro, mentions, nomAffiche, formeAffichee };
 }
 
 function pageView(id) {
   const doc = getDocument(id);
   if (!doc) return pageNotFound();
-  const { e, client, isFacture, t, origine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
+  const { e, client, isFacture, isAvoir, isDevis, t, origine, factureOrigine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
+  const avoirs = isFacture ? avoirsDe(doc) : [];
 
   view.innerHTML = `
     ${backLink()}
     <div class="page-head no-print">
-      <h1>${isFacture ? 'Facture' : 'Devis'} ${esc(doc.numero)} ${badge(doc)}</h1>
+      <h1>${libelleType(doc)} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
         <a class="btn" href="#/modifier/${esc(doc.id)}">Modifier</a>
         <button class="btn btn-primary" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
         <button class="btn" onclick="window.print()">Imprimer</button>
-        ${!isFacture ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
-        ${isFacture && doc.statut !== 'payee' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
+        ${isDevis ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
+        ${isFacture && doc.statut === 'a-payer' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
+        ${isAvoir && doc.statut === 'a-rembourser' ? `<button class="btn" data-statut-doc="${esc(doc.id)}" data-valeur="rembourse">Marquer remboursé</button>` : ''}
         <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e-mail</button>
         ${Envoi.aRelancer(doc) ? `<button class="btn" data-relancer="${esc(doc.id)}">Relancer</button>` : ''}
-        <button class="btn" id="duplicate">Dupliquer</button>
+        ${isFacture && doc.statut !== 'annulee' ? `<button class="btn" data-avoir="${esc(doc.id)}">Faire un avoir</button>` : ''}
+        ${isAvoir ? '' : '<button class="btn" id="duplicate">Dupliquer</button>'}
         <button class="btn btn-danger" id="delete">Supprimer</button>
       </div>
     </div>
+    ${avoirs.length ? `<p class="historique no-print">${avoirs.map((a) => `Avoir <a href="#/voir/${esc(a.id)}">${esc(a.numero)}</a> de ${euro(computeTotals(a).ttc)} TTC (${esc(STATUTS.avoir[a.statut] || a.statut)})`).join(' · ')}</p>` : ''}
+    ${isAvoir && factureOrigine ? `<p class="historique no-print">Avoir sur la facture <a href="#/voir/${esc(factureOrigine.id)}">${esc(factureOrigine.numero)}</a> du ${dateFr(factureOrigine.date)}</p>` : ''}
     ${(doc.envois || []).length || doc.signature ? `<ul class="historique no-print">
       ${(doc.envois || []).map((x) => `<li>${x.type === 'relance' ? '🔔 Relance envoyée' : '✉ Envoyé'} à ${esc(x.a)} le ${esc(new Date(x.le).toLocaleString('fr-FR'))}${x.lien ? ' · avec lien de signature' : ''}</li>`).join('')}
       ${doc.signature ? `<li>✍ Signé en ligne par <strong>${esc(doc.signature.nom)}</strong> le ${esc(new Date(doc.signature.le).toLocaleString('fr-FR'))}</li>` : ''}
@@ -1141,10 +1264,11 @@ function pageView(id) {
           ${e.numeroTva && !e.franchiseTva ? '<small>N° TVA : ' + esc(e.numeroTva) + '</small>' : ''}
         </div>
         <div style="text-align:right">
-          <p class="doc-title">${isFacture ? 'FACTURE' : 'DEVIS'}</p>
+          <p class="doc-title">${libelleType(doc).toUpperCase()}</p>
           <div>N° ${esc(doc.numero)}</div>
           <div>Date : ${dateFr(doc.date)}</div>
           ${origine ? `<div><small>Réf. devis ${esc(origine.numero)}</small></div>` : ''}
+          ${isAvoir && (factureOrigine || doc.numeroFactureOrigine) ? `<div><small>Réf. facture ${esc(factureOrigine?.numero || doc.numeroFactureOrigine)}</small></div>` : ''}
         </div>
       </div>
 
@@ -1180,7 +1304,7 @@ function pageView(id) {
 
       ${doc.notes ? `<p style="margin-top:24px;white-space:pre-line">${esc(doc.notes)}</p>` : ''}
 
-      ${!isFacture ? (doc.signature
+      ${isDevis ? (doc.signature
         ? `<div class="signature signature-faite">Bon pour accord : signé en ligne par <strong>${esc(doc.signature.nom)}</strong> le ${esc(new Date(doc.signature.le).toLocaleString('fr-FR'))}
             ${doc.signature.image ? `<img src="${esc(doc.signature.image)}" alt="Signature de ${esc(doc.signature.nom)}">` : ''}</div>`
         : `<div class="signature">Bon pour accord : date et signature du client</div>`) : ''}
@@ -1196,7 +1320,7 @@ function pageView(id) {
     saveData();
     render();
   });
-  document.getElementById('duplicate').addEventListener('click', () => duplicateDocument(doc));
+  document.getElementById('duplicate')?.addEventListener('click', () => duplicateDocument(doc));
   document.getElementById('delete').addEventListener('click', async () => {
     if (await deleteDocument(doc)) go('#/documents');
   });
@@ -1911,7 +2035,7 @@ document.addEventListener('click', async (e) => {
   document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
     if (!m.contains(e.target)) m.open = false;
   });
-  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf], [data-envoyer], [data-relancer]');
+  const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf], [data-envoyer], [data-relancer], [data-avoir]');
   if (!cible) {
     // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
     const ligne = e.target.closest('tr[data-ouvrir]');
@@ -1919,7 +2043,8 @@ document.addEventListener('click', async (e) => {
     return;
   }
   cible.closest('.menu-ligne')?.removeAttribute('open');
-  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye, pdf, envoyer, relancer } = cible.dataset;
+  const { new: type, duplicate, delete: del, deleteClient: delClient, payee, statutDoc, valeur, facturer, devisPaye: dejaPaye, pdf, envoyer, relancer, avoir } = cible.dataset;
+  if (avoir) faireAvoir(getDocument(avoir));
   if (type) createDocument(type);
   if (duplicate) duplicateDocument(getDocument(duplicate));
   if (del && (await deleteDocument(getDocument(del)))) render();

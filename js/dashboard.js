@@ -45,13 +45,23 @@ function depenseHT(dep) {
   return (Number(dep.montantTTC) || 0) / (1 + (Number(dep.tva) || 0) / 100);
 }
 
+// Factures payées, moins les avoirs remboursés ou déduits (un avoir qui annule
+// une facture jamais payée ne compte pas : la facture n'a pas été encaissée).
 function encaissements() {
-  return data.documents
+  const factures = data.documents
     .filter((d) => d.type === 'facture' && d.statut === 'payee')
     .map((d) => {
       const t = computeTotals(d);
       return { date: d.datePaiement || d.date, ht: t.ht, tva: t.tva, ttc: t.ttc, client: clientName(d) };
     });
+  const avoirs = data.documents
+    .filter((d) => d.type === 'avoir' && (d.statut === 'rembourse' || d.statut === 'deduit')
+      && getDocument(d.factureOrigine)?.statut !== 'annulee')
+    .map((d) => {
+      const t = computeTotals(d);
+      return { date: d.datePaiement || d.date, ht: -t.ht, tva: -t.tva, ttc: -t.ttc, client: clientName(d) };
+    });
+  return [...factures, ...avoirs];
 }
 
 function depensesListe() {

@@ -6,7 +6,7 @@
  * Utilise data, infosDocument, euro, dateFr, tauxFr... d'app.js.
  */
 const Pdf = (() => {
-  const VERSION = '?v=70';
+  const VERSION = '?v=71';
   const MARGE = 15;
   const BLEU = [31, 94, 255];
   const GRIS = [107, 115, 133];
@@ -97,7 +97,8 @@ const Pdf = (() => {
   async function document_(doc, { sortie = 'enregistrer' } = {}) {
     const pdf = await nouveau('portrait');
     if (!pdf) return null;
-    const { e, client, isFacture, t, origine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
+    const { e, client, isDevis, isAvoir, t, origine, factureOrigine, mentions, nomAffiche, formeAffichee } = infosDocument(doc);
+    const titre = libelleType(doc);
     const largeur = pdf.internal.pageSize.getWidth();
     const hauteur = pdf.internal.pageSize.getHeight();
     const droite = largeur - MARGE;
@@ -117,10 +118,11 @@ const Pdf = (() => {
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(22);
     pdf.setTextColor(...BLEU);
-    pdf.text(isFacture ? 'FACTURE' : 'DEVIS', droite, MARGE + 6, { align: 'right' });
+    pdf.text(titre.toUpperCase(), droite, MARGE + 6, { align: 'right' });
     pdf.setTextColor(...ENCRE);
     pdf.setFont('helvetica', 'normal');
-    bloc(pdf, [`N° ${doc.numero}`, `Date : ${dateFr(doc.date)}`, origine && `Réf. devis ${origine.numero}`],
+    bloc(pdf, [`N° ${doc.numero}`, `Date : ${dateFr(doc.date)}`, origine && `Réf. devis ${origine.numero}`,
+      isAvoir && (factureOrigine?.numero || doc.numeroFactureOrigine) && `Réf. facture ${factureOrigine?.numero || doc.numeroFactureOrigine}`],
       droite, MARGE + 13, { align: 'right', largeur: 70 });
 
     // Client (encadré à droite) et objet (à gauche).
@@ -176,8 +178,9 @@ const Pdf = (() => {
     // Totaux, alignés à droite.
     const acompte = doc.type === 'devis' ? Number(doc.acompte) || 0 : 0;
     const totaux = e.franchiseTva
-      ? [['Total', t.ht, true]]
-      : [['Total HT', t.ht], ...Object.entries(t.tvaParTaux).filter(([, v]) => v).map(([taux, v]) => [`TVA ${tauxFr(taux)} %`, v]), ['Total TTC', t.ttc, true]];
+      ? [[isAvoir ? "Montant de l'avoir" : 'Total', t.ht, true]]
+      : [['Total HT', t.ht], ...Object.entries(t.tvaParTaux).filter(([, v]) => v).map(([taux, v]) => [`TVA ${tauxFr(taux)} %`, v]),
+        [isAvoir ? "Montant de l'avoir TTC" : 'Total TTC', t.ttc, true]];
     if (acompte > 0) totaux.push([`Acompte à la commande (${tauxFr(acompte)} %)`, (t.ttc * acompte) / 100]);
     const xTotaux = droite - 80;
     if (y + totaux.length * 7 > hauteur - 20) {
@@ -215,7 +218,7 @@ const Pdf = (() => {
       y += lignes.length * 4.6 + 2;
     }
 
-    if (!isFacture) {
+    if (isDevis) {
       placer(40);
       y += 6;
       pdf.setDrawColor(200, 205, 215);
@@ -250,7 +253,7 @@ const Pdf = (() => {
 
     numeroterPages(pdf);
     const nomClient = docClient(doc)?.nom;
-    const fichier = nomFichier(`${isFacture ? 'Facture' : 'Devis'} ${doc.numero}${nomClient ? ' - ' + nomClient : ''}`);
+    const fichier = nomFichier(`${titre} ${doc.numero}${nomClient ? ' - ' + nomClient : ''}`);
     if (sortie === 'base64') return { nom: fichier, base64: pdf.output('datauristring').split(',')[1] };
     pdf.save(fichier);
     return { nom: fichier };

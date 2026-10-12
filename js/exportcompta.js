@@ -41,7 +41,7 @@ function dansPeriode(date, du, au) {
 
 function facturesPeriode(du, au) {
   return data.documents
-    .filter((d) => d.type === 'facture' && dansPeriode(d.date, du, au))
+    .filter((d) => (d.type === 'facture' || d.type === 'avoir') && dansPeriode(d.date, du, au))
     .sort((a, b) => (a.numero || '').localeCompare(b.numero || '', 'fr', { numeric: true }));
 }
 
@@ -56,16 +56,19 @@ function journalVentes(du, au) {
   const totaux = factures.map((f) => computeTotals(f));
   const taux = [...new Set(totaux.flatMap((t) => Object.keys(t.tvaParTaux).map(Number)))].sort((a, b) => b - a);
   const lignes = [[
-    'Date', 'N° facture', 'Client', 'SIRET client', 'Objet', 'Total HT',
-    ...taux.map((t) => `TVA ${String(t).replace('.', ',')} %`), 'Total TVA', 'Total TTC', 'Statut', 'Payée le',
+    'Date', 'N° facture / avoir', 'Client', 'SIRET client', 'Objet', 'Total HT',
+    ...taux.map((t) => `TVA ${String(t).replace('.', ',')} %`), 'Total TVA', 'Total TTC', 'Statut', 'Réglé le',
   ]];
+  // Les avoirs sont repris en négatif.
   factures.forEach((f, i) => {
     const t = totaux[i];
+    const s = f.type === 'avoir' ? -1 : 1;
     const client = f.clientArchive || getClient(f.clientId) || {};
+    const regle = f.statut === 'payee' || f.statut === 'rembourse';
     lignes.push([
-      csvDate(f.date), f.numero, client.nom || '', client.siret || '', f.objet || '', csvNombre(t.ht),
-      ...taux.map((x) => csvNombre(t.tvaParTaux[x] || 0)), csvNombre(t.tva), csvNombre(t.ttc),
-      f.statut === 'payee' ? 'Payée' : 'À payer', csvDate(f.statut === 'payee' ? f.datePaiement : ''),
+      csvDate(f.date), f.numero, client.nom || '', client.siret || '', f.objet || '', csvNombre(s * t.ht),
+      ...taux.map((x) => csvNombre(s * (t.tvaParTaux[x] || 0))), csvNombre(s * t.tva), csvNombre(s * t.ttc),
+      STATUTS[f.type]?.[f.statut] || f.statut, csvDate(regle ? f.datePaiement : ''),
     ]);
   });
   return lignes;
@@ -107,8 +110,11 @@ function pageExport(params) {
   const depenses = depensesPeriode(du, au);
   const ventes = factures.reduce((s, f) => {
     const t = computeTotals(f);
-    return { ht: s.ht + t.ht, tva: s.tva + t.tva, ttc: s.ttc + t.ttc };
+    const k = f.type === 'avoir' ? -1 : 1;
+    return { ht: s.ht + k * t.ht, tva: s.tva + k * t.tva, ttc: s.ttc + k * t.ttc };
   }, { ht: 0, tva: 0, ttc: 0 });
+  const nbAvoirs = factures.filter((f) => f.type === 'avoir').length;
+  const nbFactures = factures.length - nbAvoirs;
   const totalDepenses = depenses.reduce((s, d) => s + (Number(d.montantTTC) || 0), 0);
   const nomFichier = (quoi) => `devizo-${quoi}-${du}-au-${au}.csv`;
 
@@ -127,7 +133,7 @@ function pageExport(params) {
     <div class="panels">
       <section class="card">
         <h2>Journal des ventes</h2>
-        <p><strong>${factures.length}</strong> facture${factures.length > 1 ? 's' : ''} du ${dateFr(du)} au ${dateFr(au)}</p>
+        <p><strong>${nbFactures}</strong> facture${nbFactures > 1 ? 's' : ''}${nbAvoirs ? ` et <strong>${nbAvoirs}</strong> avoir${nbAvoirs > 1 ? 's' : ''}` : ''} du ${dateFr(du)} au ${dateFr(au)}</p>
         <p>${data.entreprise.franchiseTva ? `Total : <strong>${euro(ventes.ht)}</strong>`
           : `Total HT : <strong>${euro(ventes.ht)}</strong> · TVA : <strong>${euro(ventes.tva)}</strong> · TTC : <strong>${euro(ventes.ttc)}</strong>`}</p>
         <div class="actions">

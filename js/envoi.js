@@ -64,6 +64,16 @@ const Envoi = (() => {
           + `${e.iban ? `\n\nIBAN : ${e.iban}` : ''}\n\nSi le paiement a été effectué entre-temps, merci de ne pas tenir compte de ce message.\n\nCordialement,\n${signature}`,
       };
     }
+    if (doc.type === 'avoir') {
+      const f = getDocument(doc.factureOrigine);
+      const numF = f?.numero || doc.numeroFactureOrigine || '';
+      return {
+        objet: `Avoir ${doc.numero} – ${e.nom}`,
+        message: `${bonjour}\n\nVeuillez trouver ci-joint l'avoir n° ${doc.numero}${numF ? ` sur la facture n° ${numF}` : ''}, d'un montant de ${montant}.`
+          + `${doc.statut === 'a-rembourser' ? '\n\nCe montant vous sera remboursé prochainement.' : doc.statut === 'rembourse' ? '\n\nCe montant vous a été remboursé.' : '\n\nCe montant vient en déduction de la somme due.'}`
+          + `\n\nCordialement,\n${signature}`,
+      };
+    }
     if (doc.type === 'facture') {
       return {
         objet: `Facture ${doc.numero} – ${e.nom}`,
@@ -99,7 +109,7 @@ const Envoi = (() => {
     dialog.className = 'ask envoi';
     dialog.innerHTML = `
       <form method="dialog" id="envoi-form" novalidate>
-        <h2>${mode === 'relance' ? 'Relancer le client' : `Envoyer ${doc.type === 'facture' ? 'la facture' : 'le devis'} ${esc(doc.numero)}`}</h2>
+        <h2>${mode === 'relance' ? 'Relancer le client' : `Envoyer ${{ facture: 'la facture', avoir: "l'avoir" }[doc.type] || 'le devis'} ${esc(doc.numero)}`}</h2>
         <label for="envoi-a">À</label>
         <input id="envoi-a" name="a" type="email" inputmode="email" value="${esc(client.email || '')}" placeholder="adresse e-mail du client" required>
         ${!client.email && client.nom ? `<p class="hint">Astuce : ajoutez l'e-mail de ${esc(client.nom)} dans sa fiche client pour qu'il soit rempli tout seul la prochaine fois.</p>` : ''}
@@ -184,7 +194,7 @@ const Envoi = (() => {
         saveData();
         dialog.close();
         render();
-        toast(mode === 'relance' ? `Relance envoyée à ${a}` : (doc.type === 'facture' ? `Facture ${doc.numero} envoyée à ${a}` : `Devis ${doc.numero} envoyé à ${a}`));
+        toast(mode === 'relance' ? `Relance envoyée à ${a}` : (doc.type === 'facture' ? `Facture ${doc.numero} envoyée à ${a}` : `${libelleType(doc)} ${doc.numero} envoyé à ${a}`));
       } catch (err) {
         montrer(err.message);
         bouton.disabled = false;

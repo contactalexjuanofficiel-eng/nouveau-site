@@ -597,3 +597,13 @@ dialog.envoi .actions { margin-top: 14px; }
 .assist-liste small { display: block; color: var(--muted); font-size: .82rem; }
 #assist-form textarea { width: 100%; }
 #assist-form .actions { margin-top: 14px; }
+
+/* ---------- Avoirs ---------- */
+.dt-type-avoir { color: var(--danger); }
+.badge-annulee { color: var(--muted); background: var(--bg); text-decoration: line-through; }
+.badge-a-rembourser { color: var(--warning); background: var(--warning-soft); }
+.badge-rembourse, .badge-deduit { color: var(--success); background: var(--success-soft); }
+.choix { display: grid; gap: 8px; margin: 4px 0 12px; }
+.choix-option { display: grid; gap: 2px; text-align: left; padding: 12px 14px; height: auto; white-space: normal; }
+.choix-option small { color: var(--muted); font-weight: 400; }
+.choix-option:hover { border-color: var(--primary); }
