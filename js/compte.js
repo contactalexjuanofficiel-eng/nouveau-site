@@ -388,6 +388,7 @@ const Compte = (() => {
     const [titre, sousTitre] = titres[mode];
     view.innerHTML = `
       <div class="auth">
+        ${typeof TradApp !== 'undefined' ? `<div class="auth-langue">${TradApp.selecteur()}</div>` : ''}
         <div class="auth-card card">
           ${mode !== 'oubli' ? `
             <div class="auth-tabs" role="tablist">
@@ -591,6 +592,8 @@ const Compte = (() => {
       </section>
       ${Abonnement.resume()}
       ${typeof Installer !== 'undefined' ? Installer.carte() : ''}
+      ${typeof TradApp !== 'undefined' ? `<section class="card"><h2>Langue de l'appli</h2>${TradApp.selecteur()}
+        <p class="hint">Vos devis, factures et avoirs restent toujours en français, comme l'exige la loi en France.</p></section>` : ''}
       ${carteEquipe()}
       <section class="card">
         <h2>Changer de mot de passe</h2>

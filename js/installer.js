@@ -10,8 +10,9 @@ const Installer = (() => {
 
   const installee = () => window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
   const ios = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-  const mobile = () => ios() || /Android|Mobi/i.test(navigator.userAgent);
-  const possible = () => !installee() && (Boolean(invite) || ios());
+  const android = () => /Android/i.test(navigator.userAgent);
+  const mobile = () => ios() || android() || /Mobi/i.test(navigator.userAgent);
+  const possible = () => !installee() && (Boolean(invite) || ios() || android());
 
   // Ouvert depuis l'icône de l'écran d'accueil sur la page d'accueil du site : on va dans l'appli.
   if (installee() && /^\/(index\.html)?$/.test(location.pathname)) location.replace('app.html');
@@ -39,6 +40,25 @@ const Installer = (() => {
       <li>Touchez <strong>Ajouter</strong> : l'icône Devizo apparaît avec vos autres applis.</li>
     </ol>`;
 
+  const ETAPES_ANDROID = `
+    <ol class="installer-etapes">
+      <li>Touchez le menu <strong>⋮</strong> en haut à droite de Chrome (sur Samsung Internet : le menu <strong>≡</strong> en bas).</li>
+      <li>Choisissez <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>
+        (sur Samsung Internet : « Ajouter la page à » puis « Écran d'accueil »).</li>
+      <li>Confirmez : l'icône Devizo apparaît avec vos autres applis.</li>
+    </ol>`;
+
+  function expliquer(titre, etapes, note) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'ask';
+    dialog.innerHTML = `<p><strong>${titre}</strong></p>${etapes}<p class="hint">${note}</p>
+      <div class="actions"><button class="btn btn-primary" value="ok">J'ai compris</button></div>`;
+    dialog.addEventListener('click', (e) => e.target.value && dialog.close());
+    dialog.addEventListener('close', () => dialog.remove());
+    document.body.appendChild(dialog);
+    dialog.showModal();
+  }
+
   async function installer() {
     if (invite) {
       invite.prompt();
@@ -47,17 +67,8 @@ const Installer = (() => {
       rafraichir();
       return;
     }
-    if (ios()) {
-      const dialog = document.createElement('dialog');
-      dialog.className = 'ask';
-      dialog.innerHTML = `<p><strong>Installer Devizo sur votre iPhone</strong></p>${ETAPES_IOS}
-        <p class="hint">À faire depuis Safari (pas depuis une autre appli).</p>
-        <div class="actions"><button class="btn btn-primary" value="ok">J'ai compris</button></div>`;
-      dialog.addEventListener('click', (e) => e.target.value && dialog.close());
-      dialog.addEventListener('close', () => dialog.remove());
-      document.body.appendChild(dialog);
-      dialog.showModal();
-    }
+    if (ios()) expliquer('Installer Devizo sur votre iPhone', ETAPES_IOS, 'À faire depuis Safari (pas depuis une autre appli).');
+    else if (android()) expliquer('Installer Devizo sur votre téléphone Android', ETAPES_ANDROID, 'À faire depuis Chrome ou Samsung Internet.');
   }
 
   // Carte pour la page « Mon compte ».
@@ -70,6 +81,7 @@ const Installer = (() => {
       <p>Ajoutez Devizo à votre écran d'accueil : il s'ouvre en plein écran comme une appli, et même sans réseau sur un chantier.</p>
       ${invite ? '<button class="btn btn-primary" data-installer>📲 Installer Devizo</button>'
         : ios() ? ETAPES_IOS
+          : android() ? ETAPES_ANDROID
           : '<p class="hint">Ouvrez devizo-app.fr dans Chrome (Android, ordinateur) ou Safari (iPhone) pour l\'installer.</p>'}
     </section>`;
   }
@@ -119,8 +131,8 @@ const Installer = (() => {
       installer();
     }
   });
-  // Sur iPhone, pas d'événement : on propose après quelques secondes d'utilisation.
-  if (ios()) setTimeout(proposer, document.getElementById('view') ? 8000 : 4000);
+  // Sur iPhone (et Android si le navigateur ne propose rien), on propose après quelques secondes.
+  if (ios() || android()) setTimeout(proposer, document.getElementById('view') ? 8000 : 3000);
 
   return { carte, installee };
 })();

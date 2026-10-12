@@ -625,7 +625,7 @@ function actionsRapides(d) {
     return a ? `<a class="hint" href="#/voir/${esc(a.id)}">Annulée par ${esc(a.numero)}</a>` : '';
   }
   if (d.type === 'facture') {
-    if (d.statut === 'payee') return `<span class="hint">Payée${d.datePaiement ? ' le ' + dateFr(d.datePaiement) : ''}</span>`;
+    if (d.statut === 'payee') return `<span class="hint">${d.datePaiement ? `Payée le ${dateFr(d.datePaiement)}` : 'Payée'}</span>`;
     return `${Envoi.aRelancer(d) ? `<button class="btn btn-sm" data-relancer="${id}">Relancer</button>` : ''}
       <button class="btn btn-sm btn-primary" data-payee="${id}">Marquer payée</button>`;
   }
