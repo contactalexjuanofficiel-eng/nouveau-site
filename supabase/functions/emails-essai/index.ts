@@ -139,6 +139,9 @@ async function tousLesUtilisateurs() {
   return liste;
 }
 
+// Adresse publique de cette fonction, quel que soit le nom choisi au déploiement.
+let adresseFonction = `${URL_SUPABASE}/functions/v1/emails-essai`;
+
 async function passage() {
   const heure = heureParis();
   if (heure < 8 || heure >= 20) return { envoyes: 0, raison: 'hors des heures d\'envoi (8 h – 20 h)' };
@@ -179,7 +182,7 @@ async function passage() {
     // On réserve l'envoi d'abord : si deux passages se croisent, un seul gagne.
     const { error: dejaPris } = await admin.from('emails_auto').insert({ user_id: u.id, type });
     if (dejaPris) continue;
-    const lienStop = `${URL_SUPABASE}/functions/v1/emails-essai?stop=${u.id}&k=${await cleDesinscription(u.id)}`;
+    const lienStop = `${adresseFonction}?stop=${u.id}&k=${await cleDesinscription(u.id)}`;
     try {
       await envoyer(u.email, contenu(type, finEssai), lienStop);
       bilan.push(`${type} → ${u.email}`);
@@ -193,6 +196,8 @@ async function passage() {
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
+  const nom = url.pathname.split('/').filter(Boolean).pop();
+  if (nom && /^[a-z0-9-]+$/.test(nom)) adresseFonction = `${URL_SUPABASE}/functions/v1/${nom}`;
   if (req.method === 'GET' && url.searchParams.has('stop')) {
     const id = url.searchParams.get('stop') ?? '';
     const k = url.searchParams.get('k') ?? '';
