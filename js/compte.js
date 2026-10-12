@@ -33,6 +33,7 @@ const Compte = (() => {
   let base = null; // données de cette version, pour fusionner avec celles d'un collègue
   let minuteurEquipe = null;
   let etat = 'ok'; // 'ok' | 'envoi' | 'erreur'
+  let admin = false; // compte administrateur (panel admin, pas de blocage du profil)
 
   const adresseRetour = () => location.origin + location.pathname;
 
@@ -299,6 +300,12 @@ const Compte = (() => {
       setEtat('erreur');
     }
     await Abonnement.charger(client, user, equipe);
+    try {
+      const { data: estAdmin } = await client.rpc('est_admin');
+      admin = estAdmin === true;
+    } catch (e) {
+      admin = false;
+    }
     suivreEquipe();
     renderApp();
     if (typeof Envoi !== 'undefined') Envoi.synchroniserSignatures();
@@ -306,6 +313,7 @@ const Compte = (() => {
 
   function oublierSession() {
     utilisateur = null;
+    admin = false;
     equipe = null;
     espaceId = null;
     versionBrute = null;
@@ -608,10 +616,7 @@ const Compte = (() => {
     });
     document.getElementById('compte-deco').addEventListener('click', deconnecter);
     // Lien vers le panel d'administration, seulement pour les administrateurs.
-    client.rpc('est_admin').then(({ data: admin }) => {
-      const lien = document.getElementById('compte-admin');
-      if (lien && admin === true) lien.style.display = '';
-    }, () => {});
+    if (admin) document.getElementById('compte-admin').style.display = '';
     document.getElementById('compte-mdp').addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const champ = document.getElementById('compte-mdp-nouveau');
@@ -770,5 +775,6 @@ const Compte = (() => {
     client: () => client,
     espace: () => espaceId,
     utilisateur: () => utilisateur,
+    estAdmin: () => admin,
   };
 })();

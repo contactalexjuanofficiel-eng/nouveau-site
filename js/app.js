@@ -437,7 +437,8 @@ async function profilPret() {
     return false;
   }
   const manque = profilManquant();
-  if (!manque.length) return true;
+  // Un administrateur peut tout tester, même avec un profil incomplet.
+  if (!manque.length || (typeof Compte !== 'undefined' && Compte.estAdmin?.())) return true;
   const ok = await ask(
     `Avant de faire un devis ou une facture, complétez « Mon entreprise » : vos documents doivent comporter les mentions obligatoires. ` +
     `Il manque : ${manque.map((m) => m.texte).join(' ; ')}.`,
@@ -1822,8 +1823,9 @@ function majPastille() {
   const lien = document.querySelector('.nav a[href="#/parametres"]');
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
-  // Les autres pages sont verrouillées tant que le profil est incomplet.
-  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"])').forEach((a) => a.classList.toggle('locked', nb > 0));
+  // Les autres pages sont verrouillées tant que le profil est incomplet (sauf pour un administrateur).
+  const libre = typeof Compte !== 'undefined' && Compte.estAdmin?.();
+  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
 }
 
 function pageNotFound() {
@@ -1872,7 +1874,7 @@ function render() {
   if (['', 'documents', 'voir'].includes(parts[0] ?? '')) Envoi.synchroniserSignatures();
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
-  const bloque = profilManquant().length > 0;
+  const bloque = profilManquant().length > 0 && !(typeof Compte !== 'undefined' && Compte.estAdmin?.());
   if (bloque && !['parametres', 'compte', 'abonnement', 'assistance'].includes(parts[0])) return pageBloquee();
 
   // Abonnement : lecture seule après l'essai, fonctions réservées à la formule Pro.
