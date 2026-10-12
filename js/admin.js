@@ -373,6 +373,7 @@
       <div class="actions">
         <a class="btn btn-sm btn-primary" href="${lien}">Répondre par e-mail</a>
         <button type="button" class="btn btn-sm" data-traiter="${d.id}" data-etat="${d.traitee_le ? 'rouvrir' : 'traiter'}">${d.traitee_le ? 'Rouvrir' : '✓ Marquer traitée'}</button>
+        ${d.traitee_le ? `<button type="button" class="btn btn-sm btn-danger" data-supprimer-demande="${d.id}">Supprimer</button>` : ''}
       </div>
     </article>`;
   }
@@ -480,6 +481,17 @@
       b.disabled = true;
       const { error } = await client.from('demandes_assistance')
         .update({ traitee_le: b.dataset.etat === 'traiter' ? new Date().toISOString() : null }).eq('id', Number(b.dataset.traiter));
+      if (error) {
+        b.disabled = false;
+        alert(error.message);
+        return;
+      }
+      await charger(true);
+    }));
+    zone.querySelectorAll('[data-supprimer-demande]').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer définitivement cette demande ?')) return;
+      b.disabled = true;
+      const { error } = await client.from('demandes_assistance').delete().eq('id', Number(b.dataset.supprimerDemande));
       if (error) {
         b.disabled = false;
         alert(error.message);
