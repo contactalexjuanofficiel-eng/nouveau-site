@@ -90,7 +90,11 @@ const Installer = (() => {
     } catch (e) {
       return;
     }
-    if (typeof Compte !== 'undefined' && Compte.actif && !Compte.connecte()) return;
+    // Pas encore connecté (écran de connexion) : on repasse plus tard.
+    if (typeof Compte !== 'undefined' && Compte.actif && !Compte.connecte()) {
+      setTimeout(proposer, 8000);
+      return;
+    }
     const el = document.createElement('div');
     el.className = 'installer-bandeau no-print';
     el.setAttribute('role', 'region');
