@@ -64,10 +64,18 @@ const Abonnement = (() => {
     }
   }
 
+  // Offre de l'administrateur : 'essai' (essai prolongé) ou 'cadeau' (formule offerte).
+  const offert = () => (!membre() && infos?.offert) || null;
+
+  function finEssai() {
+    if (!user?.created_at) return Date.now() + ESSAI_JOURS * 86400000;
+    const normale = Date.parse(user.created_at) + ESSAI_JOURS * 86400000;
+    const prolongee = offert() === 'essai' && infos.fin_periode ? Date.parse(infos.fin_periode) : 0;
+    return Math.max(normale, prolongee);
+  }
+
   function joursEssaiRestants() {
-    if (!user?.created_at) return ESSAI_JOURS;
-    const fin = Date.parse(user.created_at) + ESSAI_JOURS * 86400000;
-    return Math.max(0, Math.ceil((fin - Date.now()) / 86400000));
+    return Math.max(0, Math.ceil((finEssai() - Date.now()) / 86400000));
   }
 
   function abonnementActif() {
@@ -79,6 +87,7 @@ const Abonnement = (() => {
   function etat() {
     if (typeof Compte === 'undefined' || !Compte.actif || !user) return 'libre';
     if (membre()) return equipe.active ? 'equipe' : 'expire';
+    if (offert() === 'essai') return joursEssaiRestants() > 0 ? 'essai' : 'expire';
     if (abonnementActif()) return NIVEAU[infos.formule] ? infos.formule : 'pro';
     if (joursEssaiRestants() > 0) return 'essai';
     return 'expire';
@@ -223,9 +232,14 @@ const Abonnement = (() => {
     }
     if (e === 'essai') {
       const j = joursEssaiRestants();
-      const finEssai = new Date(Date.parse(user.created_at) + ESSAI_JOURS * 86400000).toLocaleDateString('fr-FR');
-      return `<p class="big">Essai gratuit <small>encore ${j} jour${j > 1 ? 's' : ''}, jusqu'au ${finEssai}</small></p>
+      const dateFin = new Date(finEssai()).toLocaleDateString('fr-FR');
+      return `<p class="big">Essai gratuit${offert() === 'essai' ? ' prolongé' : ''} <small>encore ${j} jour${j > 1 ? 's' : ''}, jusqu'au ${dateFin}</small></p>
         <p class="hint">Pendant l'essai, vous avez accès à tout. Choisissez une formule quand vous voulez : rien n'est prélevé avant.</p>`;
+    }
+    if (estAbonne(e) && offert() === 'cadeau') {
+      return `<p class="big">Formule ${FORMULES[e].nom} offerte 🎁 <small>${fin ? `jusqu'au ${fin}` : 'sans limite de durée'}</small></p>
+        <p class="hint">Cette formule vous est offerte par Devizo${fin ? ` : rien ne sera prélevé. Pour continuer après le ${fin}, choisissez une formule ci-dessous` : ''}.</p>
+        ${e === 'equipe' ? `<p class="hint">Assistance prioritaire : écrivez à <a href="mailto:${CONTACT}">${CONTACT}</a>, votre demande est traitée en premier.</p>` : ''}`;
     }
     if (estAbonne(e)) {
       const resilie = infos.statut === 'canceled' || infos.fin_prevue === true;
@@ -252,7 +266,7 @@ const Abonnement = (() => {
     }
     const merci = params?.get('merci');
     const e = etat();
-    const actuelle = estAbonne(e) ? e : null;
+    const actuelle = estAbonne(e) && !offert() ? e : null; // une offre n'empêche pas de s'abonner
     const paiementPret = Boolean(liens.soloMois || liens.proMois);
 
     view.innerHTML = `
@@ -270,7 +284,8 @@ const Abonnement = (() => {
         ${['solo', 'pro', 'equipe'].map((f) => {
           const url = lienPaiement(f);
           let bouton;
-          if (actuelle === f) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">✓ Votre formule actuelle</span>';
+          if (offert() === 'cadeau' && e === f && !url) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">🎁 Votre formule offerte</span>';
+          else if (actuelle === f) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">✓ Votre formule actuelle</span>';
           else if (actuelle && lienPortail()) bouton = `<a class="btn btn-lg plan-cta ${f === 'pro' ? 'btn-primary' : ''}" href="${esc(lienPortail())}" target="_blank" rel="noopener">Passer à ${FORMULES[f].nom}</a>`;
           // Déjà abonné : un lien de paiement créerait un second abonnement.
           else if (actuelle) bouton = '<span class="btn btn-lg plan-cta" aria-disabled="true">Changement de formule bientôt disponible</span>';
@@ -322,9 +337,9 @@ const Abonnement = (() => {
     if (e === 'libre') return '';
     const libelle = membre() ? `Équipe de ${esc(equipe.email_titulaire)}` : {
       essai: `Essai gratuit, encore ${joursEssaiRestants()} jour${joursEssaiRestants() > 1 ? 's' : ''}`,
-      solo: 'Formule Solo',
-      pro: 'Formule Pro',
-      equipe: 'Formule Entreprise',
+      solo: `Formule Solo${offert() ? ' (offerte)' : ''}`,
+      pro: `Formule Pro${offert() ? ' (offerte)' : ''}`,
+      equipe: `Formule Entreprise${offert() ? ' (offerte)' : ''}`,
       expire: 'Essai terminé',
     }[e];
     return `<section class="card"><h2>Abonnement</h2><p><strong>${libelle}</strong></p>
