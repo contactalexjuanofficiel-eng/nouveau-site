@@ -621,3 +621,9 @@ dialog.envoi .actions { margin-top: 14px; }
 .installer-fermer { background: none; border: 0; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 6px; }
 .installer-etapes { margin: 8px 0; padding-left: 1.3em; line-height: 1.6; }
 .installer-icone { display: inline-block; padding: 0 6px; border: 1px solid var(--border); border-radius: 6px; font-size: .85em; }
+
+/* ---------- Langue de l'appli ---------- */
+.langue-app { display: inline-flex; align-items: center; gap: 8px; }
+.langue-app select { width: auto; min-width: 160px; }
+.auth-langue { display: flex; justify-content: flex-end; width: 100%; max-width: 440px; margin-bottom: 10px; }
+.installer-haut { bottom: auto; top: calc(76px + env(safe-area-inset-top, 0px)); }

@@ -13,6 +13,9 @@ const Installer = (() => {
   const mobile = () => ios() || /Android|Mobi/i.test(navigator.userAgent);
   const possible = () => !installee() && (Boolean(invite) || ios());
 
+  // Ouvert depuis l'icône de l'écran d'accueil sur la page d'accueil du site : on va dans l'appli.
+  if (installee() && /^\/(index\.html)?$/.test(location.pathname)) location.replace('app.html');
+
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
   }
@@ -79,11 +82,7 @@ const Installer = (() => {
   // Petit bandeau proposé une fois sur téléphone (« Plus tard » le masque 30 jours).
   function proposer() {
     if (!mobile() || !possible() || document.querySelector('.installer-bandeau')) return;
-    // Le bandeau cookies d'abord : on repasse plus tard.
-    if (document.querySelector('.cookies')) {
-      setTimeout(proposer, 5000);
-      return;
-    }
+    const accueil = !document.getElementById('view'); // page d'accueil du site (pas l'appli)
     try {
       const plusTard = Number(localStorage.getItem(CLE) || 0);
       if (Date.now() - plusTard < 30 * 86400000) return;
@@ -96,11 +95,11 @@ const Installer = (() => {
       return;
     }
     const el = document.createElement('div');
-    el.className = 'installer-bandeau no-print';
+    el.className = 'installer-bandeau no-print' + (document.querySelector('.cookies') ? ' installer-haut' : '');
     el.setAttribute('role', 'region');
     el.setAttribute('aria-label', 'Installer Devizo');
     el.innerHTML = `<img src="img/logo-192.png" alt="" width="40" height="40">
-      <span><strong>Installez Devizo</strong><small>Sur l'écran d'accueil, même sans réseau</small></span>
+      <span><strong>${accueil ? "Installez l'appli Devizo" : 'Installez Devizo'}</strong><small>${accueil ? "Gratuit · sur votre écran d'accueil, en 10 secondes" : "Sur l'écran d'accueil, même sans réseau"}</small></span>
       <button class="btn btn-primary btn-sm" data-installer>Installer</button>
       <button class="installer-fermer" aria-label="Plus tard">✕</button>`;
     el.querySelector('.installer-fermer').addEventListener('click', () => {
@@ -121,7 +120,7 @@ const Installer = (() => {
     }
   });
   // Sur iPhone, pas d'événement : on propose après quelques secondes d'utilisation.
-  if (ios()) setTimeout(proposer, 8000);
+  if (ios()) setTimeout(proposer, document.getElementById('view') ? 8000 : 4000);
 
   return { carte, installee };
 })();
