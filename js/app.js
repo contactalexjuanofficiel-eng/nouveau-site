@@ -1947,9 +1947,11 @@ function majPastille() {
   const lien = document.querySelector('.nav a[href="#/parametres"]');
   if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
+  const navParrain = document.getElementById('nav-parrainage');
+  if (navParrain) navParrain.hidden = !(typeof Compte !== 'undefined' && Compte.actif && Compte.connecte());
   // Les autres pages sont verrouillées tant que le profil est incomplet (sauf pour un administrateur).
   const libre = typeof Compte !== 'undefined' && Compte.estAdmin?.();
-  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
+  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"]):not([href="#/parrainage"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
 }
 
 function pageNotFound() {
@@ -1999,7 +2001,7 @@ function render() {
 
   // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
   const bloque = profilManquant().length > 0 && !(typeof Compte !== 'undefined' && Compte.estAdmin?.());
-  if (bloque && !['parametres', 'compte', 'abonnement', 'assistance'].includes(parts[0])) return pageBloquee();
+  if (bloque && !['parametres', 'compte', 'abonnement', 'assistance', 'parrainage'].includes(parts[0])) return pageBloquee();
 
   // Abonnement : lecture seule après l'essai, fonctions réservées à la formule Pro.
   if (!Abonnement.peutModifier() && (parts[0] === 'modifier' || (parts[0] === 'clients' && parts[1]))) {
@@ -2023,6 +2025,7 @@ function render() {
     case 'compte': return Compte.page();
     case 'abonnement': return Abonnement.page(params);
     case 'assistance': return Assistance.page();
+    case 'parrainage': return Compte.actif && Compte.connecte() ? Parrainage.page() : pageNotFound();
     case 'inscription':
     case 'connexion': return go('#/');
     default: return pageNotFound();

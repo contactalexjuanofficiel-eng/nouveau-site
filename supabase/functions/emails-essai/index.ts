@@ -46,14 +46,16 @@ function heureParis() {
 
 type Contenu = { objet: string; titre: string; paragraphes: string[]; bouton: [string, string]; ps?: string };
 
-function contenu(type: string, finEssai: number): Contenu {
+function contenu(type: string, finEssai: number, cree = 0): Contenu {
   const date = new Date(finEssai).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
   if (type === 'bienvenue') {
     return {
       objet: 'Bienvenue sur Devizo 👋',
       titre: 'Bienvenue sur Devizo !',
       paragraphes: [
-        `Votre essai gratuit de 14 jours a commencé : vous avez accès à tout jusqu'au ${date}, sans carte bancaire.`,
+        cree && finEssai - cree > (ESSAI_JOURS + 1) * JOUR
+          ? `Votre essai gratuit a commencé, avec 1 mois offert en plus grâce à votre parrain 🎁 : vous avez accès à tout jusqu'au ${date}, sans carte bancaire.`
+          : `Votre essai gratuit de 14 jours a commencé : vous avez accès à tout jusqu'au ${date}, sans carte bancaire.`,
         'Pour bien démarrer, trois étapes suffisent :',
         '1. Complétez « Mon entreprise » (SIRET, adresse, TVA, assurance) : vos documents seront conformes.',
         "2. Ajoutez votre premier client, ou créez-le directement depuis le devis.",
@@ -184,7 +186,7 @@ async function passage() {
     if (dejaPris) continue;
     const lienStop = `${adresseFonction}?stop=${u.id}&k=${await cleDesinscription(u.id)}`;
     try {
-      await envoyer(u.email, contenu(type, finEssai), lienStop);
+      await envoyer(u.email, contenu(type, finEssai, cree), lienStop);
       bilan.push(`${type} → ${u.email}`);
     } catch (e) {
       console.error('Envoi impossible', u.email, String(e));

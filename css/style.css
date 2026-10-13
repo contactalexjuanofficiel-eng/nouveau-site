@@ -627,3 +627,19 @@ dialog.envoi .actions { margin-top: 14px; }
 .langue-app select { width: auto; min-width: 160px; }
 .auth-langue { display: flex; justify-content: flex-end; width: 100%; max-width: 440px; margin-bottom: 10px; }
 .installer-haut { bottom: auto; top: calc(76px + env(safe-area-inset-top, 0px)); }
+
+/* Parrainage */
+.parrain-carte { border-color: var(--success); }
+.parrain-carte .big { margin: 0 0 8px; }
+.parrain-regles { margin: 0 0 16px; padding-left: 20px; line-height: 1.6; }
+.parrain-lien-label { display: block; font-weight: 600; margin-bottom: 6px; }
+.parrain-carte input[readonly] { font-weight: 600; color: var(--primary); }
+.parrain-partage { margin-top: 12px; flex-wrap: wrap; }
+.parrain-chiffres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+.parrain-chiffres div { background: var(--bg); border-radius: 12px; padding: 12px 8px; text-align: center; }
+.parrain-chiffres strong { display: block; font-size: 1.6rem; color: var(--primary); }
+.parrain-chiffres span { color: var(--muted); font-size: .9rem; }
+.parrain-liste { list-style: none; margin: 0; padding: 0; }
+.parrain-liste li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.parrain-ok { color: var(--success); font-weight: 600; }
+.parrain-info { margin: 0 0 16px; padding: 10px 12px; border-radius: 10px; background: var(--success-soft); color: var(--text); }

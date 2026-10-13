@@ -65,6 +65,53 @@ async function enregistrer(sub: Stripe.Subscription, userId?: string | null) {
   });
   if (error) throw new Error('Enregistrement impossible : ' + error.message);
   console.log(`Abonnement ${sub.id} : ${sub.status} (${formuleDe(sub)}) pour ${uid}`);
+  if (sub.status === 'active') await recompenserParrain(uid);
+}
+
+// Parrainage : quand un filleul paie pour la première fois, son parrain gagne
+// 1 mois offert (12 au maximum par an). S'il paie déjà par Stripe, le mois est
+// déduit de sa prochaine facture ; sinon son essai (ou sa formule offerte) est
+// prolongé de 30 jours.
+const PRIX_MOIS_TTC: Record<Formule, number> = { solo: 1080, pro: 2280, equipe: 4680 }; // en centimes
+const MAX_PAR_AN = 12;
+
+async function recompenserParrain(filleul: string) {
+  // Une seule récompense par filleul : la ligne est « réservée » d'un coup.
+  const { data: pris, error } = await admin.from('parrainages')
+    .update({ recompense_le: new Date().toISOString() })
+    .eq('filleul', filleul).is('recompense_le', null)
+    .select('parrain');
+  if (error) { console.error('Parrainage illisible', error.message); return; }
+  const parrain = pris?.[0]?.parrain as string | undefined;
+  if (!parrain) return; // pas de parrain, ou déjà récompensé
+  const noter = (recompense: string) => admin.from('parrainages').update({ recompense }).eq('filleul', filleul);
+  try {
+    const { count } = await admin.from('parrainages').select('filleul', { count: 'exact', head: true })
+      .eq('parrain', parrain).in('recompense', ['credit', 'essai', 'offre'])
+      .gte('recompense_le', new Date(Date.now() - 365 * 86400000).toISOString());
+    if ((count ?? 0) >= MAX_PAR_AN) { await noter('plafond'); console.log(`Parrain ${parrain} : plafond annuel atteint.`); return; }
+
+    const { data: a } = await admin.from('abonnements').select('formule, statut, offert, stripe_client, stripe_abonnement').eq('user_id', parrain).maybeSingle();
+    if (a?.stripe_client && a.stripe_abonnement && !a.offert && ['active', 'trialing', 'past_due'].includes(a.statut)) {
+      const formule = (a.formule in PRIX_MOIS_TTC ? a.formule : 'pro') as Formule;
+      await stripe.customers.createBalanceTransaction(a.stripe_client, {
+        amount: -PRIX_MOIS_TTC[formule],
+        currency: 'eur',
+        description: 'Parrainage Devizo : 1 mois offert',
+      });
+      await noter('credit');
+      console.log(`Parrain ${parrain} : 1 mois déduit de sa prochaine facture.`);
+    } else {
+      const { data: type, error: e2 } = await admin.rpc('parrainage_prolonger', { p: parrain });
+      if (e2) throw new Error(e2.message);
+      await noter(String(type));
+      console.log(`Parrain ${parrain} : 1 mois offert (${type}).`);
+    }
+  } catch (err) {
+    // On libère la ligne : la récompense sera retentée au prochain événement de ce filleul.
+    console.error('Récompense de parrainage impossible', err);
+    await admin.from('parrainages').update({ recompense_le: null, recompense: null }).eq('filleul', filleul);
+  }
 }
 
 Deno.serve(async (req) => {

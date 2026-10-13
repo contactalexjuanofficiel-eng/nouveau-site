@@ -31,6 +31,7 @@
   let stats = null;
   let utilisateurs = [];
   let demandes = null; // demandes d'assistance (null si la table n'existe pas encore)
+  let parrainages = null; // null si supabase/parrainage.sql n'est pas encore exécuté
   let filtre = { texte: '', type: 'tous' };
 
   function message(titre, texte, bouton = '') {
@@ -391,6 +392,35 @@
       </section>`;
   }
 
+  const RECOMPENSES = {
+    credit: '1 mois déduit de sa facture Stripe',
+    essai: 'Essai prolongé de 30 jours',
+    offre: 'Formule offerte prolongée de 30 jours',
+    plafond: 'Aucune (plafond de 12 par an atteint)',
+  };
+
+  function blocParrainage() {
+    if (!parrainages) return '';
+    const p = parrainages;
+    const lignes = (p.liste || []).slice(0, 100).map((x) => `<tr>
+        <td>${esc(x.parrain)}</td><td>${esc(x.filleul)}</td><td>${date(x.le)}</td>
+        <td>${x.recompense_le ? `✓ ${date(x.recompense_le)}` : '<span class="hint">pas encore</span>'}</td>
+        <td>${x.recompense ? esc(RECOMPENSES[x.recompense] || x.recompense) : '—'}</td></tr>`).join('');
+    return `<h2 class="admin-section-titre">Parrainage</h2>
+      <div class="admin-kpis">
+        ${carte('Comptes parrainés', nb(p.total), 'inscrits avec un lien de parrainage')}
+        ${carte('Devenus abonnés', nb(p.payants), `${pourcent(p.payants, p.total)} des filleuls`)}
+      </div>
+      ${lignes ? `<section class="card"><div class="table-wrap"><table class="admin-table">
+        <thead><tr><th>Parrain</th><th>Filleul</th><th>Inscrit le</th><th>Filleul abonné</th><th>Récompense du parrain</th></tr></thead>
+        <tbody>${lignes}</tbody></table></div></section>` : ''}`;
+  }
+
+  async function chargerParrainages() {
+    const { data, error } = await client.rpc('admin_parrainages');
+    parrainages = error ? null : data;
+  }
+
   async function chargerDemandes() {
     const { data, error } = await client.from('demandes_assistance').select('*')
       .order('prioritaire', { ascending: false }).order('cree_le', { ascending: false }).limit(200);
@@ -452,6 +482,8 @@
         ${carte('Devis signés en ligne', nb(s.devis_signes), `sur ${nb(s.devis_partages)} envoyés avec lien`)}
         ${carte('Clients enregistrés', nb(s.clients), `${nb(s.depenses)} dépenses saisies`)}
       </div>
+
+      ${blocParrainage()}
 
       <h2 class="admin-section-titre">Liste des utilisateurs</h2>
       <section class="card">
@@ -519,7 +551,7 @@
   }
 
   async function charger(discret = false) {
-    const [a, b] = await Promise.all([client.rpc('admin_stats'), client.rpc('admin_utilisateurs'), chargerDemandes()]);
+    const [a, b] = await Promise.all([client.rpc('admin_stats'), client.rpc('admin_utilisateurs'), chargerDemandes(), chargerParrainages()]);
     if (a.error || b.error) {
       if (discret) return;
       message('Impossible de charger les statistiques', esc((a.error || b.error).message)

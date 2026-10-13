@@ -92,7 +92,7 @@ def fil(items):
     liens = ' <span aria-hidden="true">›</span> '.join(
         f'<a href="{e(h)}">{e(t)}</a>' if h else f'<span aria-current="page">{e(t)}</span>' for t, h in items)
     ld = {'@type': 'BreadcrumbList', 'itemListElement': [
-        {'@type': 'ListItem', 'position': i + 1, 'name': t, **({'item': f'{SITE}/{h}'.replace('/index.html', '/') if h else {}})}
+        {'@type': 'ListItem', 'position': i + 1, 'name': t, **({'item': f'{SITE}/{h}'.replace('/index.html', '/')} if h else {})}
         for i, (t, h) in enumerate(items)]}
     return f'<nav class="seo-fil" aria-label="Fil d\'Ariane">{liens}</nav>', ld
 
@@ -119,6 +119,7 @@ def pied():
     </div>
   </footer>
   <script src="js/config.js?v={VERSION}"></script>
+  <script src="js/parrainage.js?v={VERSION}" defer></script>
   <script src="js/stats.js?v={VERSION}" defer></script>
   <script src="js/cookies.js?v={VERSION}" defer></script>
 </body>

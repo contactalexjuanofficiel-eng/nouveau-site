@@ -300,6 +300,12 @@ const Compte = (() => {
       setEtat('erreur');
     }
     await Abonnement.charger(client, user, equipe);
+    // Nouveau compte venu par un lien de parrainage : essai porté à 44 jours.
+    let parraine = null;
+    if (typeof Parrainage !== 'undefined') {
+      parraine = await Parrainage.appliquer(client, user);
+      if (parraine) await Abonnement.charger(client, user, equipe);
+    }
     try {
       const { data: estAdmin } = await client.rpc('est_admin');
       admin = estAdmin === true;
@@ -309,6 +315,10 @@ const Compte = (() => {
     suivreEquipe();
     renderApp();
     if (typeof Envoi !== 'undefined') Envoi.synchroniserSignatures();
+    if (parraine) {
+      const fin = new Date(parraine.fin_essai).toLocaleDateString('fr-FR');
+      await ask(`🎁 Bienvenue ! Grâce à ${parraine.parrain}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au ${fin}.`, 'Super !', false);
+    }
   }
 
   function oublierSession() {
@@ -397,6 +407,7 @@ const Compte = (() => {
             </div>` : ''}
           <h1>${titre}</h1>
           <p class="auth-sub">${sousTitre}</p>
+          ${mode === 'inscription' && typeof Parrainage !== 'undefined' ? Parrainage.texteInscription() : ''}
           ${info ? `<p class="auth-info">${esc(info)}</p>` : ''}
           <form id="auth-form" novalidate>
             <div class="field">
@@ -453,7 +464,12 @@ const Compte = (() => {
           await ouvrirSession(res.user);
         } else if (mode === 'inscription') {
           const { data: res, error } = await client.auth.signUp({
-            email, password: motDePasse, options: { emailRedirectTo: adresseRetour() },
+            email, password: motDePasse,
+            options: {
+              emailRedirectTo: adresseRetour(),
+              // Code de parrainage gardé avec le compte : il suit même si l'e-mail de confirmation est ouvert sur un autre appareil.
+              ...(typeof Parrainage !== 'undefined' && Parrainage.lire() ? { data: { parrain: Parrainage.lire().code } } : {}),
+            },
           });
           if (error) throw error;
           if (res.session) {
@@ -591,6 +607,11 @@ const Compte = (() => {
         </div>
       </section>
       ${Abonnement.resume()}
+      ${typeof Parrainage !== 'undefined' ? `<section class="card parrain-mini">
+        <h2>🎁 Parrainage</h2>
+        <p>Invitez un artisan : il a 1 mois d'essai en plus, et vous gagnez 1 mois offert quand il s'abonne.</p>
+        <a class="btn btn-primary" href="#/parrainage">Inviter un artisan</a>
+      </section>` : ''}
       ${typeof Installer !== 'undefined' ? Installer.carte() : ''}
       ${typeof TradApp !== 'undefined' ? `<section class="card"><h2>Langue de l'appli</h2>${TradApp.selecteur()}
         <p class="hint">Vos devis, factures et avoirs restent toujours en français, comme l'exige la loi en France.</p></section>` : ''}
