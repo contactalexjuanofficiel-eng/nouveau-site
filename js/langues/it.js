@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.it['tour.dretard.t'] = "Fatture in ritardo";
 window.DEVIZO_TRAD.it['tour.dretard.p'] = "Devizo ti segnala chi non ti ha pagato e da quanti giorni.";
 window.DEVIZO_TRAD.it['tour.dplafond.t'] = "Soglie";
 window.DEVIZO_TRAD.it['tour.dplafond.p'] = "Un avviso prima di superare la soglia della micro-impresa o dell’IVA.";
+// Parrainage
+window.DEVIZO_TRAD.it["parr.eyebrow"] = "🎁 Invita un amico";
+window.DEVIZO_TRAD.it["parr.titre"] = "Invita un artigiano, ottieni 1 mese gratis.";
+window.DEVIZO_TRAD.it["parr.p"] = "Nell'app trovi il tuo link personale da inviare a un collega via WhatsApp, SMS o e-mail. Ci guadagnano tutti.";
+window.DEVIZO_TRAD.it["parr.cta"] = "Crea il mio account e invita";
+window.DEVIZO_TRAD.it["parr.1t"] = "Il tuo invitato";
+window.DEVIZO_TRAD.it["parr.1p"] = "1 mese di prova gratuita in più: 44 giorni invece di 14.";
+window.DEVIZO_TRAD.it["parr.2t"] = "Tu";
+window.DEVIZO_TRAD.it["parr.2p"] = "1 mese gratis appena si abbona.";
+window.DEVIZO_TRAD.it["parr.3t"] = "Quasi senza limiti";
+window.DEVIZO_TRAD.it["parr.3p"] = "Fino a 12 mesi gratis all'anno: un anno intero gratis.";
+window.DEVIZO_TRAD.it["q9"] = "Come funziona l'invito?";
+window.DEVIZO_TRAD.it["r9"] = "Nell'app, menu «Invita un amico», trovi il tuo link personale. L'artigiano che crea l'account con questo link ha 44 giorni di prova gratuita invece di 14. Quando si abbona, ottieni 1 mese gratis, fino a 12 mesi all'anno.";

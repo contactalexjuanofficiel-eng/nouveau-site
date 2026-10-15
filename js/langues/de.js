@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.de['tour.dretard.t'] = "Überfällige Rechnungen";
 window.DEVIZO_TRAD.de['tour.dretard.p'] = "Devizo zeigt Ihnen, wer nicht bezahlt hat und seit wie vielen Tagen.";
 window.DEVIZO_TRAD.de['tour.dplafond.t'] = "Obergrenzen";
 window.DEVIZO_TRAD.de['tour.dplafond.p'] = "Eine Warnung, bevor Sie die Kleinunternehmer- oder MwSt.-Grenze überschreiten.";
+// Parrainage
+window.DEVIZO_TRAD.de["parr.eyebrow"] = "🎁 Empfehlen";
+window.DEVIZO_TRAD.de["parr.titre"] = "Laden Sie einen Handwerker ein, erhalten Sie 1 Monat gratis.";
+window.DEVIZO_TRAD.de["parr.p"] = "In der App finden Sie Ihren persönlichen Link, den Sie per WhatsApp, SMS oder E-Mail an einen Kollegen senden. Alle profitieren.";
+window.DEVIZO_TRAD.de["parr.cta"] = "Konto erstellen und empfehlen";
+window.DEVIZO_TRAD.de["parr.1t"] = "Ihr Eingeladener";
+window.DEVIZO_TRAD.de["parr.1p"] = "1 Monat zusätzlich kostenlos testen: 44 Tage statt 14.";
+window.DEVIZO_TRAD.de["parr.2t"] = "Sie";
+window.DEVIZO_TRAD.de["parr.2p"] = "1 Gratismonat, sobald er ein Abo abschließt.";
+window.DEVIZO_TRAD.de["parr.3t"] = "Fast ohne Grenze";
+window.DEVIZO_TRAD.de["parr.3p"] = "Bis zu 12 Gratismonate pro Jahr: ein ganzes Jahr gratis.";
+window.DEVIZO_TRAD.de["q9"] = "Wie funktioniert das Empfehlungsprogramm?";
+window.DEVIZO_TRAD.de["r9"] = "In der App, Menü „Empfehlen“, finden Sie Ihren persönlichen Link. Ein Handwerker, der sein Konto mit diesem Link erstellt, kann 44 statt 14 Tage kostenlos testen. Schließt er ein Abo ab, erhalten Sie 1 Gratismonat, bis zu 12 Monate pro Jahr.";

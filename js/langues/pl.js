@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.pl['tour.dretard.t'] = "Zaległe faktury";
 window.DEVIZO_TRAD.pl['tour.dretard.p'] = "Devizo pokazuje, kto Ci nie zapłacił i od ilu dni.";
 window.DEVIZO_TRAD.pl['tour.dplafond.t'] = "Limity";
 window.DEVIZO_TRAD.pl['tour.dplafond.p'] = "Ostrzeżenie, zanim przekroczysz limit mikroprzedsiębiorstwa lub VAT.";
+// Parrainage
+window.DEVIZO_TRAD.pl["parr.eyebrow"] = "🎁 Polecenia";
+window.DEVIZO_TRAD.pl["parr.titre"] = "Zaproś fachowca, zyskaj 1 miesiąc za darmo.";
+window.DEVIZO_TRAD.pl["parr.p"] = "W aplikacji masz swój osobisty link do wysłania koledze przez WhatsApp, SMS lub e-mail. Wszyscy zyskują.";
+window.DEVIZO_TRAD.pl["parr.cta"] = "Załóż konto i polecaj";
+window.DEVIZO_TRAD.pl["parr.1t"] = "Zaproszona osoba";
+window.DEVIZO_TRAD.pl["parr.1p"] = "1 dodatkowy miesiąc darmowego okresu próbnego: 44 dni zamiast 14.";
+window.DEVIZO_TRAD.pl["parr.2t"] = "Ty";
+window.DEVIZO_TRAD.pl["parr.2p"] = "1 darmowy miesiąc, gdy tylko wykupi abonament.";
+window.DEVIZO_TRAD.pl["parr.3t"] = "Prawie bez limitu";
+window.DEVIZO_TRAD.pl["parr.3p"] = "Do 12 darmowych miesięcy rocznie: cały rok za darmo.";
+window.DEVIZO_TRAD.pl["q9"] = "Jak działają polecenia?";
+window.DEVIZO_TRAD.pl["r9"] = "W aplikacji, w menu „Polecenia”, znajdziesz swój osobisty link. Fachowiec, który założy konto przez ten link, ma 44 dni darmowego okresu próbnego zamiast 14. Gdy wykupi abonament, zyskujesz 1 darmowy miesiąc, do 12 miesięcy rocznie.";

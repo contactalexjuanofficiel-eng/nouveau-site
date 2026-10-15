@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.ro['tour.dretard.t'] = "Facturi întârziate";
 window.DEVIZO_TRAD.ro['tour.dretard.p'] = "Devizo vă arată cine nu v-a plătit și de câte zile.";
 window.DEVIZO_TRAD.ro['tour.dplafond.t'] = "Plafoane";
 window.DEVIZO_TRAD.ro['tour.dplafond.p'] = "O alertă înainte de a depăși plafonul micro-întreprinderii sau al TVA.";
+// Parrainage
+window.DEVIZO_TRAD.ro["parr.eyebrow"] = "🎁 Recomandă";
+window.DEVIZO_TRAD.ro["parr.titre"] = "Invitați un meseriaș, primiți 1 lună gratuită.";
+window.DEVIZO_TRAD.ro["parr.p"] = "În aplicație aveți linkul personal pe care îl trimiteți unui coleg pe WhatsApp, SMS sau e-mail. Toată lumea câștigă.";
+window.DEVIZO_TRAD.ro["parr.cta"] = "Creez contul și recomand";
+window.DEVIZO_TRAD.ro["parr.1t"] = "Invitatul dvs.";
+window.DEVIZO_TRAD.ro["parr.1p"] = "1 lună de probă gratuită în plus: 44 de zile în loc de 14.";
+window.DEVIZO_TRAD.ro["parr.2t"] = "Dumneavoastră";
+window.DEVIZO_TRAD.ro["parr.2p"] = "1 lună gratuită de îndată ce se abonează.";
+window.DEVIZO_TRAD.ro["parr.3t"] = "Aproape fără limită";
+window.DEVIZO_TRAD.ro["parr.3p"] = "Până la 12 luni gratuite pe an: un an întreg gratuit.";
+window.DEVIZO_TRAD.ro["q9"] = "Cum funcționează recomandarea?";
+window.DEVIZO_TRAD.ro["r9"] = "În aplicație, meniul „Recomandă”, găsiți linkul personal. Meseriașul care își creează contul cu acest link are 44 de zile de probă gratuită în loc de 14. Când se abonează, primiți 1 lună gratuită, până la 12 luni pe an.";

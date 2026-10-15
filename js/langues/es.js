@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.es['tour.dretard.t'] = "Facturas atrasadas";
 window.DEVIZO_TRAD.es['tour.dretard.p'] = "Devizo te indica quién no te ha pagado y desde hace cuántos días.";
 window.DEVIZO_TRAD.es['tour.dplafond.t'] = "Límites";
 window.DEVIZO_TRAD.es['tour.dplafond.p'] = "Una alerta antes de superar el límite de la microempresa o del IVA.";
+// Parrainage
+window.DEVIZO_TRAD.es["parr.eyebrow"] = "🎁 Referidos";
+window.DEVIZO_TRAD.es["parr.titre"] = "Invite a un profesional, gane 1 mes gratis.";
+window.DEVIZO_TRAD.es["parr.p"] = "En la aplicación tiene su enlace personal para enviarlo a un compañero por WhatsApp, SMS o correo. Todos ganan.";
+window.DEVIZO_TRAD.es["parr.cta"] = "Crear mi cuenta e invitar";
+window.DEVIZO_TRAD.es["parr.1t"] = "Su invitado";
+window.DEVIZO_TRAD.es["parr.1p"] = "1 mes más de prueba gratuita: 44 días en lugar de 14.";
+window.DEVIZO_TRAD.es["parr.2t"] = "Usted";
+window.DEVIZO_TRAD.es["parr.2p"] = "1 mes gratis en cuanto se suscriba.";
+window.DEVIZO_TRAD.es["parr.3t"] = "Casi sin límite";
+window.DEVIZO_TRAD.es["parr.3p"] = "Hasta 12 meses gratis al año: un año entero gratis.";
+window.DEVIZO_TRAD.es["q9"] = "¿Cómo funcionan los referidos?";
+window.DEVIZO_TRAD.es["r9"] = "En la aplicación, menú «Referidos», encontrará su enlace personal. El profesional que crea su cuenta con este enlace tiene 44 días de prueba gratuita en lugar de 14. Cuando se suscribe, usted gana 1 mes gratis, hasta 12 meses al año.";

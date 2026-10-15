@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.tr['tour.dretard.t'] = "Geciken faturalar";
 window.DEVIZO_TRAD.tr['tour.dretard.p'] = "Devizo size kimin ödemediğini ve kaç gündür beklediğinizi gösterir.";
 window.DEVIZO_TRAD.tr['tour.dplafond.t'] = "Limitler";
 window.DEVIZO_TRAD.tr['tour.dplafond.p'] = "Mikro işletme veya KDV limitini aşmadan önce bir uyarı.";
+// Parrainage
+window.DEVIZO_TRAD.tr["parr.eyebrow"] = "🎁 Davet et";
+window.DEVIZO_TRAD.tr["parr.titre"] = "Bir zanaatkâr davet edin, 1 ay ücretsiz kazanın.";
+window.DEVIZO_TRAD.tr["parr.p"] = "Uygulamada, bir meslektaşınıza WhatsApp, SMS veya e-postayla gönderebileceğiniz kişisel bağlantınız var. Herkes kazanır.";
+window.DEVIZO_TRAD.tr["parr.cta"] = "Hesabımı oluştur ve davet et";
+window.DEVIZO_TRAD.tr["parr.1t"] = "Davet ettiğiniz kişi";
+window.DEVIZO_TRAD.tr["parr.1p"] = "1 ay ek ücretsiz deneme: 14 yerine 44 gün.";
+window.DEVIZO_TRAD.tr["parr.2t"] = "Siz";
+window.DEVIZO_TRAD.tr["parr.2p"] = "Abone olduğu anda 1 ay ücretsiz.";
+window.DEVIZO_TRAD.tr["parr.3t"] = "Neredeyse sınırsız";
+window.DEVIZO_TRAD.tr["parr.3p"] = "Yılda 12 aya kadar ücretsiz: koca bir yıl bedava.";
+window.DEVIZO_TRAD.tr["q9"] = "Davet sistemi nasıl çalışır?";
+window.DEVIZO_TRAD.tr["r9"] = "Uygulamada «Davet et» menüsünde kişisel bağlantınızı bulursunuz. Bu bağlantıyla hesap açan zanaatkâr 14 yerine 44 gün ücretsiz deneme alır. Abone olduğunda siz 1 ay ücretsiz kazanırsınız, yılda 12 aya kadar.";

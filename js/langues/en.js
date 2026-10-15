@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.en['tour.dretard.t'] = "Late invoices";
 window.DEVIZO_TRAD.en['tour.dretard.p'] = "Devizo tells you who has not paid you, and for how many days.";
 window.DEVIZO_TRAD.en['tour.dplafond.t'] = "Thresholds";
 window.DEVIZO_TRAD.en['tour.dplafond.p'] = "An alert before you exceed the micro-enterprise or VAT threshold.";
+// Parrainage
+window.DEVIZO_TRAD.en["parr.eyebrow"] = "🎁 Referral";
+window.DEVIZO_TRAD.en["parr.titre"] = "Invite a tradesperson, get 1 month free.";
+window.DEVIZO_TRAD.en["parr.p"] = "In the app, you have your personal link to send to a colleague by WhatsApp, text or email. Everyone wins.";
+window.DEVIZO_TRAD.en["parr.cta"] = "Create my account and refer";
+window.DEVIZO_TRAD.en["parr.1t"] = "Your referral";
+window.DEVIZO_TRAD.en["parr.1p"] = "1 extra month of free trial: 44 days instead of 14.";
+window.DEVIZO_TRAD.en["parr.2t"] = "You";
+window.DEVIZO_TRAD.en["parr.2p"] = "1 free month as soon as they subscribe.";
+window.DEVIZO_TRAD.en["parr.3t"] = "Almost no limit";
+window.DEVIZO_TRAD.en["parr.3p"] = "Up to 12 free months per year: a whole year for free.";
+window.DEVIZO_TRAD.en["q9"] = "How does the referral program work?";
+window.DEVIZO_TRAD.en["r9"] = "In the app, under “Referral”, you will find your personal link. A tradesperson who creates an account with this link gets a 44-day free trial instead of 14. When they subscribe, you get 1 free month, up to 12 months per year.";

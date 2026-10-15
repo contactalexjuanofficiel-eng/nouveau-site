@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.pt['tour.dretard.t'] = "Faturas em atraso";
 window.DEVIZO_TRAD.pt['tour.dretard.p'] = "O Devizo indica quem não lhe pagou e há quantos dias.";
 window.DEVIZO_TRAD.pt['tour.dplafond.t'] = "Limites";
 window.DEVIZO_TRAD.pt['tour.dplafond.p'] = "Um alerta antes de ultrapassar o limite da microempresa ou do IVA.";
+// Parrainage
+window.DEVIZO_TRAD.pt["parr.eyebrow"] = "🎁 Indicação";
+window.DEVIZO_TRAD.pt["parr.titre"] = "Convide um profissional, ganhe 1 mês grátis.";
+window.DEVIZO_TRAD.pt["parr.p"] = "Na aplicação, tem o seu link pessoal para enviar a um colega por WhatsApp, SMS ou e-mail. Todos ganham.";
+window.DEVIZO_TRAD.pt["parr.cta"] = "Criar a minha conta e convidar";
+window.DEVIZO_TRAD.pt["parr.1t"] = "O seu convidado";
+window.DEVIZO_TRAD.pt["parr.1p"] = "1 mês extra de teste grátis: 44 dias em vez de 14.";
+window.DEVIZO_TRAD.pt["parr.2t"] = "Você";
+window.DEVIZO_TRAD.pt["parr.2p"] = "1 mês grátis assim que ele subscrever.";
+window.DEVIZO_TRAD.pt["parr.3t"] = "Quase sem limite";
+window.DEVIZO_TRAD.pt["parr.3p"] = "Até 12 meses grátis por ano: um ano inteiro grátis.";
+window.DEVIZO_TRAD.pt["q9"] = "Como funciona a indicação?";
+window.DEVIZO_TRAD.pt["r9"] = "Na aplicação, menu «Indicação», encontra o seu link pessoal. O profissional que cria a conta com este link tem 44 dias de teste grátis em vez de 14. Quando subscreve, você ganha 1 mês grátis, até 12 meses por ano.";

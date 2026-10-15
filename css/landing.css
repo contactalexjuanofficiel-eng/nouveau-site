@@ -365,3 +365,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 /* Liens vers les pages métiers et les guides (référencement) */
 .l-footer .l-footer-metiers, .l-footer .l-footer-guides { flex-basis: 100%; gap: 6px 14px; font-size: .88rem; }
 .l-footer-metiers span, .l-footer-guides span { color: var(--text); font-weight: 600; }
+
+/* ---------- Parrainage ---------- */
+.section-parrain { padding-top: 0; }
+.parrain-box { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; padding: 44px; border-radius: 24px;
+  background: linear-gradient(135deg, var(--success-soft), var(--primary-soft)); border: 1px solid var(--border); }
+.parrain-texte .section-title { margin-bottom: 12px; }
+.parrain-texte p:not(.eyebrow) { color: var(--muted); margin: 0 0 24px; font-size: 1.05rem; }
+.parrain-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.parrain-points li { background: var(--card); border-radius: 16px; padding: 16px 20px; box-shadow: 0 8px 24px rgba(15, 27, 61, .06); }
+.parrain-points strong { display: block; font-family: var(--display); font-size: 1.1rem; margin-bottom: 4px; }
+.parrain-points span { color: var(--muted); }
+@media (max-width: 760px) {
+  .parrain-box { grid-template-columns: 1fr; padding: 28px 20px; gap: 24px; }
+  .parrain-texte .btn { width: 100%; text-align: center; }
+}

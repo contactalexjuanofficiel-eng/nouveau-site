@@ -154,3 +154,16 @@ window.DEVIZO_TRAD.ar['tour.dretard.t'] = "الفواتير المتأخرة";
 window.DEVIZO_TRAD.ar['tour.dretard.p'] = "يخبرك Devizo بمن لم يدفع لك ومنذ كم يومًا.";
 window.DEVIZO_TRAD.ar['tour.dplafond.t'] = "السقوف";
 window.DEVIZO_TRAD.ar['tour.dplafond.p'] = "تنبيه قبل تجاوز سقف المقاولة الصغيرة أو الضريبة على القيمة المضافة.";
+// Parrainage
+window.DEVIZO_TRAD.ar["parr.eyebrow"] = "🎁 الإحالة";
+window.DEVIZO_TRAD.ar["parr.titre"] = "ادعُ حرفيًا واحصل على شهر مجاني.";
+window.DEVIZO_TRAD.ar["parr.p"] = "في التطبيق، لديك رابطك الشخصي لإرساله إلى زميل عبر واتساب أو رسالة نصية أو البريد الإلكتروني. الجميع يربح.";
+window.DEVIZO_TRAD.ar["parr.cta"] = "أنشئ حسابي وادعُ";
+window.DEVIZO_TRAD.ar["parr.1t"] = "المدعو";
+window.DEVIZO_TRAD.ar["parr.1p"] = "شهر إضافي من التجربة المجانية: 44 يومًا بدلًا من 14.";
+window.DEVIZO_TRAD.ar["parr.2t"] = "أنت";
+window.DEVIZO_TRAD.ar["parr.2p"] = "شهر مجاني بمجرد أن يشترك.";
+window.DEVIZO_TRAD.ar["parr.3t"] = "تقريبًا بلا حدود";
+window.DEVIZO_TRAD.ar["parr.3p"] = "حتى 12 شهرًا مجانيًا في السنة: سنة كاملة مجانًا.";
+window.DEVIZO_TRAD.ar["q9"] = "كيف تعمل الإحالة؟";
+window.DEVIZO_TRAD.ar["r9"] = "في التطبيق، قائمة «الإحالة»، تجد رابطك الشخصي. الحرفي الذي ينشئ حسابه عبر هذا الرابط يحصل على 44 يومًا من التجربة المجانية بدلًا من 14. وعندما يشترك، تحصل على شهر مجاني، حتى 12 شهرًا في السنة.";
