@@ -643,3 +643,10 @@ dialog.envoi .actions { margin-top: 14px; }
 .parrain-liste li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
 .parrain-ok { color: var(--success); font-weight: 600; }
 .parrain-info { margin: 0 0 16px; padding: 10px 12px; border-radius: 10px; background: var(--success-soft); color: var(--text); }
+
+/* Connexion avec Google */
+.auth-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card); font-weight: 600; margin-top: 4px; }
+.auth-google svg { flex: none; }
+.auth-legal-google { margin: 8px 0 0; text-align: center; }
+.auth-ou { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .85rem; margin: 18px 0 6px; }
+.auth-ou::before, .auth-ou::after { content: ""; flex: 1; height: 1px; background: var(--border); }

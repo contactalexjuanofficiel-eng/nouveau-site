@@ -37,6 +37,48 @@ const Compte = (() => {
 
   const adresseRetour = () => location.origin + location.pathname;
 
+  // Connexion avec Google : le bouton n'apparaît que si Google est activé dans
+  // Supabase (Authentication > Sign In / Providers > Google).
+  let googleActif = null;
+  function verifierGoogle() {
+    if (!googleActif) {
+      googleActif = fetch(`${cfg.supabaseUrl}/auth/v1/settings`, { headers: { apikey: cfg.supabaseAnonKey } })
+        .then((r) => (r.ok ? r.json() : {}))
+        .then((s) => Boolean(s.external && s.external.google))
+        .catch(() => false);
+    }
+    return googleActif;
+  }
+  const LOGO_GOOGLE = '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
+
+  async function afficherGoogle(mode) {
+    const zone = document.getElementById('auth-google');
+    if (!zone || !(await verifierGoogle()) || !document.body.contains(zone)) return;
+    zone.innerHTML = `<button type="button" class="btn btn-lg auth-google">${LOGO_GOOGLE}<span>Continuer avec Google</span></button>
+      ${mode === 'connexion' ? '<p class="auth-legal auth-legal-google">Pas encore de compte ? Il est créé automatiquement, et vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</p>' : ''}
+      <p class="auth-ou"><span>ou avec votre e-mail</span></p>`;
+    zone.querySelector('button').addEventListener('click', async (ev) => {
+      ev.currentTarget.disabled = true;
+      try {
+        sessionStorage.setItem('devizo-oauth', mode);
+      } catch (e) {
+        // stockage indisponible
+      }
+      const { error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: adresseRetour(), queryParams: { prompt: 'select_account' } },
+      });
+      if (error) {
+        ev.currentTarget.disabled = false;
+        const z = document.getElementById('auth-erreur');
+        if (z) {
+          z.textContent = "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.";
+          z.hidden = false;
+        }
+      }
+    });
+  }
+
   // ------------------------------------------------------------------
   // Indicateur de sauvegarde dans la barre du haut
   // ------------------------------------------------------------------
@@ -244,8 +286,15 @@ const Compte = (() => {
 
     // Retour d'un lien reçu par e-mail (confirmation, mot de passe oublié).
     const hash = location.hash;
-    const retourEmail = /access_token|error_description|type=recovery/.test(hash);
-    const erreurLien = new URLSearchParams(hash.slice(1)).get('error_description');
+    const retourEmail = /access_token|error_description|type=recovery/.test(hash) || /error_description/.test(location.search);
+    const erreurLien = new URLSearchParams(hash.slice(1)).get('error_description') || new URLSearchParams(location.search).get('error_description');
+    let viaGoogle = null;
+    try {
+      viaGoogle = sessionStorage.getItem('devizo-oauth');
+      sessionStorage.removeItem('devizo-oauth');
+    } catch (e) {
+      // stockage indisponible
+    }
 
     client.auth.onAuthStateChange((evenement) => {
       if (evenement === 'PASSWORD_RECOVERY') setTimeout(() => pageNouveauMotDePasse(), 0);
@@ -255,6 +304,10 @@ const Compte = (() => {
     if (retourEmail) history.replaceState(null, '', location.pathname + '#/');
     if (/type=recovery/.test(hash) && session) return pageNouveauMotDePasse();
     if (!session) {
+      if (viaGoogle) {
+        return pageConnexion(viaGoogle === 'inscription' ? 'inscription' : 'connexion',
+          erreurLien ? "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail." : '');
+      }
       return pageConnexion(hash === '#inscription' ? 'inscription' : 'connexion',
         erreurLien ? 'Ce lien a expiré ou a déjà été utilisé. Connectez-vous ou demandez un nouveau lien.' : '');
     }
@@ -409,6 +462,7 @@ const Compte = (() => {
           <p class="auth-sub">${sousTitre}</p>
           ${mode === 'inscription' && typeof Parrainage !== 'undefined' ? Parrainage.texteInscription() : ''}
           ${info ? `<p class="auth-info">${esc(info)}</p>` : ''}
+          ${mode !== 'oubli' ? '<div id="auth-google"></div>' : ''}
           <form id="auth-form" novalidate>
             <div class="field">
               <label for="auth-email">Adresse e-mail</label>
@@ -429,11 +483,12 @@ const Compte = (() => {
             ${mode === 'connexion' ? '<button type="button" class="link" data-mode="oubli">Mot de passe oublié ?</button>' : ''}
             ${mode === 'oubli' ? '<button type="button" class="link" data-mode="connexion">← Retour à la connexion</button>' : ''}
           </p>
-          ${mode === 'inscription' ? '<p class="auth-legal">En créant un compte, vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Vos données ne sont jamais revendues et vous pouvez supprimer votre compte à tout moment.</p>' : ''}
+          ${mode === 'inscription' ? '<p class="auth-legal">En créant un compte (avec votre e-mail ou avec Google), vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Vos données ne sont jamais revendues et vous pouvez supprimer votre compte à tout moment.</p>' : ''}
         </div>
       </div>`;
 
     view.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => pageConnexion(b.dataset.mode)));
+    if (mode !== 'oubli') afficherGoogle(mode);
     const mdp = document.getElementById('auth-mdp');
     document.getElementById('auth-voir')?.addEventListener('click', (e) => {
       mdp.type = mdp.type === 'password' ? 'text' : 'password';

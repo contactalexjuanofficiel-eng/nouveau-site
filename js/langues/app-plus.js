@@ -47,6 +47,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 extra month of free trial, 44 free days in total.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Welcome! Thanks to {0}, your free trial lasts 44 days: you have full access until {1}.",
     "Super !": "Great!",
+    // Connexion Google
+    "Continuer avec Google": "Continue with Google",
+    "ou avec votre e-mail": "or with your email",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "Signing in with Google did not work. Try again, or use your email address.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "Signing in with Google did not complete. Try again, or use your email address.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "No account yet? One is created automatically, and you accept the",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "By creating an account (with your email or with Google), you accept the",
   },
   es: {
     'Devis & factures': 'Presupuestos y facturas',
@@ -95,6 +102,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 mes más de prueba gratuita, 44 días gratis en total.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 ¡Bienvenido! Gracias a {0}, su prueba gratuita dura 44 días: tiene acceso a todo hasta el {1}.",
     "Super !": "¡Genial!",
+    // Connexion Google
+    "Continuer avec Google": "Continuar con Google",
+    "ou avec votre e-mail": "o con su correo electrónico",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "El inicio de sesión con Google no ha funcionado. Inténtelo de nuevo o use su correo electrónico.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "El inicio de sesión con Google no se ha completado. Inténtelo de nuevo o use su correo electrónico.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "¿Aún no tiene cuenta? Se crea automáticamente y usted acepta las",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Al crear una cuenta (con su correo o con Google), usted acepta las",
   },
   pt: {
     'Devis & factures': 'Orçamentos e faturas',
@@ -143,6 +157,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 mês extra de teste grátis, 44 dias grátis no total.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Bem-vindo! Graças a {0}, o seu teste grátis dura 44 dias: tem acesso a tudo até {1}.",
     "Super !": "Ótimo!",
+    // Connexion Google
+    "Continuer avec Google": "Continuar com o Google",
+    "ou avec votre e-mail": "ou com o seu e-mail",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "O início de sessão com o Google não funcionou. Tente novamente ou use o seu e-mail.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "O início de sessão com o Google não foi concluído. Tente novamente ou use o seu e-mail.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Ainda não tem conta? É criada automaticamente e aceita as",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Ao criar uma conta (com o seu e-mail ou com o Google), aceita as",
   },
   it: {
     'Devis & factures': 'Preventivi e fatture',
@@ -191,6 +212,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 mese di prova gratuita in più, 44 giorni gratis in totale.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Benvenuto! Grazie a {0}, la tua prova gratuita dura 44 giorni: hai accesso a tutto fino al {1}.",
     "Super !": "Ottimo!",
+    // Connexion Google
+    "Continuer avec Google": "Continua con Google",
+    "ou avec votre e-mail": "oppure con la tua e-mail",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "L'accesso con Google non ha funzionato. Riprova o usa il tuo indirizzo e-mail.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "L'accesso con Google non è andato a buon fine. Riprova o usa il tuo indirizzo e-mail.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Non hai ancora un account? Viene creato automaticamente e accetti le",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Creando un account (con la tua e-mail o con Google), accetti le",
   },
   de: {
     'Devis & factures': 'Angebote & Rechnungen',
@@ -239,6 +267,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 Monat zusätzlich kostenlos testen, insgesamt 44 Tage gratis.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Willkommen! Dank {0} dauert Ihre kostenlose Testphase 44 Tage: Sie haben vollen Zugriff bis {1}.",
     "Super !": "Super!",
+    // Connexion Google
+    "Continuer avec Google": "Mit Google fortfahren",
+    "ou avec votre e-mail": "oder mit Ihrer E-Mail",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "Die Anmeldung mit Google hat nicht funktioniert. Versuchen Sie es erneut oder nutzen Sie Ihre E-Mail-Adresse.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "Die Anmeldung mit Google wurde nicht abgeschlossen. Versuchen Sie es erneut oder nutzen Sie Ihre E-Mail-Adresse.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Noch kein Konto? Es wird automatisch erstellt, und Sie akzeptieren die",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Mit der Erstellung eines Kontos (per E-Mail oder mit Google) akzeptieren Sie die",
   },
   ar: {
     'Devis & factures': 'عروض الأسعار والفواتير',
@@ -287,6 +322,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 شهر إضافي من التجربة المجانية، أي 44 يومًا مجانًا.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 مرحبًا! بفضل {0}، تدوم تجربتك المجانية 44 يومًا: لديك وصول كامل حتى {1}.",
     "Super !": "رائع!",
+    // Connexion Google
+    "Continuer avec Google": "المتابعة باستخدام Google",
+    "ou avec votre e-mail": "أو باستخدام بريدك الإلكتروني",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "لم ينجح تسجيل الدخول باستخدام Google. حاول مرة أخرى أو استخدم بريدك الإلكتروني.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "لم يكتمل تسجيل الدخول باستخدام Google. حاول مرة أخرى أو استخدم بريدك الإلكتروني.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "ليس لديك حساب بعد؟ يُنشأ تلقائيًا، وتوافق على",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "بإنشاء حساب (ببريدك الإلكتروني أو باستخدام Google)، توافق على",
   },
   tr: {
     'Devis & factures': 'Teklifler ve faturalar',
@@ -335,6 +377,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 ay ek ücretsiz deneme, toplam 44 gün ücretsiz.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Hoş geldiniz! {0} sayesinde ücretsiz denemeniz 44 gün sürüyor: {1} tarihine kadar her şeye erişiminiz var.",
     "Super !": "Harika!",
+    // Connexion Google
+    "Continuer avec Google": "Google ile devam et",
+    "ou avec votre e-mail": "veya e-postanızla",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "Google ile giriş çalışmadı. Tekrar deneyin veya e-posta adresinizi kullanın.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "Google ile giriş tamamlanmadı. Tekrar deneyin veya e-posta adresinizi kullanın.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Henüz hesabınız yok mu? Otomatik olarak oluşturulur ve şunları kabul edersiniz:",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Hesap oluşturarak (e-postanızla veya Google ile) şunları kabul edersiniz:",
   },
   ro: {
     'Devis & factures': 'Devize și facturi',
@@ -383,6 +432,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 lună de probă gratuită în plus, adică 44 de zile gratuite.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Bun venit! Datorită {0}, perioada de probă durează 44 de zile: aveți acces la tot până pe {1}.",
     "Super !": "Super!",
+    // Connexion Google
+    "Continuer avec Google": "Continuați cu Google",
+    "ou avec votre e-mail": "sau cu e-mailul dvs.",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "Conectarea cu Google nu a funcționat. Încercați din nou sau folosiți adresa de e-mail.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "Conectarea cu Google nu s-a finalizat. Încercați din nou sau folosiți adresa de e-mail.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Nu aveți încă un cont? Se creează automat și acceptați",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Creând un cont (cu e-mailul sau cu Google), acceptați",
   },
   pl: {
     'Devis & factures': 'Kosztorysy i faktury',
@@ -431,6 +487,13 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "🎁 1 mois d'essai offert en plus, soit 44 jours gratuits.": "🎁 1 dodatkowy miesiąc próbny, łącznie 44 darmowe dni.",
     "🎁 Bienvenue ! Grâce à {0}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au {1}.": "🎁 Witamy! Dzięki {0} Twój darmowy okres próbny trwa 44 dni: masz pełny dostęp do {1}.",
     "Super !": "Świetnie!",
+    // Connexion Google
+    "Continuer avec Google": "Kontynuuj z Google",
+    "ou avec votre e-mail": "lub przez e-mail",
+    "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.": "Logowanie przez Google nie zadziałało. Spróbuj ponownie lub użyj adresu e-mail.",
+    "La connexion avec Google n'a pas abouti. Réessayez, ou utilisez votre adresse e-mail.": "Logowanie przez Google nie zostało ukończone. Spróbuj ponownie lub użyj adresu e-mail.",
+    "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Nie masz jeszcze konta? Zostanie utworzone automatycznie, a Ty akceptujesz",
+    "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Tworząc konto (przez e-mail lub Google), akceptujesz",
   },
 };
 
