@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.en["parr.3t"] = "Almost no limit";
 window.DEVIZO_TRAD.en["parr.3p"] = "Up to 12 free months per year: a whole year for free.";
 window.DEVIZO_TRAD.en["q9"] = "How does the referral program work?";
 window.DEVIZO_TRAD.en["r9"] = "In the app, under “Referral”, you will find your personal link. A tradesperson who creates an account with this link gets a 44-day free trial instead of 14. When they subscribe, you get 1 free month, up to 12 months per year.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.en["cta.google"] = "Continue with Google";
+window.DEVIZO_TRAD.en["hero.video"] = "A complete quote in 2 minutes, from your phone";
+window.DEVIZO_TRAD.en["barre.essai"] = "14-day free trial";

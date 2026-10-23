@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.pl["parr.3t"] = "Prawie bez limitu";
 window.DEVIZO_TRAD.pl["parr.3p"] = "Do 12 darmowych miesięcy rocznie: cały rok za darmo.";
 window.DEVIZO_TRAD.pl["q9"] = "Jak działają polecenia?";
 window.DEVIZO_TRAD.pl["r9"] = "W aplikacji, w menu „Polecenia”, znajdziesz swój osobisty link. Fachowiec, który założy konto przez ten link, ma 44 dni darmowego okresu próbnego zamiast 14. Gdy wykupi abonament, zyskujesz 1 darmowy miesiąc, do 12 miesięcy rocznie.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.pl["cta.google"] = "Kontynuuj z Google";
+window.DEVIZO_TRAD.pl["hero.video"] = "Pełny kosztorys w 2 minuty, z telefonu";
+window.DEVIZO_TRAD.pl["barre.essai"] = "14 dni za darmo";

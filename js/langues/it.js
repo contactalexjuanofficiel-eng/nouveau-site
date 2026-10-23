@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.it["parr.3t"] = "Quasi senza limiti";
 window.DEVIZO_TRAD.it["parr.3p"] = "Fino a 12 mesi gratis all'anno: un anno intero gratis.";
 window.DEVIZO_TRAD.it["q9"] = "Come funziona l'invito?";
 window.DEVIZO_TRAD.it["r9"] = "Nell'app, menu «Invita un amico», trovi il tuo link personale. L'artigiano che crea l'account con questo link ha 44 giorni di prova gratuita invece di 14. Quando si abbona, ottieni 1 mese gratis, fino a 12 mesi all'anno.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.it["cta.google"] = "Continua con Google";
+window.DEVIZO_TRAD.it["hero.video"] = "Un preventivo completo in 2 minuti, dal telefono";
+window.DEVIZO_TRAD.it["barre.essai"] = "Prova gratuita di 14 giorni";

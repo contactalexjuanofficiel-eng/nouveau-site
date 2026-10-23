@@ -51,6 +51,23 @@ const Compte = (() => {
   }
   const LOGO_GOOGLE = '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
 
+  // Étapes du parcours d'inscription (comptées sans cookie par js/stats.js).
+  const compter = (etape) => (window.devizoCompter ? window.devizoCompter(etape) : (window.devizoEnAttente = window.devizoEnAttente || []).push(etape));
+
+  // Part vers l'écran de Google (le retour est traité au démarrage, voir demarrer()).
+  async function lancerGoogle(mode) {
+    try {
+      sessionStorage.setItem('devizo-oauth', mode);
+    } catch (e) {
+      // stockage indisponible
+    }
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: adresseRetour(), queryParams: { prompt: 'select_account' } },
+    });
+    return !error;
+  }
+
   async function afficherGoogle(mode) {
     const zone = document.getElementById('auth-google');
     if (!zone || !(await verifierGoogle()) || !document.body.contains(zone)) return;
@@ -58,18 +75,11 @@ const Compte = (() => {
       ${mode === 'connexion' ? '<p class="auth-legal auth-legal-google">Pas encore de compte ? Il est créé automatiquement, et vous acceptez les <a href="cgv.html" target="_blank" rel="noopener">conditions générales</a> et la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</p>' : ''}
       <p class="auth-ou"><span>ou avec votre e-mail</span></p>`;
     zone.querySelector('button').addEventListener('click', async (ev) => {
-      ev.currentTarget.disabled = true;
-      try {
-        sessionStorage.setItem('devizo-oauth', mode);
-      } catch (e) {
-        // stockage indisponible
-      }
-      const { error } = await client.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: adresseRetour(), queryParams: { prompt: 'select_account' } },
-      });
-      if (error) {
-        ev.currentTarget.disabled = false;
+      const bouton = ev.currentTarget;
+      bouton.disabled = true;
+      compter('clic-google');
+      if (!(await lancerGoogle(mode))) {
+        bouton.disabled = false;
         const z = document.getElementById('auth-erreur');
         if (z) {
           z.textContent = "La connexion avec Google n'a pas marché. Réessayez, ou utilisez votre adresse e-mail.";
@@ -325,6 +335,15 @@ const Compte = (() => {
     const { data: { session } } = await client.auth.getSession();
     if (retourEmail) history.replaceState(null, '', location.pathname + '#/');
     if (/type=recovery/.test(hash) && session) return pageNouveauMotDePasse();
+    // Bouton « Continuer avec Google » de la page d'accueil : on part tout de suite chez Google.
+    if (!session && hash === '#google') {
+      if (await verifierGoogle()) {
+        view.innerHTML = '<div class="card auth-loading">Connexion avec Google…</div>';
+        if (await lancerGoogle('inscription')) return;
+      }
+      history.replaceState(null, '', location.pathname + '#inscription');
+      return pageConnexion('inscription');
+    }
     if (!session) {
       if (viaGoogle) {
         return pageConnexion(viaGoogle === 'inscription' ? 'inscription' : 'connexion',
@@ -341,7 +360,7 @@ const Compte = (() => {
     versionBrute = null;
     base = null;
     document.body.classList.remove('sans-compte');
-    if (/^#(inscription|connexion)?$/.test(location.hash)) history.replaceState(null, '', location.pathname + '#/');
+    if (/^#(inscription|connexion|google)?$/.test(location.hash)) history.replaceState(null, '', location.pathname + '#/');
     view.innerHTML = '<div class="card auth-loading">Chargement de vos données…</div>';
     await chargerEquipe();
     await proposerInvitations();
@@ -384,6 +403,12 @@ const Compte = (() => {
     try {
       const { data: estAdmin } = await client.rpc('est_admin');
       admin = estAdmin === true;
+      // Les visites de l'administrateur ne sont plus comptées dans les statistiques.
+      try {
+        if (admin) localStorage.setItem('devizo-admin', '1');
+      } catch (e) {
+        // stockage indisponible
+      }
     } catch (e) {
       admin = false;
     }
@@ -511,6 +536,7 @@ const Compte = (() => {
 
     view.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => pageConnexion(b.dataset.mode)));
     if (mode !== 'oubli') afficherGoogle(mode);
+    if (mode === 'inscription') compter('formulaire');
     const mdp = document.getElementById('auth-mdp');
     document.getElementById('auth-voir')?.addEventListener('click', (e) => {
       mdp.type = mdp.type === 'password' ? 'text' : 'password';

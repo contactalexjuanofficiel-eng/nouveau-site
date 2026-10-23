@@ -5,14 +5,14 @@
 (() => {
   const cfg = window.DEVIZO_CONFIG || {};
   const page = document.documentElement.dataset.page;
-  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !page || navigator.webdriver || window.DEVIZO_DEMO) return;
-  if (/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)) return;
+  let admin = false;
   try {
-    if (sessionStorage.getItem('devizo-vu-' + page)) return;
-    sessionStorage.setItem('devizo-vu-' + page, '1');
+    admin = localStorage.getItem('devizo-admin') === '1'; // l'administrateur ne fausse pas les chiffres
   } catch (e) {
-    // stockage indisponible : on compte quand même
+    // stockage indisponible
   }
+  const actif = cfg.supabaseUrl && cfg.supabaseAnonKey && !navigator.webdriver && !window.DEVIZO_DEMO && !admin
+    && !/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname);
   // D'où vient le visiteur : paramètre utm_source d'un lien, sinon la page précédente.
   const SITES = [
     [/(^|\.)(mail\.google\.com|outlook\.|mail\.yahoo\.|mail\.)/, 'email'],
@@ -50,10 +50,32 @@
     return 'ordinateur';
   }
 
-  fetch(cfg.supabaseUrl + '/rest/v1/rpc/compter_visite', {
-    method: 'POST',
-    keepalive: true,
-    headers: { apikey: cfg.supabaseAnonKey, Authorization: 'Bearer ' + cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ p: page, s: source(), a: appareil() }),
-  }).catch(() => {});
+  // Compte une page ou une étape du parcours d'inscription, une seule fois par session de navigation.
+  function compter(p) {
+    if (!actif || !p) return;
+    try {
+      if (sessionStorage.getItem('devizo-vu-' + p)) return;
+      sessionStorage.setItem('devizo-vu-' + p, '1');
+    } catch (e) {
+      // stockage indisponible : on compte quand même
+    }
+    fetch(cfg.supabaseUrl + '/rest/v1/rpc/compter_visite', {
+      method: 'POST',
+      keepalive: true,
+      headers: { apikey: cfg.supabaseAnonKey, Authorization: 'Bearer ' + cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
+      // Une étape (clic, formulaire) n'est pas une nouvelle arrivée : elle ne compte pas dans les provenances.
+      body: JSON.stringify({ p, s: p === page ? source() : 'interne', a: appareil() }),
+    }).catch(() => {});
+  }
+  window.devizoCompter = compter;
+  (window.devizoEnAttente || []).forEach(compter);
+  compter(page);
+
+  // Clic sur un bouton « Essai gratuit » ou « Continuer avec Google » (page d'accueil, pages métiers…).
+  document.addEventListener('click', (e) => {
+    const lien = e.target instanceof Element && e.target.closest('a[href*="app.html#inscription"], a[href*="app.html#google"]');
+    if (!lien) return;
+    compter('clic-essai');
+    if (lien.getAttribute('href').includes('#google')) compter('clic-google');
+  }, true);
 })();

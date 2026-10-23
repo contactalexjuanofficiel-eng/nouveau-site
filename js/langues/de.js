@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.de["parr.3t"] = "Fast ohne Grenze";
 window.DEVIZO_TRAD.de["parr.3p"] = "Bis zu 12 Gratismonate pro Jahr: ein ganzes Jahr gratis.";
 window.DEVIZO_TRAD.de["q9"] = "Wie funktioniert das Empfehlungsprogramm?";
 window.DEVIZO_TRAD.de["r9"] = "In der App, Menü „Empfehlen“, finden Sie Ihren persönlichen Link. Ein Handwerker, der sein Konto mit diesem Link erstellt, kann 44 statt 14 Tage kostenlos testen. Schließt er ein Abo ab, erhalten Sie 1 Gratismonat, bis zu 12 Monate pro Jahr.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.de["cta.google"] = "Mit Google fortfahren";
+window.DEVIZO_TRAD.de["hero.video"] = "Ein komplettes Angebot in 2 Minuten, vom Handy aus";
+window.DEVIZO_TRAD.de["barre.essai"] = "14 Tage kostenlos testen";

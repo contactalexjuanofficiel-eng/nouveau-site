@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.pt["parr.3t"] = "Quase sem limite";
 window.DEVIZO_TRAD.pt["parr.3p"] = "Até 12 meses grátis por ano: um ano inteiro grátis.";
 window.DEVIZO_TRAD.pt["q9"] = "Como funciona a indicação?";
 window.DEVIZO_TRAD.pt["r9"] = "Na aplicação, menu «Indicação», encontra o seu link pessoal. O profissional que cria a conta com este link tem 44 dias de teste grátis em vez de 14. Quando subscreve, você ganha 1 mês grátis, até 12 meses por ano.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.pt["cta.google"] = "Continuar com o Google";
+window.DEVIZO_TRAD.pt["hero.video"] = "Um orçamento completo em 2 minutos, no telemóvel";
+window.DEVIZO_TRAD.pt["barre.essai"] = "Teste grátis de 14 dias";

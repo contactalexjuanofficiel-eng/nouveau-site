@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.es["parr.3t"] = "Casi sin límite";
 window.DEVIZO_TRAD.es["parr.3p"] = "Hasta 12 meses gratis al año: un año entero gratis.";
 window.DEVIZO_TRAD.es["q9"] = "¿Cómo funcionan los referidos?";
 window.DEVIZO_TRAD.es["r9"] = "En la aplicación, menú «Referidos», encontrará su enlace personal. El profesional que crea su cuenta con este enlace tiene 44 días de prueba gratuita en lugar de 14. Cuando se suscribe, usted gana 1 mes gratis, hasta 12 meses al año.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.es["cta.google"] = "Continuar con Google";
+window.DEVIZO_TRAD.es["hero.video"] = "Un presupuesto completo en 2 minutos, desde el teléfono";
+window.DEVIZO_TRAD.es["barre.essai"] = "Prueba gratis 14 días";

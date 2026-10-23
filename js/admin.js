@@ -351,6 +351,25 @@
         <span class="admin-rep-n">${nb(n)} <small>${pourcent(n, total)}</small></span></li>`).join('')}</ul>`;
   }
 
+  // Parcours d'inscription : de la visite de l'accueil au compte créé (30 derniers jours).
+  function parcours(s, visites) {
+    const etapes = [
+      ["Visites de l'accueil", visites.accueil || 0],
+      ['Clics sur « Essai gratuit »', visites['clic-essai'] || 0, visites['clic-google'] ? `dont ${nb(visites['clic-google'])} sur « Continuer avec Google »` : ''],
+      ["Formulaire d'inscription ouvert", visites.formulaire || 0, 'par e-mail (Google passe directement à l\'étape suivante)'],
+      ['Comptes créés', s.nouveaux_30j || 0],
+    ];
+    const max = Math.max(1, ...etapes.map((e) => e[1]));
+    if (!visites['clic-essai'] && !visites.formulaire) {
+      return '<p class="hint">Les clics sont comptés depuis la dernière mise à jour : les chiffres arrivent avec les prochaines visites. Pensez à exécuter <code>supabase/parcours.sql</code> dans Supabase.</p>';
+    }
+    return `<ul class="admin-repartition admin-parcours">${etapes.map(([libelle, n, detail], i) => `
+      <li><span class="admin-rep-libelle">${esc(libelle)}${detail ? `<small>${esc(detail)}</small>` : ''}</span>
+        <span class="admin-rep-barre"><span style="width:${Math.max(2, Math.round((n / max) * 100))}%"></span></span>
+        <span class="admin-rep-n">${nb(n)} <small>${i ? `→ ${pourcent(n, etapes[i - 1][1])}` : ''}</small></span></li>`).join('')}</ul>
+      <p class="hint">Le pourcentage (→) compare chaque étape à celle d'avant : la plus grosse baisse montre où les visiteurs décrochent. Vos propres visites ne sont pas comptées sur cet appareil.</p>`;
+  }
+
   // ------------------------------------------------------------------
   // Demandes d'assistance
   // ------------------------------------------------------------------
@@ -469,6 +488,7 @@
         <div class="admin-graphs">${graphique(s.par_jour || [], 'visites', "visites de l'accueil")}${graphique(s.par_jour || [], 'inscriptions', 'inscriptions')}</div>
         <p class="hint">Une visite = une personne qui ouvre la page dans un onglet (sans cookie, aucune donnée personnelle).</p>
       </section>
+      <section class="card"><h2>Parcours d'inscription</h2>${parcours(s, visites)}</section>
       <div class="admin-deux">
         <section class="card"><h2>D'où viennent les visiteurs</h2>${repartition(s.sources_30j, SOURCES)}</section>
         <section class="card"><h2>Téléphone ou ordinateur</h2>${repartition(s.appareils_30j, APPAREILS)}</section>
@@ -584,6 +604,11 @@
       message('Accès refusé', `Le compte <strong>${esc(session.user.email)}</strong> n'est pas administrateur.`,
         '<a class="btn" href="app.html">Retour à l\'appli</a>');
       return;
+    }
+    try {
+      localStorage.setItem('devizo-admin', '1'); // vos visites ne sont plus comptées dans les statistiques
+    } catch (e) {
+      // stockage indisponible
     }
     zone.innerHTML = '<p class="hint">Chargement des statistiques…</p>';
     await charger();

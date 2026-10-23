@@ -55,6 +55,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "No account yet? One is created automatically, and you accept the",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "By creating an account (with your email or with Google), you accept the",
     "Se déconnecter de Devizo ?": "Log out of Devizo?",
+    "Connexion avec Google…": "Signing in with Google…",
   },
   es: {
     'Devis & factures': 'Presupuestos y facturas',
@@ -111,6 +112,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "¿Aún no tiene cuenta? Se crea automáticamente y usted acepta las",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Al crear una cuenta (con su correo o con Google), usted acepta las",
     "Se déconnecter de Devizo ?": "¿Cerrar sesión en Devizo?",
+    "Connexion avec Google…": "Conectando con Google…",
   },
   pt: {
     'Devis & factures': 'Orçamentos e faturas',
@@ -167,6 +169,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Ainda não tem conta? É criada automaticamente e aceita as",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Ao criar uma conta (com o seu e-mail ou com o Google), aceita as",
     "Se déconnecter de Devizo ?": "Terminar sessão no Devizo?",
+    "Connexion avec Google…": "A ligar com o Google…",
   },
   it: {
     'Devis & factures': 'Preventivi e fatture',
@@ -223,6 +226,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Non hai ancora un account? Viene creato automaticamente e accetti le",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Creando un account (con la tua e-mail o con Google), accetti le",
     "Se déconnecter de Devizo ?": "Uscire da Devizo?",
+    "Connexion avec Google…": "Accesso con Google…",
   },
   de: {
     'Devis & factures': 'Angebote & Rechnungen',
@@ -279,6 +283,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Noch kein Konto? Es wird automatisch erstellt, und Sie akzeptieren die",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Mit der Erstellung eines Kontos (per E-Mail oder mit Google) akzeptieren Sie die",
     "Se déconnecter de Devizo ?": "Von Devizo abmelden?",
+    "Connexion avec Google…": "Anmeldung mit Google…",
   },
   ar: {
     'Devis & factures': 'عروض الأسعار والفواتير',
@@ -335,6 +340,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "ليس لديك حساب بعد؟ يُنشأ تلقائيًا، وتوافق على",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "بإنشاء حساب (ببريدك الإلكتروني أو باستخدام Google)، توافق على",
     "Se déconnecter de Devizo ?": "تسجيل الخروج من Devizo؟",
+    "Connexion avec Google…": "جارٍ تسجيل الدخول باستخدام Google…",
   },
   tr: {
     'Devis & factures': 'Teklifler ve faturalar',
@@ -391,6 +397,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Henüz hesabınız yok mu? Otomatik olarak oluşturulur ve şunları kabul edersiniz:",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Hesap oluşturarak (e-postanızla veya Google ile) şunları kabul edersiniz:",
     "Se déconnecter de Devizo ?": "Devizo'dan çıkış yapılsın mı?",
+    "Connexion avec Google…": "Google ile giriş yapılıyor…",
   },
   ro: {
     'Devis & factures': 'Devize și facturi',
@@ -447,6 +454,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Nu aveți încă un cont? Se creează automat și acceptați",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Creând un cont (cu e-mailul sau cu Google), acceptați",
     "Se déconnecter de Devizo ?": "Vă deconectați de la Devizo?",
+    "Connexion avec Google…": "Conectare cu Google…",
   },
   pl: {
     'Devis & factures': 'Kosztorysy i faktury',
@@ -503,6 +511,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Pas encore de compte ? Il est créé automatiquement, et vous acceptez les": "Nie masz jeszcze konta? Zostanie utworzone automatycznie, a Ty akceptujesz",
     "En créant un compte (avec votre e-mail ou avec Google), vous acceptez les": "Tworząc konto (przez e-mail lub Google), akceptujesz",
     "Se déconnecter de Devizo ?": "Wylogować się z Devizo?",
+    "Connexion avec Google…": "Logowanie przez Google…",
   },
 };
 

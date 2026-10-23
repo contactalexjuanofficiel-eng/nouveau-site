@@ -27,8 +27,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=80">
-  <link rel="stylesheet" href="css/landing.css?v=80">
+  <link rel="stylesheet" href="css/style.css?v=81">
+  <link rel="stylesheet" href="css/landing.css?v=81">
 </head>
 <body class="landing">
   <header class="l-header">
@@ -66,7 +66,7 @@
           <p class="lead" data-i18n="hero.lead">Devis et factures conformes en 2 minutes depuis votre téléphone, suivi de vos dépenses, et un tableau de bord qui vous dit enfin <strong>combien il vous reste</strong> après charges et impôts.</p>
           <div class="hero-cta">
             <a class="btn btn-primary btn-lg" href="app.html#inscription" data-i18n="cta.essai">Commencer l'essai gratuit</a>
-            <a class="btn btn-lg" href="#comment" data-i18n="hero.comment">Voir comment ça marche</a>
+            <a class="btn btn-lg btn-google" href="app.html#google"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg><span data-i18n="cta.google">Continuer avec Google</span></a>
           </div>
           <ul class="trust">
             <li data-i18n="trust.1">14 jours gratuits</li>
@@ -75,45 +75,12 @@
           </ul>
         </div>
 
-        <!-- Devis qui se remplit tout seul -->
-        <div class="mock" aria-hidden="true">
-          <div class="mock-paper">
-            <div class="mock-head">
-              <div>
-                <strong>Dupont Plomberie</strong>
-                <small>SIRET 123 456 789 00007</small>
-              </div>
-              <div class="mock-title">
-                <span>DEVIS</span>
-                <small>N° D-2026-014</small>
-              </div>
-            </div>
-            <p class="mock-objet" data-tour="client"><b>Client :</b> Mme Martin · <b>Objet :</b> Rénovation salle de bain</p>
-            <ul class="mock-lines" data-tour="lignes">
-              <li style="--i:0"><span>Dépose baignoire et évacuation</span><span>280,00 €</span></li>
-              <li style="--i:1"><span>Receveur de douche 90×120</span><span>640,00 €</span></li>
-              <li style="--i:2"><span>Mitigeur thermostatique</span><span>189,00 €</span></li>
-              <li style="--i:3"><span>Main d'œuvre · 14 h</span><span>672,00 €</span></li>
-            </ul>
-            <div class="mock-total">
-              <div data-tour="tva"><span>TVA 10 %</span><span>178,10 €</span></div>
-              <div class="mock-ttc"><span>Total TTC</span><span class="mock-count" data-to="1959.10">1 959,10 €</span></div>
-              <div class="mock-acompte" data-tour="acompte"><span>Acompte 30 %</span><span>587,73 €</span></div>
-            </div>
-            <p class="mock-legal" data-tour="mentions">Assurance décennale MAAF Pro · Devis gratuit · Valable 30 jours</p>
-            <div class="mock-actions">
-              <span class="mock-btn" data-tour="pdf" data-i18n="mock.pdf">Télécharger le PDF</span>
-              <span class="mock-btn mock-btn-primary" data-tour="facture" data-i18n="mock.facture">Transformer en facture</span>
-            </div>
-          </div>
-          <div class="tour-cursor" hidden>
-            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2l16 9.5-7 1.6-3.6 6.9z" fill="#ffffff" stroke="#0f1b3d" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="tour-bubble" hidden></div>
-          <div class="mock-badge" data-i18n="mock.badge">
-            <span class="dot"></span> Devis accepté · facture F-2026-009 créée
-          </div>
-        </div>
+        <!-- Vidéo : un devis en 2 minutes -->
+        <figure class="hero-video">
+          <video src="video/devis-2-minutes.mp4" poster="video/devis-2-minutes.jpg" width="540" height="960"
+            autoplay muted loop playsinline preload="auto" aria-label="Démonstration : un devis fait en 2 minutes sur téléphone"></video>
+          <figcaption data-i18n="hero.video">Un devis complet en 2 minutes, depuis le téléphone</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -435,12 +402,18 @@
     </div>
   </footer>
 
-  <script src="js/i18n.js?v=80"></script>
-  <script src="js/landing.js?v=80"></script>
-  <script src="js/config.js?v=80"></script>
-  <script src="js/parrainage.js?v=80" defer></script>
-  <script src="js/stats.js?v=80" defer></script>
-  <script src="js/cookies.js?v=80" defer></script>
-  <script src="js/installer.js?v=80" defer></script>
+  <!-- Barre fixe sur téléphone -->
+  <div class="barre-essai" hidden>
+    <a class="btn btn-primary" href="app.html#inscription" data-i18n="barre.essai">Essai gratuit 14 jours</a>
+    <a class="btn barre-google" href="app.html#google" aria-label="Continuer avec Google"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg></a>
+  </div>
+
+  <script src="js/i18n.js?v=81"></script>
+  <script src="js/landing.js?v=81"></script>
+  <script src="js/config.js?v=81"></script>
+  <script src="js/parrainage.js?v=81" defer></script>
+  <script src="js/stats.js?v=81" defer></script>
+  <script src="js/cookies.js?v=81" defer></script>
+  <script src="js/installer.js?v=81" defer></script>
 </body>
 </html>

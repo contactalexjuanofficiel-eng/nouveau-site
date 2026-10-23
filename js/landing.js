@@ -57,6 +57,24 @@ const ETAPES_TABLEAU = [
   const mock = document.querySelector('.mock');
   if (mock && !reduceMotion) visite(mock, ETAPES_DEVIS, { badge: mock.querySelector('.mock-badge'), attente: 2800 });
 
+  // Vidéo de l'accroche : arrêtée (avec les commandes) si l'utilisateur préfère moins d'animations.
+  const video = document.querySelector('.hero-video video');
+  if (video && reduceMotion) {
+    video.removeAttribute('autoplay');
+    video.pause();
+    video.controls = true;
+  }
+
+  // Barre « Essai gratuit » en bas de l'écran du téléphone, dès que les boutons du haut ne sont plus visibles.
+  const barre = document.querySelector('.barre-essai');
+  const boutonsHaut = document.querySelector('.hero-cta');
+  if (barre && boutonsHaut && 'IntersectionObserver' in window) {
+    barre.hidden = false;
+    new IntersectionObserver(([e]) => {
+      barre.classList.toggle('visible', !e.isIntersecting && e.boundingClientRect.top < 0);
+    }).observe(boutonsHaut);
+  }
+
   if (!('IntersectionObserver' in window) || reduceMotion) return;
 
   // Appelle onEnter à chaque retour à l'écran, onLeave quand la partie sort.

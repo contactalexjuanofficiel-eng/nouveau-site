@@ -380,3 +380,33 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   .parrain-box { grid-template-columns: 1fr; padding: 28px 20px; gap: 24px; }
   .parrain-texte .btn { width: 100%; text-align: center; }
 }
+
+/* ---------- Vidéo de l'accroche ---------- */
+.hero-video { margin: 0; justify-self: center; width: min(340px, 100%); text-align: center; }
+.hero-video video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 28px; background: #eef2fb;
+  box-shadow: 0 30px 70px rgba(15, 27, 61, .22), 0 0 0 1px var(--border); }
+.hero-video figcaption { margin-top: 14px; color: var(--muted); font-size: .95rem; }
+@media (max-width: 860px) { .hero-video { width: min(300px, 82vw); margin-top: 8px; } }
+
+/* ---------- Bouton Google ---------- */
+.btn-google { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(--card); }
+.btn-google svg { flex: none; }
+
+/* ---------- Barre fixe « Essai gratuit » (téléphone) ---------- */
+.barre-essai { display: none; }
+@media (max-width: 760px) {
+  .barre-essai:not([hidden]) {
+    display: flex; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -10px 30px rgba(15, 27, 61, .12);
+    transform: translateY(110%); transition: transform .25s ease;
+  }
+  .barre-essai.visible { transform: none; }
+  .barre-essai .btn-primary { flex: 1; text-align: center; padding-block: 13px; font-size: 1.05rem; }
+  .barre-essai .barre-google { flex: none; display: grid; place-items: center; width: 52px; padding: 0; background: var(--card); }
+  /* Pas de barre par-dessus le bandeau des cookies ou d'installation. */
+  body:has(.cookies) .barre-essai, body:has(.installer-bandeau:not(.installer-haut)) .barre-essai { display: none; }
+  body:has(.barre-essai.visible) { padding-bottom: 76px; }
+  .hero-cta .btn { flex: 1 1 100%; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { .barre-essai { transition: none; } }

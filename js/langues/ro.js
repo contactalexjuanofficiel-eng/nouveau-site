@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.ro["parr.3t"] = "Aproape fără limită";
 window.DEVIZO_TRAD.ro["parr.3p"] = "Până la 12 luni gratuite pe an: un an întreg gratuit.";
 window.DEVIZO_TRAD.ro["q9"] = "Cum funcționează recomandarea?";
 window.DEVIZO_TRAD.ro["r9"] = "În aplicație, meniul „Recomandă”, găsiți linkul personal. Meseriașul care își creează contul cu acest link are 44 de zile de probă gratuită în loc de 14. Când se abonează, primiți 1 lună gratuită, până la 12 luni pe an.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.ro["cta.google"] = "Continuați cu Google";
+window.DEVIZO_TRAD.ro["hero.video"] = "O ofertă completă în 2 minute, de pe telefon";
+window.DEVIZO_TRAD.ro["barre.essai"] = "Probă gratuită 14 zile";

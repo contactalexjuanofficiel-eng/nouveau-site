@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.ar["parr.3t"] = "تقريبًا بلا حدود";
 window.DEVIZO_TRAD.ar["parr.3p"] = "حتى 12 شهرًا مجانيًا في السنة: سنة كاملة مجانًا.";
 window.DEVIZO_TRAD.ar["q9"] = "كيف تعمل الإحالة؟";
 window.DEVIZO_TRAD.ar["r9"] = "في التطبيق، قائمة «الإحالة»، تجد رابطك الشخصي. الحرفي الذي ينشئ حسابه عبر هذا الرابط يحصل على 44 يومًا من التجربة المجانية بدلًا من 14. وعندما يشترك، تحصل على شهر مجاني، حتى 12 شهرًا في السنة.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.ar["cta.google"] = "المتابعة باستخدام Google";
+window.DEVIZO_TRAD.ar["hero.video"] = "عرض سعر كامل في دقيقتين من هاتفك";
+window.DEVIZO_TRAD.ar["barre.essai"] = "تجربة مجانية 14 يومًا";

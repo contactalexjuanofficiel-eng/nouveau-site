@@ -167,3 +167,7 @@ window.DEVIZO_TRAD.tr["parr.3t"] = "Neredeyse sınırsız";
 window.DEVIZO_TRAD.tr["parr.3p"] = "Yılda 12 aya kadar ücretsiz: koca bir yıl bedava.";
 window.DEVIZO_TRAD.tr["q9"] = "Davet sistemi nasıl çalışır?";
 window.DEVIZO_TRAD.tr["r9"] = "Uygulamada «Davet et» menüsünde kişisel bağlantınızı bulursunuz. Bu bağlantıyla hesap açan zanaatkâr 14 yerine 44 gün ücretsiz deneme alır. Abone olduğunda siz 1 ay ücretsiz kazanırsınız, yılda 12 aya kadar.";
+// Vidéo, Google et barre fixe
+window.DEVIZO_TRAD.tr["cta.google"] = "Google ile devam et";
+window.DEVIZO_TRAD.tr["hero.video"] = "Telefondan 2 dakikada eksiksiz bir teklif";
+window.DEVIZO_TRAD.tr["barre.essai"] = "14 gün ücretsiz deneme";
