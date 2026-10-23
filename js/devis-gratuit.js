@@ -10,6 +10,33 @@
   if (!zone) return;
   const BROUILLON = 'devizo-devis-gratuit-brouillon';
   const POUR_APPLI = 'devizo-devis-gratuit';
+  // Limite : 3 devis différents par période de 30 jours sur cet appareil. Retélécharger
+  // le même devis (même numéro, même client) après une correction ne compte pas.
+  const COMPTEUR = 'devizo-devis-gratuit-compteur';
+  const LIMITE = 3;
+  const PERIODE = 30 * 86400000;
+  function faits() {
+    try {
+      return (JSON.parse(localStorage.getItem(COMPTEUR)) || []).filter((x) => Date.now() - x.le < PERIODE);
+    } catch (e) {
+      return [];
+    }
+  }
+  const cleDevis = () => (etat.devis.numero + '|' + etat.client.nom).trim().toLowerCase();
+  const dejaCompte = () => faits().some((x) => x.cle === cleDevis());
+  const restants = () => Math.max(0, LIMITE - faits().length);
+  function noterDevis() {
+    if (dejaCompte()) return;
+    try {
+      localStorage.setItem(COMPTEUR, JSON.stringify([...faits(), { cle: cleDevis(), le: Date.now() }]));
+    } catch (e) {
+      // stockage indisponible
+    }
+  }
+  function prochainDevisGratuit() {
+    const plusAncien = Math.min(...faits().map((x) => x.le));
+    return new Date(plusAncien + PERIODE).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  }
   const FORMES = { micro: 'Micro-entreprise', ei: 'Entreprise individuelle (EI)', eurl: 'EURL', sarl: 'SARL', sasu: 'SASU', sas: 'SAS' };
   const UNITES = ['u', 'h', 'j', 'm²', 'm', 'ml', 'm³', 'forfait', 'lot', 'kg'];
   const TAUX = [20, 10, 5.5, 0];
@@ -151,7 +178,8 @@
 
         <p class="gen-erreur" role="alert" hidden></p>
         <button type="submit" class="btn btn-primary btn-lg gen-pdf">Télécharger le devis en PDF</button>
-        <p class="gen-info">🔒 Gratuit et sans inscription. Rien n'est enregistré sur nos serveurs : fermez l'onglet et tout est effacé.</p>
+        <p class="gen-info">🔒 Gratuit et sans inscription, jusqu'à ${LIMITE} devis par mois (${restants() > 0 ? `encore ${restants()} ce mois-ci` : 'limite atteinte ce mois-ci'}).
+          Rien n'est enregistré sur nos serveurs : fermez l'onglet et tout est effacé.</p>
       </form>`;
   }
 
@@ -332,14 +360,20 @@
   }
 
   // Après le téléchargement : proposer de garder le devis dans l'appli.
-  function proposerCompte() {
+  function proposerCompte(limite = false) {
     const dlg = document.createElement('dialog');
     dlg.className = 'gen-dialogue';
+    const reste = restants();
     dlg.innerHTML = `
-      <p class="gen-dialogue-ok">✓ Votre devis est téléchargé</p>
+      ${limite
+        ? `<p class="gen-dialogue-limite">Vous avez utilisé vos ${LIMITE} devis gratuits du mois</p>
+      <h2>🚀 Continuez avec l'appli Devizo</h2>
+      <p>Créez votre compte : <strong>devis et factures illimités pendant 14 jours</strong>, sans carte bancaire.
+        Ce devis est <strong>déjà dans votre appli</strong>, avec votre entreprise et votre client. Prochain devis gratuit sans compte le ${prochainDevisGratuit()}.</p>`
+        : `<p class="gen-dialogue-ok">✓ Votre devis est téléchargé${reste ? ` · encore ${reste} devis gratuit${reste > 1 ? 's' : ''} ce mois-ci` : ''}</p>
       <h2>💾 Gardez ce devis et transformez-le en facture</h2>
       <p>Créez votre compte gratuit : ce devis est <strong>déjà dans votre appli</strong>, avec votre entreprise et votre client.
-        Plus besoin de tout retaper la prochaine fois.</p>
+        Plus besoin de tout retaper la prochaine fois.</p>`}
       <ul>
         <li>Devis → facture en un clic, numérotation automatique</li>
         <li>Envoi par e-mail et signature en ligne du client</li>
@@ -347,7 +381,7 @@
       </ul>
       <a class="btn btn-lg btn-google" href="app.html#google"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg><span>Continuer avec Google</span></a>
       <a class="btn btn-primary btn-lg" href="app.html#inscription">Créer mon compte avec mon e-mail</a>
-      <button type="button" class="gen-non">Non merci</button>`;
+      <button type="button" class="gen-non">${limite ? 'Fermer' : 'Non merci'}</button>`;
     dlg.querySelector('.gen-non').addEventListener('click', () => dlg.close());
     dlg.addEventListener('close', () => dlg.remove());
     document.body.appendChild(dlg);
@@ -364,18 +398,26 @@
       return;
     }
     zoneErreur.hidden = true;
+    // Le devis est gardé pour l'appli dans tous les cas : en créant son compte, l'artisan le retrouve.
+    try {
+      localStorage.setItem(POUR_APPLI, JSON.stringify({ ...etat, le: Date.now() }));
+    } catch (e) {
+      // stockage indisponible
+    }
+    if (!dejaCompte() && restants() === 0) {
+      proposerCompte(true);
+      return;
+    }
     const bouton = zone.querySelector('.gen-pdf');
     bouton.disabled = true;
     bouton.textContent = 'Création du PDF…';
     try {
       await fairePdf();
-      try {
-        localStorage.setItem(POUR_APPLI, JSON.stringify({ ...etat, le: Date.now() }));
-      } catch (e) {
-        // stockage indisponible
-      }
+      noterDevis();
       if (window.devizoCompter) window.devizoCompter('pdf-gratuit');
       proposerCompte();
+      zone.querySelector('.gen-info').innerHTML = `🔒 Gratuit et sans inscription, jusqu'à ${LIMITE} devis par mois (${restants() > 0 ? `encore ${restants()} ce mois-ci` : 'limite atteinte ce mois-ci'}).
+          Rien n'est enregistré sur nos serveurs : fermez l'onglet et tout est effacé.`;
     } catch (e) {
       zoneErreur.textContent = "Le PDF n'a pas pu être créé. Vérifiez votre connexion internet et réessayez.";
       zoneErreur.hidden = false;

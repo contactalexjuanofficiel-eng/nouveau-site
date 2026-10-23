@@ -312,7 +312,7 @@ def page_guide(g):
 
 FAQ_GRATUIT = [
     ("Le générateur de devis est-il vraiment gratuit ?",
-     "Oui. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document."),
+     "Oui, jusqu'à 3 devis par mois. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document. Pour faire plus de devis, et des factures, créez un compte Devizo : 14 jours gratuits, sans carte bancaire."),
     ("Mes informations sont-elles enregistrées ?",
      "Non. Rien n'est envoyé sur nos serveurs : le devis reste dans votre navigateur le temps de l'onglet. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."),
     ("Le devis est-il conforme à la loi ?",
@@ -337,7 +337,7 @@ def page_devis_gratuit():
   <main id="top" class="seo-gratuit">
     <div class="l-wrap">
       {fil_html}
-      <p class="eyebrow">Gratuit · sans inscription · PDF</p>
+      <p class="eyebrow">Gratuit · sans inscription · 3 devis par mois</p>
       <h1>Faites votre devis gratuit en ligne</h1>
       <p class="lead">Remplissez les cases, les totaux se calculent tout seuls, et téléchargez un devis PDF propre, prêt à envoyer à votre client.
         Pensé pour les artisans : plombiers, électriciens, peintres, maçons, auto-entrepreneurs…</p>
@@ -366,7 +366,7 @@ def page_devis_gratuit():
           <table class="seo-tableau">
             <thead><tr><th></th><th>Générateur gratuit</th><th>Appli Devizo</th></tr></thead>
             <tbody>
-              <tr><td>Devis en PDF</td><td>✓</td><td>✓</td></tr>
+              <tr><td>Devis en PDF</td><td>3 par mois</td><td>✓ illimités</td></tr>
               <tr><td>Factures et avoirs</td><td>—</td><td>✓</td></tr>
               <tr><td>Devis et clients enregistrés</td><td>—</td><td>✓ sur tous vos appareils</td></tr>
               <tr><td>Numérotation automatique, sans trou</td><td>—</td><td>✓</td></tr>

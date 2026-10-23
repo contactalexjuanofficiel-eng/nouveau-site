@@ -144,3 +144,4 @@
   .gen-ligne .gen-suppr { grid-area: s; margin-top: 6px; justify-self: end; }
   .gen-pdf { width: 100%; min-width: 0; }
 }
+.gen-dialogue .gen-dialogue-limite { color: var(--warning, #b7791f); font-weight: 700; margin: 0; }
