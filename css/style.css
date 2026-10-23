@@ -650,3 +650,21 @@ dialog.envoi .actions { margin-top: 14px; }
 .auth-legal-google { margin: 8px 0 0; text-align: center; }
 .auth-ou { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .85rem; margin: 18px 0 6px; }
 .auth-ou::before, .auth-ou::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+/* Bouton de déconnexion (marche/arrêt) */
+.btn-deco-haut { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--card); color: var(--danger); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.btn-deco-haut:hover, .btn-deco-haut:focus-visible { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-deco { display: inline-flex; align-items: center; gap: 8px; color: var(--danger); }
+.btn-deco:hover { border-color: var(--danger); }
+.sans-compte #deco { display: none !important; }
+@media (max-width: 760px) { .btn-deco-haut { width: 44px; height: 44px; } }
+
+/* Bouton de déconnexion (marche/arrêt) */
+.btn-deco-haut { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--card); color: var(--danger); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.btn-deco-haut:hover, .btn-deco-haut:focus-visible { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-deco { display: inline-flex; align-items: center; gap: 8px; color: var(--danger); }
+.btn-deco:hover { border-color: var(--danger); }
+.sans-compte #deco { display: none !important; }
+@media (max-width: 760px) { .btn-deco-haut { width: 44px; height: 44px; } }

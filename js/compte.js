@@ -82,6 +82,27 @@ const Compte = (() => {
   // ------------------------------------------------------------------
   // Indicateur de sauvegarde dans la barre du haut
   // ------------------------------------------------------------------
+  // Bouton « marche/arrêt » en haut à droite pour se déconnecter.
+  const ICONE_DECO = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg>';
+  function boutonDeconnexion(apres) {
+    if (document.getElementById('deco')) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'deco';
+    b.className = 'btn-deco-haut no-print';
+    b.title = 'Se déconnecter';
+    b.setAttribute('aria-label', 'Se déconnecter');
+    b.innerHTML = ICONE_DECO;
+    b.addEventListener('click', async () => {
+      if (await ask('Se déconnecter de Devizo ?', 'Se déconnecter')) deconnecter();
+    });
+    apres.after(b);
+  }
+  const retirerBarre = () => {
+    document.getElementById('sync')?.remove();
+    document.getElementById('deco')?.remove();
+  };
+
   function setEtat(nouvel) {
     etat = nouvel;
     let el = document.getElementById('sync');
@@ -90,6 +111,7 @@ const Compte = (() => {
       el.id = 'sync';
       el.href = '#/compte';
       document.querySelector('.topbar .logo')?.after(el);
+      boutonDeconnexion(el);
     }
     el.className = 'sync sync-' + nouvel;
     el.textContent = {
@@ -396,7 +418,7 @@ const Compte = (() => {
       // rien à faire
     }
     data = structuredClone(DEFAULT_DATA);
-    document.getElementById('sync')?.remove();
+    retirerBarre();
     history.replaceState(null, '', location.pathname + '#/');
     pageConnexion('connexion', 'Vous êtes déconnecté.');
   }
@@ -657,7 +679,7 @@ const Compte = (() => {
         <p>Sauvegarde : <strong>${{ ok: '✓ à jour', envoi: 'en cours…', erreur: '⚠ en attente du réseau' }[etat]}</strong></p>
         <div class="actions">
           <button class="btn" id="compte-sync">Sauvegarder maintenant</button>
-          <button class="btn" id="compte-deco">Se déconnecter</button>
+          <button class="btn btn-deco" id="compte-deco">${ICONE_DECO}<span>Se déconnecter</span></button>
           <a class="btn" id="compte-admin" href="admin.html" style="display:none">⚙ Administration</a>
         </div>
       </section>
@@ -732,7 +754,7 @@ const Compte = (() => {
         // rien à faire
       }
       data = structuredClone(DEFAULT_DATA);
-      document.getElementById('sync')?.remove();
+      retirerBarre();
       pageConnexion('inscription', 'Votre compte a été supprimé.');
     });
   }
