@@ -171,3 +171,4 @@ window.DEVIZO_TRAD.de["r9"] = "In der App, Menü „Empfehlen“, finden Sie Ihr
 window.DEVIZO_TRAD.de["cta.google"] = "Mit Google fortfahren";
 window.DEVIZO_TRAD.de["hero.video"] = "Ein komplettes Angebot in 2 Minuten, vom Handy aus";
 window.DEVIZO_TRAD.de["barre.essai"] = "14 Tage kostenlos testen";
+window.DEVIZO_TRAD.de["nav.gratuit"] = "Gratis-Angebot";

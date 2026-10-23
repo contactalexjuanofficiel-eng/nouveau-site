@@ -367,6 +367,7 @@
       <li><span class="admin-rep-libelle">${esc(libelle)}${detail ? `<small>${esc(detail)}</small>` : ''}</span>
         <span class="admin-rep-barre"><span style="width:${Math.max(2, Math.round((n / max) * 100))}%"></span></span>
         <span class="admin-rep-n">${nb(n)} <small>${i ? `→ ${pourcent(n, etapes[i - 1][1])}` : ''}</small></span></li>`).join('')}</ul>
+      ${visites['pdf-gratuit'] ? `<p class="admin-parcours-gratuit">📄 <strong>${nb(visites['pdf-gratuit'])}</strong> devis téléchargé(s) avec le générateur gratuit</p>` : ''}
       <p class="hint">Le pourcentage (→) compare chaque étape à celle d'avant : la plus grosse baisse montre où les visiteurs décrochent. Vos propres visites ne sont pas comptées sur cet appareil.</p>`;
   }
 

@@ -400,6 +400,11 @@ const Compte = (() => {
       parraine = await Parrainage.appliquer(client, user);
       if (parraine) await Abonnement.charger(client, user, equipe);
     }
+    // Devis fait avec le générateur gratuit avant de créer le compte : on le reprend.
+    let devisRepris = null;
+    if (typeof importerDevisGratuit === 'function') {
+      devisRepris = await importerDevisGratuit(Date.now() - Date.parse(user.created_at || 0) < 86400000);
+    }
     try {
       const { data: estAdmin } = await client.rpc('est_admin');
       admin = estAdmin === true;
@@ -415,6 +420,10 @@ const Compte = (() => {
     suivreEquipe();
     renderApp();
     if (typeof Envoi !== 'undefined') Envoi.synchroniserSignatures();
+    if (devisRepris) {
+      if (typeof toast === 'function') toast(`Votre devis ${devisRepris.numero} a été ajouté à votre compte`);
+      if (!parraine) location.hash = '#/voir/' + devisRepris.id;
+    }
     if (parraine) {
       const fin = new Date(parraine.fin_essai).toLocaleDateString('fr-FR');
       await ask(`🎁 Bienvenue ! Grâce à ${parraine.parrain}, votre essai gratuit dure 44 jours : vous avez accès à tout jusqu'au ${fin}.`, 'Super !', false);

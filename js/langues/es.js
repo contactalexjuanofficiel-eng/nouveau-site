@@ -171,3 +171,4 @@ window.DEVIZO_TRAD.es["r9"] = "En la aplicación, menú «Referidos», encontrar
 window.DEVIZO_TRAD.es["cta.google"] = "Continuar con Google";
 window.DEVIZO_TRAD.es["hero.video"] = "Un presupuesto completo en 2 minutos, desde el teléfono";
 window.DEVIZO_TRAD.es["barre.essai"] = "Prueba gratis 14 días";
+window.DEVIZO_TRAD.es["nav.gratuit"] = "Presupuesto gratis";

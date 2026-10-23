@@ -115,3 +115,4 @@ dialog.admin-dialog { max-width: 560px; max-height: calc(100vh - 32px); overflow
 .admin-parcours li { grid-template-columns: minmax(150px, 1.4fr) 2fr 8.5em; }
 .admin-parcours .admin-rep-libelle small { display: block; color: var(--muted); font-size: .8rem; }
 @media (max-width: 600px) { .admin-parcours li { grid-template-columns: 1fr; gap: 4px; } }
+.admin-parcours-gratuit { margin: 14px 0 0; }

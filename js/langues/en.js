@@ -171,3 +171,4 @@ window.DEVIZO_TRAD.en["r9"] = "In the app, under “Referral”, you will find y
 window.DEVIZO_TRAD.en["cta.google"] = "Continue with Google";
 window.DEVIZO_TRAD.en["hero.video"] = "A complete quote in 2 minutes, from your phone";
 window.DEVIZO_TRAD.en["barre.essai"] = "14-day free trial";
+window.DEVIZO_TRAD.en["nav.gratuit"] = "Free quote";

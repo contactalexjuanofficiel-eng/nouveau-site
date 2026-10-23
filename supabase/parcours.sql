@@ -1,6 +1,7 @@
 -- Parcours d'inscription : en plus des pages vues, on compte (sans cookie,
 -- seulement des totaux par jour) les clics sur « Essai gratuit », les clics
--- sur « Continuer avec Google » et l'ouverture du formulaire d'inscription.
+-- sur « Continuer avec Google », l'ouverture du formulaire d'inscription et les
+-- devis téléchargés avec le générateur gratuit (devis-gratuit.html).
 -- À exécuter une fois dans Supabase (SQL Editor > New query > Run), après
 -- admin.sql. Peut être relancé sans risque.
 create or replace function public.compter_visite(p text, s text default 'direct', a text default 'inconnu')
@@ -10,7 +11,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if p not in ('accueil', 'app', 'signer', 'legal', 'clic-essai', 'clic-google', 'formulaire') then
+  if p not in ('accueil', 'app', 'signer', 'legal', 'clic-essai', 'clic-google', 'formulaire', 'pdf-gratuit') then
     return;
   end if;
   if s is null or s not in ('direct', 'interne', 'google', 'bing', 'autre-moteur', 'facebook', 'instagram', 'tiktok',

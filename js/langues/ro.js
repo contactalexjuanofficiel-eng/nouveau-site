@@ -171,3 +171,4 @@ window.DEVIZO_TRAD.ro["r9"] = "În aplicație, meniul „Recomandă”, găsiți
 window.DEVIZO_TRAD.ro["cta.google"] = "Continuați cu Google";
 window.DEVIZO_TRAD.ro["hero.video"] = "O ofertă completă în 2 minute, de pe telefon";
 window.DEVIZO_TRAD.ro["barre.essai"] = "Probă gratuită 14 zile";
+window.DEVIZO_TRAD.ro["nav.gratuit"] = "Ofertă gratuită";

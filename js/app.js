@@ -171,6 +171,69 @@ function nextNumber(type) {
   return prefix + String(max + 1).padStart(3, '0');
 }
 
+// Devis fait avec le générateur gratuit (devis-gratuit.html) : à la connexion,
+// il est ajouté au compte, avec l'entreprise (champs vides seulement) et le client.
+async function importerDevisGratuit(compteNeuf) {
+  let g;
+  try {
+    g = JSON.parse(localStorage.getItem('devizo-devis-gratuit'));
+  } catch (e) {
+    return null;
+  }
+  if (!g || !g.devis || Date.now() - (g.le || 0) > 7 * 86400000) {
+    localStorage.removeItem('devizo-devis-gratuit');
+    return null;
+  }
+  if (!Abonnement.peutModifier()) return null;
+  const titre = g.devis.objet || g.client?.nom || 'votre devis';
+  if (!compteNeuf && !(await ask(`Ajouter à votre compte le devis « ${titre} » fait avec le générateur gratuit ?`, 'Ajouter', 'Non merci'))) {
+    localStorage.removeItem('devizo-devis-gratuit');
+    return null;
+  }
+  const e = data.entreprise;
+  const ge = g.entreprise || {};
+  const vide = !e.nom;
+  for (const k of ['nom', 'rue', 'codePostal', 'ville', 'siret', 'telephone', 'email', 'numeroTva', 'assureur', 'numeroContrat']) {
+    if (!e[k] && ge[k]) e[k] = String(ge[k]).trim();
+  }
+  e.siret = String(e.siret || '').replace(/\s/g, '');
+  if (vide) {
+    if (FORMES[ge.formeJuridique]) e.formeJuridique = ge.formeJuridique;
+    e.franchiseTva = Boolean(ge.franchiseTva);
+    e.devisGratuit = Boolean(ge.devisGratuit);
+  }
+  if (!e.adresse) e.adresse = composeAdresse(e);
+  const gc = g.client || {};
+  let client = data.clients.find((c) => c.nom && c.nom.trim().toLowerCase() === String(gc.nom || '').trim().toLowerCase());
+  if (!client && gc.nom) {
+    client = { id: newId(), nom: gc.nom.trim(), rue: gc.rue || '', codePostal: gc.codePostal || '', ville: gc.ville || '' };
+    client.adresse = composeAdresse(client);
+    data.clients.push(client);
+  }
+  const numeroPris = data.documents.some((d) => d.numero === g.devis.numero);
+  const doc = {
+    id: newId(),
+    type: 'devis',
+    numero: g.devis.numero && !numeroPris ? g.devis.numero : nextNumber('devis'),
+    clientId: client?.id || '',
+    date: g.devis.date || today(),
+    echeance: g.devis.echeance || echeanceDefaut('devis'),
+    objet: g.devis.objet || '',
+    lignes: (g.devis.lignes || []).filter((l) => l.description || Number(String(l.prixUnitaire).replace(',', '.')))
+      .map((l) => ({ description: l.description || '', quantite: Number(String(l.quantite).replace(',', '.')) || 0, unite: l.unite || 'u',
+        prixUnitaire: Number(String(l.prixUnitaire).replace(',', '.')) || 0, tva: e.franchiseTva ? 0 : Number(l.tva) || 0 })),
+    notes: '',
+    acompte: 0,
+    statut: 'envoye',
+    creeLe: Date.now(),
+  };
+  if (!doc.lignes.length) doc.lignes = [newLine()];
+  data.documents.push(doc);
+  localStorage.removeItem('devizo-devis-gratuit');
+  saveData();
+  return doc;
+}
+
 // ====================================================================
 // Référentiels et vérifications
 // ====================================================================

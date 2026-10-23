@@ -75,6 +75,7 @@ def tete(titre, description, chemin, ld, type_og='website'):
       <nav class="l-nav" aria-label="Navigation principale">
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
+        <a href="devis-gratuit.html">Devis gratuit</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
       </nav>
       <div class="l-actions">
@@ -110,7 +111,8 @@ def pied():
           <a class="btn btn-primary" href="app.html#inscription">Essai gratuit 14 jours</a>
         </div>
         <div><h2>Par métier</h2><ul>{metiers}</ul></div>
-        <div><h2>Guides</h2><ul>{guides}</ul>
+        <div><h2>Outils gratuits</h2><ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li></ul>
+          <h2>Guides</h2><ul>{guides}</ul>
           <h2>Devizo</h2><ul><li><a href="index.html#tarifs">Tarifs</a></li><li><a href="index.html#faq">Questions fréquentes</a></li>
           <li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">Conditions générales</a></li>
           <li><a href="confidentialite.html">Confidentialité</a></li></ul></div>
@@ -308,6 +310,98 @@ def page_guide(g):
 ''' + pied()
 
 
+FAQ_GRATUIT = [
+    ("Le générateur de devis est-il vraiment gratuit ?",
+     "Oui. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document."),
+    ("Mes informations sont-elles enregistrées ?",
+     "Non. Rien n'est envoyé sur nos serveurs : le devis reste dans votre navigateur le temps de l'onglet. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."),
+    ("Le devis est-il conforme à la loi ?",
+     "Le PDF contient les mentions principales d'un devis d'artisan : vos coordonnées et votre SIRET, celles du client, la date et la durée de validité, le détail des prestations avec les prix unitaires HT, la TVA ou la mention « TVA non applicable, art. 293 B du CGI », l'assurance décennale et la zone « Bon pour accord ». Selon votre métier, d'autres mentions peuvent être nécessaires : consultez notre guide des mentions obligatoires."),
+    ("Puis-je faire une facture avec ce générateur ?",
+     "Non, le générateur gratuit fait uniquement des devis. Les factures demandent une numérotation qui se suit sans trou et une conservation pendant 10 ans : c'est ce que fait l'appli Devizo, qui transforme un devis accepté en facture en un clic. Essai gratuit 14 jours, sans carte bancaire."),
+    ("Quel taux de TVA mettre sur un devis de travaux ?",
+     "En général 10 % pour des travaux d'amélioration ou d'entretien dans un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, et 20 % dans le neuf ou pour un professionnel. En micro-entreprise sous le seuil de franchise, cochez « Je ne facture pas la TVA »."),
+]
+
+
+def page_devis_gratuit():
+    titre = 'Devis gratuit en ligne : modèle de devis PDF pour artisan | Devizo'
+    description = ("Faites un devis gratuit en ligne en 2 minutes, sans inscription : modèle de devis artisan conforme "
+                   "(SIRET, TVA, assurance décennale, bon pour accord), téléchargeable en PDF.")
+    fil_html, fil_ld = fil([('Accueil', 'index.html'), ('Devis gratuit en ligne', None)])
+    appli = {'@type': 'WebApplication', 'name': 'Générateur de devis gratuit Devizo', 'url': f'{SITE}/devis-gratuit.html',
+             'applicationCategory': 'BusinessApplication', 'operatingSystem': 'Web', 'inLanguage': 'fr',
+             'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'EUR'}, 'publisher': {'@id': f'{SITE}/#organisation'}}
+    ld = [ORGANISATION, fil_ld, appli, faq_ld(FAQ_GRATUIT)]
+    return tete(titre, description, 'devis-gratuit.html', ld) + f'''
+  <main id="top" class="seo-gratuit">
+    <div class="l-wrap">
+      {fil_html}
+      <p class="eyebrow">Gratuit · sans inscription · PDF</p>
+      <h1>Faites votre devis gratuit en ligne</h1>
+      <p class="lead">Remplissez les cases, les totaux se calculent tout seuls, et téléchargez un devis PDF propre, prêt à envoyer à votre client.
+        Pensé pour les artisans : plombiers, électriciens, peintres, maçons, auto-entrepreneurs…</p>
+      <div id="generateur" class="gen-zone"><p class="hint">Chargement du générateur…</p></div>
+      <noscript><p>Le générateur a besoin de JavaScript pour fonctionner.</p></noscript>
+    </div>
+
+    <div class="l-wrap l-narrow seo-gratuit-texte">
+      <section>
+        <h2>Comment faire un devis en 3 étapes</h2>
+        <ol>
+          <li><strong>Votre entreprise</strong> : nom, adresse, SIRET. Si vous êtes en micro-entreprise sans TVA, cochez la case : la mention « TVA non applicable, art. 293 B du CGI » est ajoutée.</li>
+          <li><strong>Votre client</strong> : son nom et son adresse.</li>
+          <li><strong>Les prestations</strong> : une ligne par fourniture ou travail, avec la quantité et le prix unitaire HT. Le total HT, la TVA et le total TTC se calculent automatiquement.</li>
+        </ol>
+        <p>Cliquez sur « Télécharger le devis en PDF » : il ne reste plus qu'à l'envoyer à votre client et à lui faire signer la case « Bon pour accord ».</p>
+      </section>
+      <aside class="seo-encart">
+        <p><strong>Vous faites des devis toutes les semaines ?</strong> Avec l'appli Devizo, vos clients et vos prestations sont enregistrés,
+          le devis accepté devient une facture en un clic, et votre client signe en ligne. Essai gratuit 14 jours, sans carte bancaire.</p>
+        <a class="btn btn-primary" href="app.html#inscription">Essayer l'appli Devizo</a>
+      </aside>
+      <section>
+        <h2>Générateur gratuit ou appli Devizo ?</h2>
+        <div class="table-wrap">
+          <table class="seo-tableau">
+            <thead><tr><th></th><th>Générateur gratuit</th><th>Appli Devizo</th></tr></thead>
+            <tbody>
+              <tr><td>Devis en PDF</td><td>✓</td><td>✓</td></tr>
+              <tr><td>Factures et avoirs</td><td>—</td><td>✓</td></tr>
+              <tr><td>Devis et clients enregistrés</td><td>—</td><td>✓ sur tous vos appareils</td></tr>
+              <tr><td>Numérotation automatique, sans trou</td><td>—</td><td>✓</td></tr>
+              <tr><td>Envoi par e-mail et signature en ligne</td><td>—</td><td>✓</td></tr>
+              <tr><td>Relance des factures impayées</td><td>—</td><td>✓</td></tr>
+              <tr><td>Tableau de bord : ce qu'il vous reste</td><td>—</td><td>✓</td></tr>
+              <tr><td>Prix</td><td>Gratuit</td><td>14 jours gratuits, puis dès 9 € HT/mois</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section>
+        <h2>Ce qu'un devis doit contenir</h2>
+        <p>Un devis d'artisan doit permettre au client de savoir exactement ce qu'il va payer : qui fait les travaux, pour qui, quoi, à quel prix et jusqu'à quand l'offre est valable.
+          Pour la liste complète et les cas particuliers (travaux chez un particulier, dépannage, assurance décennale), lisez notre
+          <a href="guide-mentions-obligatoires-devis.html">guide des mentions obligatoires d'un devis</a>.</p>
+      </section>
+      <section id="faq">
+        <h2>Questions fréquentes</h2>
+        <div class="faq">{faq_html(FAQ_GRATUIT)}
+        </div>
+      </section>
+    </div>
+    <section class="final-cta">
+      <div class="l-wrap">
+        <h2>Vos devis et factures au même endroit</h2>
+        <p>14 jours gratuits, sans carte bancaire. Formules à partir de 9 € HT par mois.</p>
+        <a class="btn btn-lg btn-light" href="app.html#inscription">Commencer l'essai gratuit</a>
+      </div>
+    </section>
+  </main>
+  <script src="js/devis-gratuit.js?v={VERSION}" defer></script>
+''' + pied()
+
+
 def ecrire(nom, contenu):
     with open(RACINE + nom, 'w') as f:
         f.write(contenu)
@@ -320,6 +414,8 @@ for m in METIERS:
 for g in GUIDES:
     ecrire(g['fichier'], page_guide(g))
     pages.append((g['fichier'], '0.8'))
+ecrire('devis-gratuit.html', page_devis_gratuit())
+pages.insert(0, ('devis-gratuit.html', '0.9'))
 
 urls = [('', '1.0')] + pages + [('mentions-legales.html', '0.2'), ('cgv.html', '0.2'), ('confidentialite.html', '0.2')]
 ecrire('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

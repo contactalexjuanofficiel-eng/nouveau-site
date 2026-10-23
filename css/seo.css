@@ -78,3 +78,69 @@
   .seo-devis { padding: 16px; }
   .seo-devis th:nth-child(4), .seo-devis td:nth-child(4) { display: none; }
 }
+
+/* ---------- Générateur de devis gratuit ---------- */
+.seo-gratuit { padding-top: 24px; }
+.seo-gratuit h1 { font-size: clamp(2rem, 4.4vw, 3rem); margin: 0 0 12px; }
+.seo-gratuit .lead { max-width: 760px; }
+.gen-zone { margin: 28px 0 56px; }
+.gen { display: grid; gap: 20px; max-width: 980px; }
+.gen fieldset { margin: 0; border: 1px solid var(--border); border-radius: 18px; background: var(--card); padding: 22px 22px 18px; }
+.gen legend { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 1.2rem; padding: 0 6px; }
+.gen legend span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: var(--on-primary, #fff); font-size: .95rem; }
+.gen-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 12px; }
+.gen-grille-3 { grid-template-columns: 1fr 1fr 1fr; }
+.gen-cp-ville { display: grid; grid-template-columns: 8em 1fr; gap: 12px; }
+.gen-champ { display: grid; gap: 5px; min-width: 0; }
+.gen-champ label { font-weight: 600; font-size: .92rem; }
+.gen-champ small { color: var(--muted); font-size: .8rem; }
+.gen-requis { color: var(--danger); }
+.gen input, .gen select { width: 100%; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+.gen input:focus, .gen select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.gen-case { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; cursor: pointer; }
+.gen-case input { width: 20px; height: 20px; flex: none; margin-top: 2px; }
+.gen-lignes-tete, .gen-ligne { display: grid; grid-template-columns: minmax(0, 1fr) 4.5em 6em 7.5em 5.5em 7.5em 2.4em; gap: 8px; align-items: center; }
+.gen-lignes-tete.sans-tva, .gen-lignes.sans-tva .gen-ligne { grid-template-columns: minmax(0, 1fr) 4.5em 6em 7.5em 7.5em 2.4em; }
+.gen-lignes-tete { color: var(--muted); font-size: .8rem; font-weight: 600; margin: 14px 0 6px; }
+.gen-lignes { display: grid; gap: 8px; }
+.gen-et { display: none; }
+.gen-total { text-align: right; font-weight: 600; white-space: nowrap; }
+.gen-suppr { border: 0; background: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; border-radius: 8px; height: 40px; }
+.gen-suppr:hover:not(:disabled) { color: var(--danger); background: var(--bg); }
+.gen-suppr:disabled { opacity: .3; cursor: default; }
+.gen-ajouter { margin-top: 12px; }
+.gen-totaux { margin: 16px 0 8px auto; max-width: 320px; display: grid; gap: 6px; }
+.gen-totaux div { display: flex; justify-content: space-between; gap: 16px; }
+.gen-totaux .gen-note { color: var(--muted); font-size: .85rem; }
+.gen-totaux .gen-ttc { border-top: 2px solid var(--border); padding-top: 8px; font-size: 1.2rem; }
+.gen-erreur { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--danger-soft); color: var(--danger); font-weight: 600; }
+.gen-pdf { justify-self: start; min-width: 300px; }
+.gen-info { margin: -6px 0 0; color: var(--muted); font-size: .9rem; }
+.gen-dialogue { max-width: 460px; width: calc(100vw - 32px); border: 0; border-radius: 20px; padding: 26px; background: var(--card); color: var(--text); box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
+.gen-dialogue::backdrop { background: rgba(11, 20, 48, .55); }
+.gen-dialogue h2 { font-size: 1.35rem; margin: 6px 0 10px; }
+.gen-dialogue p { margin: 0 0 12px; color: var(--muted); }
+.gen-dialogue .gen-dialogue-ok { color: var(--success); font-weight: 700; margin: 0; }
+.gen-dialogue ul { margin: 0 0 18px; padding-left: 20px; line-height: 1.7; }
+.gen-dialogue .btn { display: flex; width: 100%; justify-content: center; margin-top: 10px; text-align: center; }
+.gen-non { display: block; margin: 14px auto 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; }
+.seo-gratuit-texte { padding-bottom: 32px; }
+.seo-tableau { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.seo-tableau th, .seo-tableau td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+.seo-tableau td:not(:first-child), .seo-tableau th:not(:first-child) { text-align: center; }
+.seo-tableau thead th:last-child { color: var(--primary); }
+@media (max-width: 760px) {
+  .gen fieldset { padding: 18px 14px 14px; }
+  .gen-grille, .gen-grille-3 { grid-template-columns: 1fr; }
+  .gen-lignes-tete { display: none; }
+  .gen-ligne, .gen-lignes.sans-tva .gen-ligne { grid-template-columns: 1fr 1fr 1.2fr; row-gap: 4px; padding: 12px; border: 1px solid var(--border); border-radius: 12px;
+    grid-template-areas: "d d d" "eq eu ep" "q u p" "v t s"; }
+  .gen-ligne .gen-desc { grid-area: d; margin-bottom: 6px; }
+  .gen-et { display: block; color: var(--muted); font-size: .78rem; font-weight: 600; }
+  .gen-et-q { grid-area: eq; } .gen-et-u { grid-area: eu; } .gen-et-p { grid-area: ep; }
+  .gen-ligne .gen-qte { grid-area: q; } .gen-ligne .gen-unite { grid-area: u; } .gen-ligne .gen-pu { grid-area: p; }
+  .gen-ligne .gen-tva { grid-area: v; margin-top: 6px; }
+  .gen-ligne .gen-total { grid-area: t; text-align: right; margin-top: 6px; }
+  .gen-ligne .gen-suppr { grid-area: s; margin-top: 6px; justify-self: end; }
+  .gen-pdf { width: 100%; min-width: 0; }
+}
