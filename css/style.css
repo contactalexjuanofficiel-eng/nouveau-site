@@ -668,3 +668,12 @@ dialog.envoi .actions { margin-top: 14px; }
 .btn-deco:hover { border-color: var(--danger); }
 .sans-compte #deco { display: none !important; }
 @media (max-width: 760px) { .btn-deco-haut { width: 44px; height: 44px; } }
+/* Sur ordinateur, le bouton de déconnexion se place juste après le menu (à droite de « Parrainage »). */
+@media (min-width: 761px) {
+  .topbar .nav { order: 2; }
+  .topbar .btn-deco-haut { order: 3; }
+}
+/* Écran moyen : le menu passe sur sa propre ligne, avec le bouton de déconnexion au bout. */
+@media (min-width: 761px) and (max-width: 1599px) {
+  .topbar .nav { flex: 1 1 calc(100% - 64px); min-width: 0; }
+}
