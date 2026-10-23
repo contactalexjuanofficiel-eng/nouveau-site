@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.pt["cta.google"] = "Continuar com o Google";
 window.DEVIZO_TRAD.pt["hero.video"] = "Um orçamento completo em 2 minutos, no telemóvel";
 window.DEVIZO_TRAD.pt["barre.essai"] = "Teste grátis de 14 dias";
 window.DEVIZO_TRAD.pt["nav.gratuit"] = "Orçamento grátis";
+window.DEVIZO_TRAD.pt["nav.gratuitBadge"] = "sem registo";
+window.DEVIZO_TRAD.pt["hero.gratuit"] = "Ainda não está pronto? Faça um <strong>orçamento grátis</strong> em 2 minutos, sem registo";

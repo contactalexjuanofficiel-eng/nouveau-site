@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.it["cta.google"] = "Continua con Google";
 window.DEVIZO_TRAD.it["hero.video"] = "Un preventivo completo in 2 minuti, dal telefono";
 window.DEVIZO_TRAD.it["barre.essai"] = "Prova gratuita di 14 giorni";
 window.DEVIZO_TRAD.it["nav.gratuit"] = "Preventivo gratis";
+window.DEVIZO_TRAD.it["nav.gratuitBadge"] = "senza registrazione";
+window.DEVIZO_TRAD.it["hero.gratuit"] = "Non sei ancora pronto? Fai un <strong>preventivo gratis</strong> in 2 minuti, senza registrazione";

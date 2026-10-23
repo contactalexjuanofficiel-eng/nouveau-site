@@ -410,3 +410,20 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   .hero-cta .btn { flex: 1 1 100%; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) { .barre-essai { transition: none; } }
+
+/* ---------- « Devis gratuit » mis en avant ---------- */
+.l-nav { align-items: center; }
+.l-nav .l-nav-gratuit { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; line-height: 1; padding: 8px 12px 8px 14px; border-radius: 999px;
+  background: #1e9e5a; color: #fff; font-weight: 700; text-decoration: none; box-shadow: 0 6px 16px rgba(30, 158, 90, .28); }
+.l-nav .l-nav-gratuit small { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding: 3px 7px; border-radius: 999px; background: rgba(255, 255, 255, .22); }
+.l-nav .l-nav-gratuit:hover { background: #178a4d; color: #fff; }
+.hero-gratuit { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 12px 16px; border-radius: 14px; max-width: 540px;
+  background: var(--success-soft); color: var(--text); text-decoration: none; border: 1px solid rgba(30, 158, 90, .3); }
+.hero-gratuit strong { color: var(--success); }
+.hero-gratuit:hover { border-color: var(--success); }
+.hero-gratuit span:last-child { margin-left: auto; color: var(--success); font-weight: 700; }
+@media (max-width: 1599px) { .l-nav .l-nav-gratuit small { display: none; } .l-nav .l-nav-gratuit { padding: 8px 14px; } }
+/* Place pour « Devis gratuit » : on retire d'abord les liens secondaires. */
+@media (max-width: 1439px) { .l-pill-contour { display: none; } }
+@media (max-width: 1179px) { .l-nav a[href="#pilotage"] { display: none; } }
+@media (max-width: 1059px) { .l-nav a[href="#faq"] { display: none; } }

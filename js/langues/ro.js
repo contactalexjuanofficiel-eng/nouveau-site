@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.ro["cta.google"] = "Continuați cu Google";
 window.DEVIZO_TRAD.ro["hero.video"] = "O ofertă completă în 2 minute, de pe telefon";
 window.DEVIZO_TRAD.ro["barre.essai"] = "Probă gratuită 14 zile";
 window.DEVIZO_TRAD.ro["nav.gratuit"] = "Ofertă gratuită";
+window.DEVIZO_TRAD.ro["nav.gratuitBadge"] = "fără cont";
+window.DEVIZO_TRAD.ro["hero.gratuit"] = "Nu sunteți încă pregătit? Faceți o <strong>ofertă gratuită</strong> în 2 minute, fără cont";

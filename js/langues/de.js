@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.de["cta.google"] = "Mit Google fortfahren";
 window.DEVIZO_TRAD.de["hero.video"] = "Ein komplettes Angebot in 2 Minuten, vom Handy aus";
 window.DEVIZO_TRAD.de["barre.essai"] = "14 Tage kostenlos testen";
 window.DEVIZO_TRAD.de["nav.gratuit"] = "Gratis-Angebot";
+window.DEVIZO_TRAD.de["nav.gratuitBadge"] = "ohne Anmeldung";
+window.DEVIZO_TRAD.de["hero.gratuit"] = "Noch nicht bereit? Erstellen Sie ein <strong>kostenloses Angebot</strong> in 2 Minuten, ohne Anmeldung";

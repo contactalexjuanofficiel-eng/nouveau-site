@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.tr["cta.google"] = "Google ile devam et";
 window.DEVIZO_TRAD.tr["hero.video"] = "Telefondan 2 dakikada eksiksiz bir teklif";
 window.DEVIZO_TRAD.tr["barre.essai"] = "14 gün ücretsiz deneme";
 window.DEVIZO_TRAD.tr["nav.gratuit"] = "Ücretsiz teklif";
+window.DEVIZO_TRAD.tr["nav.gratuitBadge"] = "kayıtsız";
+window.DEVIZO_TRAD.tr["hero.gratuit"] = "Henüz hazır değil misiniz? Kayıt olmadan 2 dakikada <strong>ücretsiz teklif</strong> hazırlayın";

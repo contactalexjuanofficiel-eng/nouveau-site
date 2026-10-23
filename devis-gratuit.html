@@ -22,9 +22,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=84">
-  <link rel="stylesheet" href="css/landing.css?v=84">
-  <link rel="stylesheet" href="css/seo.css?v=84">
+  <link rel="stylesheet" href="css/style.css?v=86">
+  <link rel="stylesheet" href="css/landing.css?v=86">
+  <link rel="stylesheet" href="css/seo.css?v=86">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://devizo-app.fr/#organisation","name":"Devizo","url":"https://devizo-app.fr/","logo":"https://devizo-app.fr/img/logo-512.png","email":"devizocontact@gmail.com"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://devizo-app.fr/"},{"@type":"ListItem","position":2,"name":"Devis gratuit en ligne"}]},{"@type":"WebApplication","name":"Générateur de devis gratuit Devizo","url":"https://devizo-app.fr/devis-gratuit.html","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://devizo-app.fr/#organisation"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Le générateur de devis est-il vraiment gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui, jusqu'à 3 devis par mois. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document. Pour faire plus de devis, et des factures, créez un compte Devizo : 14 jours gratuits, sans carte bancaire."}},{"@type":"Question","name":"Mes informations sont-elles enregistrées ?","acceptedAnswer":{"@type":"Answer","text":"Non. Rien n'est envoyé sur nos serveurs : le devis reste dans votre navigateur le temps de l'onglet. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."}},{"@type":"Question","name":"Le devis est-il conforme à la loi ?","acceptedAnswer":{"@type":"Answer","text":"Le PDF contient les mentions principales d'un devis d'artisan : vos coordonnées et votre SIRET, celles du client, la date et la durée de validité, le détail des prestations avec les prix unitaires HT, la TVA ou la mention « TVA non applicable, art. 293 B du CGI », l'assurance décennale et la zone « Bon pour accord ». Selon votre métier, d'autres mentions peuvent être nécessaires : consultez notre guide des mentions obligatoires."}},{"@type":"Question","name":"Puis-je faire une facture avec ce générateur ?","acceptedAnswer":{"@type":"Answer","text":"Non, le générateur gratuit fait uniquement des devis. Les factures demandent une numérotation qui se suit sans trou et une conservation pendant 10 ans : c'est ce que fait l'appli Devizo, qui transforme un devis accepté en facture en un clic. Essai gratuit 14 jours, sans carte bancaire."}},{"@type":"Question","name":"Quel taux de TVA mettre sur un devis de travaux ?","acceptedAnswer":{"@type":"Answer","text":"En général 10 % pour des travaux d'amélioration ou d'entretien dans un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, et 20 % dans le neuf ou pour un professionnel. En micro-entreprise sous le seuil de franchise, cochez « Je ne facture pas la TVA »."}}]}]}</script>
 </head>
 <body class="landing seo">
@@ -32,9 +32,9 @@
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
       <nav class="l-nav" aria-label="Navigation principale">
+        <a class="l-nav-gratuit" href="devis-gratuit.html"><span>Devis gratuit</span><small>sans inscription</small></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
-        <a href="devis-gratuit.html">Devis gratuit</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
       </nav>
       <div class="l-actions">
@@ -93,7 +93,8 @@
         <h2>Ce qu'un devis doit contenir</h2>
         <p>Un devis d'artisan doit permettre au client de savoir exactement ce qu'il va payer : qui fait les travaux, pour qui, quoi, à quel prix et jusqu'à quand l'offre est valable.
           Pour la liste complète et les cas particuliers (travaux chez un particulier, dépannage, assurance décennale), lisez notre
-          <a href="guide-mentions-obligatoires-devis.html">guide des mentions obligatoires d'un devis</a>.</p>
+          <a href="guide-mentions-obligatoires-devis.html">guide des mentions obligatoires d'un devis</a>.
+          Un doute sur la TVA ? Utilisez le <a href="calcul-tva-travaux.html">calculateur de TVA des travaux</a>.</p>
       </section>
       <section id="faq">
         <h2>Questions fréquentes</h2>
@@ -129,7 +130,7 @@
       </div>
     </section>
   </main>
-  <script src="js/devis-gratuit.js?v=84" defer></script>
+  <script src="js/devis-gratuit.js?v=86" defer></script>
 
   <footer class="l-footer seo-pied">
     <div class="l-wrap">
@@ -140,7 +141,7 @@
           <a class="btn btn-primary" href="app.html#inscription">Essai gratuit 14 jours</a>
         </div>
         <div><h2>Par métier</h2><ul><li><a href="devis-facture-plombier.html">Devis plombier</a></li><li><a href="devis-facture-electricien.html">Devis électricien</a></li><li><a href="devis-facture-peintre.html">Devis peintre</a></li><li><a href="devis-facture-macon.html">Devis maçon</a></li><li><a href="devis-facture-menuisier.html">Devis menuisier</a></li><li><a href="devis-facture-carreleur.html">Devis carreleur</a></li><li><a href="devis-facture-couvreur.html">Devis couvreur</a></li><li><a href="devis-facture-chauffagiste.html">Devis chauffagiste</a></li><li><a href="devis-facture-plaquiste.html">Devis plaquiste</a></li><li><a href="devis-facture-paysagiste.html">Devis paysagiste</a></li><li><a href="devis-facture-serrurier.html">Devis serrurier</a></li><li><a href="devis-facture-auto-entrepreneur.html">Devis auto-entrepreneur</a></li></ul></div>
-        <div><h2>Outils gratuits</h2><ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li></ul>
+        <div><h2>Outils gratuits</h2><ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li><li><a href="calcul-tva-travaux.html">Calcul de la TVA des travaux</a></li><li><a href="simulateur-cotisations-auto-entrepreneur.html">Simulateur de cotisations</a></li><li><a href="verifier-siret.html">Vérifier un SIRET</a></li></ul>
           <h2>Guides</h2><ul><li><a href="guide-mentions-obligatoires-devis.html">Mentions obligatoires d&#x27;un devis</a></li><li><a href="guide-mentions-obligatoires-facture.html">Mentions obligatoires d&#x27;une facture</a></li></ul>
           <h2>Devizo</h2><ul><li><a href="index.html#tarifs">Tarifs</a></li><li><a href="index.html#faq">Questions fréquentes</a></li>
           <li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">Conditions générales</a></li>
@@ -149,9 +150,9 @@
       <p class="seo-copy">© 2026 Devizo</p>
     </div>
   </footer>
-  <script src="js/config.js?v=84"></script>
-  <script src="js/parrainage.js?v=84" defer></script>
-  <script src="js/stats.js?v=84" defer></script>
-  <script src="js/cookies.js?v=84" defer></script>
+  <script src="js/config.js?v=86"></script>
+  <script src="js/parrainage.js?v=86" defer></script>
+  <script src="js/stats.js?v=86" defer></script>
+  <script src="js/cookies.js?v=86" defer></script>
 </body>
 </html>

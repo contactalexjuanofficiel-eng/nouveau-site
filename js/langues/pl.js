@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.pl["cta.google"] = "Kontynuuj z Google";
 window.DEVIZO_TRAD.pl["hero.video"] = "Pełny kosztorys w 2 minuty, z telefonu";
 window.DEVIZO_TRAD.pl["barre.essai"] = "14 dni za darmo";
 window.DEVIZO_TRAD.pl["nav.gratuit"] = "Darmowy kosztorys";
+window.DEVIZO_TRAD.pl["nav.gratuitBadge"] = "bez rejestracji";
+window.DEVIZO_TRAD.pl["hero.gratuit"] = "Jeszcze nie teraz? Zrób <strong>darmowy kosztorys</strong> w 2 minuty, bez rejestracji";

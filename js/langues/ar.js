@@ -172,3 +172,5 @@ window.DEVIZO_TRAD.ar["cta.google"] = "المتابعة باستخدام Google"
 window.DEVIZO_TRAD.ar["hero.video"] = "عرض سعر كامل في دقيقتين من هاتفك";
 window.DEVIZO_TRAD.ar["barre.essai"] = "تجربة مجانية 14 يومًا";
 window.DEVIZO_TRAD.ar["nav.gratuit"] = "عرض سعر مجاني";
+window.DEVIZO_TRAD.ar["nav.gratuitBadge"] = "بدون تسجيل";
+window.DEVIZO_TRAD.ar["hero.gratuit"] = "لست مستعدًا بعد؟ أنشئ <strong>عرض سعر مجانيًا</strong> في دقيقتين، بدون تسجيل";

@@ -6,6 +6,7 @@ ICI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ICI)
 from metiers import METIERS
 from guides import GUIDES
+from outils_gratuits import OUTILS
 
 SITE = 'https://devizo-app.fr'
 RACINE = os.path.normpath(os.path.join(ICI, '..', '..')) + '/'
@@ -73,9 +74,9 @@ def tete(titre, description, chemin, ld, type_og='website'):
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
       <nav class="l-nav" aria-label="Navigation principale">
+        <a class="l-nav-gratuit" href="devis-gratuit.html"><span>Devis gratuit</span><small>sans inscription</small></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
-        <a href="devis-gratuit.html">Devis gratuit</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
       </nav>
       <div class="l-actions">
@@ -101,6 +102,7 @@ def fil(items):
 def pied():
     metiers = ''.join(f'<li><a href="devis-facture-{m["slug"]}.html">Devis {e(m["nom"])}</a></li>' for m in METIERS)
     guides = ''.join(f'<li><a href="{g["fichier"]}">{e(g["court"])}</a></li>' for g in GUIDES)
+    outils = ''.join(f'<li><a href="{o["fichier"]}">{e(o["court"])}</a></li>' for o in OUTILS)
     return f'''
   <footer class="l-footer seo-pied">
     <div class="l-wrap">
@@ -111,7 +113,7 @@ def pied():
           <a class="btn btn-primary" href="app.html#inscription">Essai gratuit 14 jours</a>
         </div>
         <div><h2>Par métier</h2><ul>{metiers}</ul></div>
-        <div><h2>Outils gratuits</h2><ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li></ul>
+        <div><h2>Outils gratuits</h2><ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li>{outils}</ul>
           <h2>Guides</h2><ul>{guides}</ul>
           <h2>Devizo</h2><ul><li><a href="index.html#tarifs">Tarifs</a></li><li><a href="index.html#faq">Questions fréquentes</a></li>
           <li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">Conditions générales</a></li>
@@ -382,7 +384,8 @@ def page_devis_gratuit():
         <h2>Ce qu'un devis doit contenir</h2>
         <p>Un devis d'artisan doit permettre au client de savoir exactement ce qu'il va payer : qui fait les travaux, pour qui, quoi, à quel prix et jusqu'à quand l'offre est valable.
           Pour la liste complète et les cas particuliers (travaux chez un particulier, dépannage, assurance décennale), lisez notre
-          <a href="guide-mentions-obligatoires-devis.html">guide des mentions obligatoires d'un devis</a>.</p>
+          <a href="guide-mentions-obligatoires-devis.html">guide des mentions obligatoires d'un devis</a>.
+          Un doute sur la TVA ? Utilisez le <a href="calcul-tva-travaux.html">calculateur de TVA des travaux</a>.</p>
       </section>
       <section id="faq">
         <h2>Questions fréquentes</h2>
@@ -402,6 +405,50 @@ def page_devis_gratuit():
 ''' + pied()
 
 
+def page_outil(o):
+    fil_html, fil_ld = fil([('Accueil', 'index.html'), ('Outils gratuits', 'devis-gratuit.html'), (o['court'], None)])
+    appli = {'@type': 'WebApplication', 'name': o['court'] + ' (Devizo)', 'url': f'{SITE}/{o["fichier"]}',
+             'applicationCategory': 'BusinessApplication', 'operatingSystem': 'Web', 'inLanguage': 'fr',
+             'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'EUR'}, 'publisher': {'@id': f'{SITE}/#organisation'}}
+    ld = [ORGANISATION, fil_ld, appli, faq_ld(o['faq'])]
+    corps = ''.join(f'''
+      <section>
+        <h2>{e(t)}</h2>{h}
+      </section>''' for t, h in o['sections'])
+    autres = ''.join(f'<li><a href="{x["fichier"]}">{e(x["court"])}</a></li>' for x in OUTILS if x is not o)
+    return tete(o['titre'], o['description'], o['fichier'], ld) + f'''
+  <main id="top" class="seo-gratuit">
+    <div class="l-wrap l-narrow">
+      {fil_html}
+      <p class="eyebrow">{e(o['eyebrow'])}</p>
+      <h1>{e(o['h1'])}</h1>
+      <p class="lead">{e(o['lead'])}</p>
+      <div id="{o['zone']}" class="outil-zone"><p class="hint">Chargement de l'outil…</p></div>
+      <noscript><p>Cet outil a besoin de JavaScript pour fonctionner.</p></noscript>
+    </div>
+    <div class="l-wrap l-narrow seo-gratuit-texte">{corps}
+      <section id="faq">
+        <h2>Questions fréquentes</h2>
+        <div class="faq">{faq_html(o['faq'])}
+        </div>
+      </section>
+      <aside class="seo-encart">
+        <p><strong>Autres outils gratuits</strong></p>
+        <ul class="outil-autres"><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li>{autres}</ul>
+      </aside>
+    </div>
+    <section class="final-cta">
+      <div class="l-wrap">
+        <h2>Devis, factures et gestion au même endroit</h2>
+        <p>14 jours gratuits, sans carte bancaire. Formules à partir de 9 € HT par mois.</p>
+        <a class="btn btn-lg btn-light" href="app.html#inscription">Commencer l'essai gratuit</a>
+      </div>
+    </section>
+  </main>
+  <script src="js/outils.js?v={VERSION}" defer></script>
+''' + pied()
+
+
 def ecrire(nom, contenu):
     with open(RACINE + nom, 'w') as f:
         f.write(contenu)
@@ -416,6 +463,9 @@ for g in GUIDES:
     pages.append((g['fichier'], '0.8'))
 ecrire('devis-gratuit.html', page_devis_gratuit())
 pages.insert(0, ('devis-gratuit.html', '0.9'))
+for o in OUTILS:
+    ecrire(o['fichier'], page_outil(o))
+    pages.insert(1, (o['fichier'], '0.8'))
 
 urls = [('', '1.0')] + pages + [('mentions-legales.html', '0.2'), ('cgv.html', '0.2'), ('confidentialite.html', '0.2')]
 ecrire('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

@@ -145,3 +145,51 @@
   .gen-pdf { width: 100%; min-width: 0; }
 }
 .gen-dialogue .gen-dialogue-limite { color: var(--warning, #b7791f); font-weight: 700; margin: 0; }
+
+/* ---------- Outils gratuits (TVA, cotisations, SIRET) ---------- */
+.outil-zone { margin: 24px 0 48px; }
+.outil-carte { display: grid; gap: 18px; }
+.outil-question { margin: 0; border: 1px solid var(--border); border-radius: 18px; background: var(--card); padding: 18px 18px 16px; }
+.outil-question legend { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.08rem; padding: 0 6px; }
+.outil-question legend span { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: var(--on-primary, #fff); font-size: .9rem; }
+.outil-choix { display: grid; gap: 8px; }
+.outil-choix label { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; background: var(--bg); }
+.outil-choix label:hover { border-color: var(--primary); }
+.outil-choix label.choisi { border-color: var(--primary); background: var(--primary-soft); }
+.outil-choix input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: var(--primary); }
+.outil-choix small { display: block; color: var(--muted); font-size: .85rem; margin-top: 2px; }
+.outil-ligne { display: flex; gap: 10px; align-items: center; margin: 4px 0 12px; }
+.outil-ligne input, .outil-ligne select { font: inherit; font-size: 1.1rem; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); min-width: 0; }
+.outil-ligne input { flex: 1 1 auto; width: 100%; }
+.outil-ligne select { flex: none; width: auto; }
+.outil-unite { color: var(--muted); font-weight: 600; }
+.outil-label { display: block; font-weight: 600; font-size: .92rem; margin-top: 6px; }
+.outil-case { display: flex; gap: 10px; align-items: center; margin-top: 4px; cursor: pointer; }
+.outil-case input { width: 18px; height: 18px; accent-color: var(--primary); }
+.outil-resultat { border-radius: 18px; padding: 20px; background: var(--card); border: 2px solid var(--primary); }
+.outil-resultat.ok { border-color: var(--success); }
+.outil-resultat.ko { border-color: var(--danger); }
+.outil-resultat > p { margin: 0 0 12px; }
+.outil-taux { font-family: var(--display); font-weight: 800; font-size: 1.7rem; color: var(--primary); }
+.outil-resultat.ok .outil-taux { color: var(--success); }
+.outil-resultat.ko .outil-taux { color: var(--danger); }
+.outil-sous-titre { font-weight: 700; margin: 16px 0 4px; }
+.outil-chiffres { display: grid; gap: 4px; margin: 8px 0 12px; }
+.outil-chiffres div { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.outil-chiffres div span { color: var(--muted); }
+.outil-chiffres div strong { text-align: right; }
+.outil-chiffres .fort { border-bottom: 0; font-size: 1.25rem; padding-top: 10px; }
+.outil-chiffres .fort span { color: var(--text); font-weight: 700; }
+.outil-chiffres .fort strong { color: var(--primary); }
+.outil-note { color: var(--muted); font-size: .88rem; }
+.outil-jauges { display: grid; gap: 14px; margin: 8px 0 12px; }
+.outil-jauges p { margin: 0 0 6px; font-size: .92rem; }
+.outil-jauge { height: 10px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.outil-jauge span { display: block; height: 100%; background: var(--primary); border-radius: 999px; }
+.outil-jauge.alerte span { background: var(--danger); }
+.outil-jauges small { color: var(--muted); }
+.outil-cta { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 16px 18px; border-radius: 16px; background: var(--primary-soft); }
+.outil-cta p { margin: 0; flex: 1 1 260px; }
+.outil-siret-form .btn { flex: none; padding-block: 13px; }
+.outil-autres { margin: 0; padding-left: 18px; }
+@media (max-width: 560px) { .outil-cta .btn { width: 100%; text-align: center; } }
