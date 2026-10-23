@@ -74,7 +74,7 @@ def tete(titre, description, chemin, ld, type_og='website'):
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
       <nav class="l-nav" aria-label="Navigation principale">
-        <a class="l-nav-gratuit" href="devis-gratuit.html"><span>Devis gratuit</span><small>sans inscription</small></a>
+        <a class="l-nav-gratuit" href="devis-gratuit.html"><span class="roule"><span class="roule-a"><span>Devis gratuit</span><small>sans inscription</small></span><span class="roule-b" aria-hidden="true">Faire mon devis →</span></span></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>

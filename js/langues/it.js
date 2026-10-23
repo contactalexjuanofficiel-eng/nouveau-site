@@ -174,3 +174,4 @@ window.DEVIZO_TRAD.it["barre.essai"] = "Prova gratuita di 14 giorni";
 window.DEVIZO_TRAD.it["nav.gratuit"] = "Preventivo gratis";
 window.DEVIZO_TRAD.it["nav.gratuitBadge"] = "senza registrazione";
 window.DEVIZO_TRAD.it["hero.gratuit"] = "Non sei ancora pronto? Fai un <strong>preventivo gratis</strong> in 2 minuti, senza registrazione";
+window.DEVIZO_TRAD.it["nav.gratuitGo"] = "Fai il mio preventivo";

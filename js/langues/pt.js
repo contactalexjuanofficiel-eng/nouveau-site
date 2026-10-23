@@ -174,3 +174,4 @@ window.DEVIZO_TRAD.pt["barre.essai"] = "Teste grátis de 14 dias";
 window.DEVIZO_TRAD.pt["nav.gratuit"] = "Orçamento grátis";
 window.DEVIZO_TRAD.pt["nav.gratuitBadge"] = "sem registo";
 window.DEVIZO_TRAD.pt["hero.gratuit"] = "Ainda não está pronto? Faça um <strong>orçamento grátis</strong> em 2 minutos, sem registo";
+window.DEVIZO_TRAD.pt["nav.gratuitGo"] = "Fazer o meu orçamento";

@@ -174,3 +174,4 @@ window.DEVIZO_TRAD.en["barre.essai"] = "14-day free trial";
 window.DEVIZO_TRAD.en["nav.gratuit"] = "Free quote";
 window.DEVIZO_TRAD.en["nav.gratuitBadge"] = "no sign-up";
 window.DEVIZO_TRAD.en["hero.gratuit"] = "Not ready yet? Make a <strong>free quote</strong> in 2 minutes, no sign-up";
+window.DEVIZO_TRAD.en["nav.gratuitGo"] = "Make my quote";

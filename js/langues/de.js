@@ -174,3 +174,4 @@ window.DEVIZO_TRAD.de["barre.essai"] = "14 Tage kostenlos testen";
 window.DEVIZO_TRAD.de["nav.gratuit"] = "Gratis-Angebot";
 window.DEVIZO_TRAD.de["nav.gratuitBadge"] = "ohne Anmeldung";
 window.DEVIZO_TRAD.de["hero.gratuit"] = "Noch nicht bereit? Erstellen Sie ein <strong>kostenloses Angebot</strong> in 2 Minuten, ohne Anmeldung";
+window.DEVIZO_TRAD.de["nav.gratuitGo"] = "Angebot erstellen";

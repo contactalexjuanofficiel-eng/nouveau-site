@@ -174,3 +174,4 @@ window.DEVIZO_TRAD.ar["barre.essai"] = "تجربة مجانية 14 يومًا";
 window.DEVIZO_TRAD.ar["nav.gratuit"] = "عرض سعر مجاني";
 window.DEVIZO_TRAD.ar["nav.gratuitBadge"] = "بدون تسجيل";
 window.DEVIZO_TRAD.ar["hero.gratuit"] = "لست مستعدًا بعد؟ أنشئ <strong>عرض سعر مجانيًا</strong> في دقيقتين، بدون تسجيل";
+window.DEVIZO_TRAD.ar["nav.gratuitGo"] = "أنشئ عرض السعر";

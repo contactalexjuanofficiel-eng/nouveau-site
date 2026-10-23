@@ -427,3 +427,20 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 @media (max-width: 1439px) { .l-pill-contour { display: none; } }
 @media (max-width: 1179px) { .l-nav a[href="#pilotage"] { display: none; } }
 @media (max-width: 1059px) { .l-nav a[href="#faq"] { display: none; } }
+/* Bouton « Devis gratuit » : pas de soulignement, le texte défile vers le haut au survol. */
+.l-nav a.l-nav-gratuit:hover, .l-nav a.l-nav-gratuit:focus-visible { text-decoration: none; }
+.l-nav-gratuit { position: relative; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+.l-nav-gratuit .roule { display: grid; overflow: hidden; height: 22px; }
+.l-nav-gratuit .roule-a, .l-nav-gratuit .roule-b { grid-area: 1 / 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; height: 22px; transition: transform .35s cubic-bezier(.2, .8, .2, 1), opacity .35s; }
+.l-nav-gratuit .roule-b { transform: translateY(110%); opacity: 0; }
+.l-nav-gratuit:hover .roule-a, .l-nav-gratuit:focus-visible .roule-a { transform: translateY(-110%); opacity: 0; }
+.l-nav-gratuit:hover .roule-b, .l-nav-gratuit:focus-visible .roule-b { transform: none; opacity: 1; }
+.l-nav .l-nav-gratuit:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(30, 158, 90, .38); }
+/* Reflet qui traverse le bouton au survol */
+.l-nav-gratuit::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .35), transparent); transform: skewX(-20deg); }
+.l-nav-gratuit:hover::after { left: 130%; transition: left .6s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .l-nav-gratuit .roule-a, .l-nav-gratuit .roule-b, .l-nav-gratuit, .l-nav-gratuit:hover::after { transition: none; }
+}
