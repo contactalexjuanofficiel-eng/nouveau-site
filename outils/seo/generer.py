@@ -252,6 +252,13 @@ def page_metier(m):
 
     <section class="section seo-autres">
       <div class="l-wrap">
+        <h2>Outils gratuits et guides pour les {e(m["pluriel"])}</h2>
+        <ul><li><a href="devis-gratuit.html">Faire un devis gratuit en ligne</a></li>{''.join(f'<li><a href="{o["fichier"]}">{e(o["court"])}</a></li>' for o in OUTILS)}{''.join(f'<li><a href="{g["fichier"]}">{e(g["court"])}</a></li>' for g in GUIDES)}</ul>
+      </div>
+    </section>
+
+    <section class="section seo-autres">
+      <div class="l-wrap">
         <h2>Devizo pour les autres métiers du bâtiment</h2>
         <ul>{''.join(f'<li><a href="devis-facture-{x["slug"]}.html">Devis et factures {e(x["nom"])}</a></li>' for x in autres)}</ul>
       </div>
@@ -290,13 +297,19 @@ def page_guide(g):
       <h1>{e(g['titre'])}</h1>
       <p class="lead">{e(g['intro'])}</p>
       <aside class="seo-encart">
-        <p><strong>Avec Devizo, ces mentions sont ajoutées automatiquement</strong> à partir des informations de votre entreprise.
+        <p>{g.get('encart', "<strong>Avec Devizo, ces mentions sont ajoutées automatiquement</strong> à partir des informations de votre entreprise.")}
           Essai gratuit 14 jours, sans carte bancaire.</p>
         <a class="btn btn-primary" href="app.html#inscription">{e(g['cta'])}</a>
       </aside>
       <nav class="seo-sommaire" aria-label="Sommaire"><p>Sommaire</p><ol>{sommaire}</ol></nav>
       {corps}
       {faq}
+      <aside class="seo-encart seo-liens">
+        <p><strong>À lire aussi</strong></p>
+        <ul>{''.join(f'<li><a href="{x["fichier"]}">{e(x["court"])}</a></li>' for x in GUIDES if x is not g)}</ul>
+        <p><strong>Outils gratuits</strong></p>
+        <ul><li><a href="devis-gratuit.html">Devis gratuit en ligne</a></li>{''.join(f'<li><a href="{o["fichier"]}">{e(o["court"])}</a></li>' for o in OUTILS)}</ul>
+      </aside>
       <p class="seo-avertissement">Ce guide présente les règles générales applicables en France. Il ne remplace pas l'avis d'un expert-comptable
         ou d'un juriste pour votre situation. Sources officielles : <a href="https://entreprendre.service-public.fr/" rel="noopener">entreprendre.service-public.fr</a>
         et <a href="https://www.economie.gouv.fr/" rel="noopener">economie.gouv.fr</a>.</p>
@@ -449,6 +462,25 @@ def page_outil(o):
 ''' + pied()
 
 
+def page_404():
+    h = tete('Page introuvable | Devizo', "Cette page n'existe pas ou a été déplacée.", '404.html', [ORGANISATION])
+    h = h.replace('  <link rel="canonical" href="https://devizo-app.fr/404.html">\n', '  <meta name="robots" content="noindex">\n')
+    h = h.replace('<head>\n', '<head>\n  <base href="/">\n', 1)  # liens corrects même pour une adresse dans un sous-dossier
+    liens = ''.join(f'<li><a href="{x}">{e(t)}</a></li>' for x, t in [('devis-gratuit.html', 'Faire un devis gratuit en ligne')]
+                    + [(o['fichier'], o['court']) for o in OUTILS] + [(g['fichier'], g['court']) for g in GUIDES])
+    return h + f'''
+  <main id="top" class="seo-guide">
+    <div class="l-wrap l-narrow" style="padding-block:48px">
+      <p class="eyebrow">Erreur 404</p>
+      <h1>Cette page n'existe pas</h1>
+      <p class="lead">Le lien est peut-être ancien, ou l'adresse contient une faute. Voici où aller :</p>
+      <p><a class="btn btn-primary btn-lg" href="index.html">Retour à l'accueil</a> <a class="btn btn-lg" href="app.html">Ouvrir l'appli</a></p>
+      <aside class="seo-encart seo-liens"><p><strong>Outils gratuits et guides</strong></p><ul>{liens}</ul></aside>
+    </div>
+  </main>
+''' + pied()
+
+
 def ecrire(nom, contenu):
     with open(RACINE + nom, 'w') as f:
         f.write(contenu)
@@ -461,6 +493,7 @@ for m in METIERS:
 for g in GUIDES:
     ecrire(g['fichier'], page_guide(g))
     pages.append((g['fichier'], '0.8'))
+ecrire('404.html', page_404())
 ecrire('devis-gratuit.html', page_devis_gratuit())
 pages.insert(0, ('devis-gratuit.html', '0.9'))
 for o in OUTILS:

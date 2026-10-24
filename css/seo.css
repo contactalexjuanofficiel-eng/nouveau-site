@@ -193,3 +193,11 @@
 .outil-siret-form .btn { flex: none; padding-block: 13px; }
 .outil-autres { margin: 0; padding-left: 18px; }
 @media (max-width: 560px) { .outil-cta .btn { width: 100%; text-align: center; } }
+
+/* Guides : citations (modèles de messages) et liens « À lire aussi » */
+.seo-guide blockquote { margin: 8px 0 18px; padding: 14px 18px; border-left: 4px solid var(--primary); background: var(--primary-soft); border-radius: 0 12px 12px 0; color: var(--text); font-style: italic; }
+.seo-liens { display: block; }
+.seo-liens ul { margin: 6px 0 14px; padding-left: 20px; columns: 2; column-gap: 28px; }
+.seo-liens li { margin-bottom: 4px; break-inside: avoid; }
+@media (max-width: 600px) { .seo-liens ul { columns: 1; } }
+.seo-autres + .seo-autres { padding-top: 0; }
