@@ -503,4 +503,11 @@ ecrire('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="ht
        + ''.join(f'  <url><loc>{SITE}/{u}</loc><lastmod>{AUJOURDHUI}</lastmod><priority>{p}</priority></url>\n' for u, p in urls)
        + '</urlset>\n')
 ecrire('robots.txt', f'User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /signer.html\nDisallow: /supabase/\n\nSitemap: {SITE}/sitemap.xml\n')
+# Prestations types par métier pour l'appli (démarrage guidé) : les lignes des
+# exemples des pages métiers, en prix indicatifs que l'artisan adapte ensuite.
+catalogue = [{'slug': m['slug'], 'nom': m['nom'][:1].upper() + m['nom'][1:],
+              'lignes': [{'description': d, 'unite': u, 'prixUnitaire': p, 'tva': t} for d, _, u, p, t in m['lignes']]}
+             for m in METIERS if m['slug'] != 'auto-entrepreneur']
+ecrire('js/metiers-catalogue.js', '// Fichier généré par outils/seo/generer.py : ne pas modifier à la main.\n'
+       'window.DEVIZO_METIERS = ' + json.dumps(catalogue, ensure_ascii=False, indent=1) + ';\n')
 print(len(pages), 'pages générées')

@@ -151,8 +151,11 @@ const Abonnement = (() => {
       html = `L'abonnement Entreprise de ${esc(equipe.email_titulaire)} n'est plus actif : les documents restent consultables, mais plus modifiables.`;
     } else if (e === 'essai') {
       const j = joursEssaiRestants();
-      classe = j <= 3 ? 'warn' : '';
-      html = `🎁 Essai gratuit : encore <strong>${j} jour${j > 1 ? 's' : ''}</strong>. <a href="#/abonnement">Choisir une formule</a>`;
+      // Début d'essai : simple rappel discret ; on ne parle de choisir une formule qu'à la fin.
+      classe = j <= 3 ? 'warn' : 'doux';
+      html = j <= 3
+        ? `🎁 Essai gratuit : encore <strong>${j} jour${j > 1 ? 's' : ''}</strong>. <a href="#/abonnement">Choisir une formule</a>`
+        : `🎁 Essai gratuit · ${j} jours pour tout essayer`;
     } else if (e === 'expire') {
       classe = 'bad';
       html = 'Votre essai gratuit est terminé : vos documents restent consultables, mais vous ne pouvez plus en créer. <a href="#/abonnement">Choisir une formule</a>';

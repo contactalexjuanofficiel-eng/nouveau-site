@@ -266,8 +266,74 @@ function variation(actuel, precedent, hausseBonne) {
   return `<span class="delta ${bon ? 'good' : 'bad'}">${pct > 0 ? '▲' : '▼'} ${Math.abs(pct).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} % <span>vs période précédente</span></span>`;
 }
 
+// Carte « Bien démarrer » : les premières étapes d'un nouveau compte, avec une
+// jauge. Rien n'est obligatoire ; la carte disparaît quand tout est fait ou masqué.
+function carteDemarrage() {
+  const e = data.entreprise;
+  // Seulement pour un compte qui démarre : un artisan déjà lancé n'en a pas besoin.
+  const lance = data.documents.length >= 5 || data.documents.some((d) => d.type === 'facture' && d.statut === 'payee');
+  if (e.demarrageMasque || lance) return '';
+  const envoye = data.documents.some((d) => (d.envois || []).length);
+  const etapes = [
+    { fait: !profilManquant().length, texte: 'Les informations de votre entreprise', lien: '#/bienvenue', bouton: 'Compléter' },
+    { fait: Boolean(data.documents.some((d) => d.type === 'devis')), texte: 'Votre premier devis', nouveau: 'devis', bouton: 'Créer' },
+    { fait: data.clients.length > 0, texte: 'Votre premier client', lien: '#/clients/nouveau', bouton: 'Ajouter' },
+    { fait: Boolean(e.logo), texte: 'Votre logo sur vos documents', lien: '#/parametres?champ=logo', bouton: 'Ajouter' },
+    { fait: Boolean(String(e.iban || '').trim()), texte: 'Votre IBAN, pour être payé par virement', lien: '#/parametres?champ=iban', bouton: 'Ajouter' },
+    { fait: envoye, texte: 'Envoyer un devis à signer en ligne', lien: '#/documents', bouton: 'Voir' },
+  ];
+  const faites = etapes.filter((x) => x.fait).length;
+  if (faites === etapes.length) return '';
+  return `
+    <section class="card demarrage" aria-labelledby="demarrage-titre">
+      <div class="demarrage-tete">
+        <div>
+          <h2 id="demarrage-titre">Bien démarrer avec Devizo</h2>
+          <p class="hint">${faites} sur ${etapes.length} · quelques minutes pour être prêt à envoyer vos devis</p>
+        </div>
+        <button type="button" class="demarrage-masquer" data-masquer-demarrage aria-label="Masquer">✕</button>
+      </div>
+      <div class="demarrage-jauge" role="progressbar" aria-valuemin="0" aria-valuemax="${etapes.length}" aria-valuenow="${faites}"><span style="width:${(faites / etapes.length) * 100}%"></span></div>
+      <ol class="demarrage-liste">
+        ${etapes.map((x) => `<li class="${x.fait ? 'fait' : ''}">
+          <span class="demarrage-coche" aria-hidden="true">${x.fait ? '✓' : ''}</span>
+          <span class="demarrage-texte">${esc(x.texte)}</span>
+          ${x.fait ? '' : x.nouveau ? `<button type="button" class="btn btn-sm" data-new="${x.nouveau}">${x.bouton}</button>` : `<a class="btn btn-sm" href="${x.lien}">${x.bouton}</a>`}
+        </li>`).join('')}
+      </ol>
+    </section>`;
+}
+
+function brancherDemarrage() {
+  view.querySelector('[data-masquer-demarrage]')?.addEventListener('click', () => {
+    data.entreprise.demarrageMasque = true;
+    saveData();
+    view.querySelector('.demarrage')?.remove();
+  });
+}
+
 function pageDashboard() {
   const e = data.entreprise;
+  // Tout nouveau compte (aucun document) : les premières étapes, sans graphiques vides.
+  if (!data.documents.length && !(data.depenses || []).length) {
+    view.innerHTML = `
+      <div class="page-head">
+        <h1>Bonjour${e.nom ? `, ${esc(e.nom)}` : ''} 👋</h1>
+        <div class="actions"><button class="btn btn-primary" data-new="devis">+ Nouveau devis</button></div>
+      </div>
+      ${carteDemarrage()}
+      <section class="card tdb-vide">
+        <h2>Votre tableau de bord</h2>
+        <p>Dès votre première facture encaissée, vous verrez ici ce qu'il vous reste vraiment, après vos dépenses et vos cotisations, mois par mois.</p>
+        <div class="tdb-vide-apercu" aria-hidden="true">
+          <div><span>Il vous reste</span><strong>— €</strong></div>
+          <div><span>Chiffre d'affaires</span><strong>— €</strong></div>
+          <div><span>À encaisser</span><strong>— €</strong></div>
+        </div>
+      </section>`;
+    brancherDemarrage();
+    return;
+  }
   const pro = Abonnement.aAcces('pro');
   const regime = regimeFiscal(e);
   const now = new Date();
@@ -327,6 +393,8 @@ function pageDashboard() {
         ${pro ? '<a class="btn" href="#/depenses?ajout=1">+ Dépense</a>' : ''}
       </div>
     </div>
+
+    ${carteDemarrage()}
 
     <div class="periodes" role="group" aria-label="Période">
       ${Object.entries(PERIODES).map(([k, v]) => `<button type="button" class="chip ${k === periodeChoisie ? 'active' : ''}" data-periode="${k}">${v}</button>`).join('')}
@@ -434,6 +502,7 @@ function pageDashboard() {
       à l'Urssaf et aux impôts. Régime et taux modifiables dans <a href="#/parametres?champ=regimeFiscal">Mon entreprise</a>.</p>
   `;
 
+  brancherDemarrage();
   view.querySelectorAll('[data-periode]').forEach((btn) => btn.addEventListener('click', () => {
     periodeChoisie = btn.dataset.periode;
     pageDashboard();

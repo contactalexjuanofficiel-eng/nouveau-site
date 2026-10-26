@@ -376,6 +376,8 @@ input.missing, textarea.missing, select.missing { border-color: var(--warning); 
 .verif.ko strong { color: var(--warning); }
 .verif .btn { justify-self: start; }
 .verif .checkbox { color: var(--text); }
+.verif { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.verif .btn { white-space: normal; height: auto; }
 
 .adresse-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--sp-4) var(--sp-5); }
 .adresse-grid .full { grid-column: 1 / -1; }
@@ -658,13 +660,13 @@ dialog.envoi .actions { margin-top: var(--sp-4); }
 .gate h1, .gate h2 { margin-top: 0; }
 .todo { margin: var(--sp-2) 0 var(--sp-4); padding-inline-start: 0; list-style: none; display: grid; gap: var(--sp-2); }
 .todo li { display: flex; gap: var(--sp-2); align-items: baseline; }
-.todo li::before { content: "○"; color: var(--warning); font-weight: var(--fw-bold); }
+.todo li::before { content: "○"; color: var(--primary); font-weight: var(--fw-bold); }
 .todo a {
   color: var(--text); background: none; border: 0; padding: 0; font: inherit;
   text-align: start; cursor: pointer; text-decoration: underline; text-decoration-color: var(--border-strong);
 }
 .todo a:hover { color: var(--primary); text-decoration-color: currentColor; }
-.checklist { border: 1px solid color-mix(in srgb, var(--warning) 50%, var(--border)); }
+.checklist { border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border)); background: color-mix(in srgb, var(--primary-soft) 45%, var(--card)); }
 .checklist.done { border-color: color-mix(in srgb, var(--success) 50%, var(--border)); color: var(--success); }
 .checklist .todo { margin-bottom: 0; }
 .checklist-head { display: grid; gap: var(--sp-2); }
@@ -818,6 +820,7 @@ dialog.envoi .actions { margin-top: var(--sp-4); }
   padding: var(--sp-2-5) var(--sp-4); text-align: center; font-size: var(--fs-md);
   background: var(--primary-soft); color: var(--text); border-bottom: 1px solid var(--border);
 }
+.bandeau-abo.doux { background: none; color: var(--muted); font-size: var(--fs-xs); padding-block: var(--sp-1-5); }
 .bandeau-abo.warn { background: var(--warning-soft); }
 .bandeau-abo.bad { background: var(--danger-soft); }
 .bandeau-abo a { font-weight: var(--fw-semibold); margin-inline-start: var(--sp-1); }
@@ -920,3 +923,120 @@ dialog.envoi .actions { margin-top: var(--sp-4); }
 [dir=rtl] .doc { direction: ltr; text-align: start; }
 [dir=rtl] td, [dir=rtl] .barlist-value, [dir=rtl] .big, [dir=rtl] .stat .value, [dir=rtl] .legend strong { unicode-bidi: plaintext; }
 @media (max-width: 760px) { .page-head > .actions > :only-child { grid-column: 1 / -1; } }
+
+/* ====================================================================
+   Démarrage guidé (compte neuf) : plein écran, sans menu, une étape à la fois
+   ==================================================================== */
+body.mode-accueil .topbar, body.mode-accueil .tabbar, body.mode-accueil #bandeau-abo { display: none !important; }
+body.mode-accueil.app-shell:not(.sans-compte) { padding: 0; }
+body.mode-accueil .container { max-width: var(--w-form); padding-block: var(--sp-6) var(--sp-12); }
+.onb-tete { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-6); }
+.onb-logo { display: inline-flex; align-items: center; gap: var(--sp-2); font-weight: var(--fw-heavy); font-size: var(--fs-xl); color: var(--primary); }
+.onb-plus-tard { min-height: var(--touch); padding: 0 var(--sp-3); border: 0; border-radius: var(--r-md); background: none; color: var(--muted); font: inherit; font-size: var(--fs-md); cursor: pointer; }
+.onb-plus-tard:hover { background: var(--bg-2); color: var(--text); }
+
+.onb-etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); list-style: none; margin: 0 0 var(--sp-5); padding: 0; counter-reset: etape; }
+.onb-etapes li { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--muted); }
+.onb-etapes li::before { content: ""; height: 4px; border-radius: var(--r-full); background: var(--border); }
+.onb-etapes li.fait::before, .onb-etapes li.actif::before { background: var(--primary); }
+.onb-etapes li.actif { color: var(--text); font-weight: var(--fw-semibold); }
+.onb-etapes span { display: none; }
+
+.onb-carte { padding: var(--sp-8); }
+.onb-carte h1 { margin: 0 0 var(--sp-2); font-size: var(--fs-2xl); letter-spacing: var(--tracking-tight); }
+.onb-intro { margin: 0 0 var(--sp-6); color: var(--text-2); font-size: var(--fs-base); line-height: var(--lh-relaxed); }
+.onb-form label { display: block; margin: var(--sp-3) 0 var(--sp-1-5); }
+.onb-form .grid-2 { gap: 0 var(--sp-4); }
+.onb-pleine { grid-column: 1 / -1; }
+.onb-recherche { display: flex; gap: var(--sp-2); }
+.onb-recherche input { flex: 1; min-width: 0; height: var(--h-lg); font-size: var(--fs-lg); letter-spacing: .02em; }
+.onb-recherche .btn { min-height: var(--h-lg); }
+.onb-lien { display: inline-flex; align-items: center; min-height: var(--touch); margin-top: var(--sp-3); padding: 0; border: 0; background: none; color: var(--primary); font: inherit; font-size: var(--fs-md); font-weight: var(--fw-medium); cursor: pointer; text-align: start; }
+.onb-lien:hover { text-decoration: underline; }
+.onb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-4); margin-top: var(--sp-6); }
+.onb-actions .onb-lien { margin-top: 0; }
+.onb-actions-centre { justify-content: center; }
+.auth-erreur.info { color: var(--text-2); background: var(--primary-soft); border-color: transparent; }
+
+.onb-trouve { margin-top: var(--sp-4); padding: var(--sp-5); border: 1px solid color-mix(in srgb, var(--success) 45%, var(--border)); border-radius: var(--r-lg); background: var(--success-soft); }
+.onb-trouve p { margin: 0 0 var(--sp-2); line-height: var(--lh-relaxed); }
+.onb-trouve-titre { color: var(--success); font-weight: var(--fw-semibold); font-size: var(--fs-sm); }
+.onb-trouve .onb-actions { margin-top: var(--sp-4); }
+
+.onb-question { margin: 0 0 var(--sp-6); padding: 0; border: 0; min-width: 0; }
+.onb-question legend { padding: 0; margin-bottom: var(--sp-3); font-size: var(--fs-lg); font-weight: var(--fw-semibold); }
+.onb-question .checkbox { margin-top: var(--sp-3); }
+.onb-metiers { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.onb-puce { margin: 0 !important; cursor: pointer; }
+.onb-puce input { position: absolute; opacity: 0; pointer-events: none; }
+.onb-puce span { display: inline-flex; align-items: center; min-height: var(--h-md); padding: 0 var(--sp-4); border: 1px solid var(--border-strong); border-radius: var(--r-full); font-size: var(--fs-md); font-weight: var(--fw-medium); color: var(--text); transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+.onb-puce:hover span { border-color: var(--primary); }
+.onb-puce input:checked + span { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.onb-puce input:focus-visible + span { box-shadow: 0 0 0 3px var(--ring); }
+.onb-choix { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); }
+.onb-choix .choice span { display: grid; gap: var(--sp-0-5); }
+#onb-tva-champ { margin-top: var(--sp-2); }
+
+.onb-fini { text-align: center; }
+.onb-fini-icone { margin: 0 0 var(--sp-2); font-size: 3rem; line-height: 1; }
+.onb-bilan { display: grid; gap: var(--sp-3); max-width: 420px; margin: var(--sp-5) auto 0; padding: 0; list-style: none; text-align: start; }
+.onb-bilan li { position: relative; padding-inline-start: var(--sp-8); line-height: var(--lh-normal); }
+.onb-bilan li::before { content: "✓"; position: absolute; inset-inline-start: 0; top: -1px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--success-soft); color: var(--success); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.onb-bilan li.manque::before { content: "!"; background: var(--warning-soft); color: var(--warning); }
+.onb-fini .hint { margin-top: var(--sp-6); }
+
+@media (max-width: 760px) {
+  body.mode-accueil .container { padding: var(--sp-4) var(--sp-4) var(--sp-10); }
+  .onb-carte { padding: var(--sp-5); }
+  .onb-choix { grid-template-columns: 1fr; }
+  .onb-recherche { flex-direction: column; }
+  .onb-actions .btn-lg, .onb-recherche .btn { width: 100%; }
+  .onb-actions { flex-direction: column; align-items: stretch; }
+  .onb-actions .onb-lien { justify-content: center; }
+}
+
+/* Document pas encore prêt (informations de l'entreprise manquantes) */
+.doc-incomplet { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-4); padding: var(--sp-4) var(--sp-5); border-radius: var(--r-lg); background: var(--primary-soft); color: var(--text); }
+.doc-incomplet p { flex: 1 1 280px; margin: 0; font-size: var(--fs-md); line-height: var(--lh-normal); }
+
+/* Carte « Bien démarrer » du tableau de bord */
+.demarrage { margin-bottom: var(--sp-4); }
+.demarrage-tete { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+.demarrage-tete h2 { margin: 0 0 var(--sp-1); font-size: var(--fs-xl); }
+.demarrage-tete .hint { margin: 0; }
+.demarrage-masquer { flex: none; width: var(--touch); height: var(--touch); margin: calc(var(--sp-2) * -1); border: 0; border-radius: var(--r-md); background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.demarrage-masquer:hover { background: var(--bg-2); color: var(--text); }
+.demarrage-jauge { height: 6px; margin: var(--sp-4) 0 var(--sp-2); border-radius: var(--r-full); background: var(--bg-2); overflow: hidden; }
+.demarrage-jauge span { display: block; height: 100%; border-radius: inherit; background: var(--success); transition: width var(--dur-slow) var(--ease); }
+.demarrage-liste { display: grid; margin: 0; padding: 0; list-style: none; }
+.demarrage-liste li { display: flex; align-items: center; gap: var(--sp-3); min-height: 52px; padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+.demarrage-liste li:last-child { border-bottom: 0; }
+.demarrage-coche { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--border-strong); border-radius: 50%; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.demarrage-liste li.fait .demarrage-coche { border-color: var(--success); background: var(--success); color: var(--on-primary); }
+.demarrage-texte { flex: 1; font-size: var(--fs-base); }
+.demarrage-liste li.fait .demarrage-texte { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border-strong); }
+
+/* Tableau de bord d'un compte tout neuf */
+.tdb-vide h2 { margin-top: 0; }
+.tdb-vide p { color: var(--text-2); max-width: 60ch; }
+.tdb-vide-apercu { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-4); }
+.tdb-vide-apercu div { display: grid; gap: var(--sp-1); padding: var(--sp-4); border: 1px dashed var(--border-strong); border-radius: var(--r-lg); }
+.tdb-vide-apercu span { color: var(--muted); font-size: var(--fs-sm); }
+.tdb-vide-apercu strong { font-size: var(--fs-2xl); color: var(--faint); }
+
+/* Mon entreprise : parties facultatives repliées */
+.partie-option { padding: 0; }
+.partie-option > summary { display: grid; gap: var(--sp-0-5); padding: var(--sp-5) var(--sp-6); padding-inline-end: var(--sp-12); position: relative; cursor: pointer; list-style: none; }
+.partie-option > summary::-webkit-details-marker { display: none; }
+.partie-option > summary::after { content: ""; position: absolute; inset-inline-end: var(--sp-6); top: 50%; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); transition: transform var(--dur-fast) var(--ease); }
+.partie-option[open] > summary::after { transform: translateY(-30%) rotate(-135deg); }
+.partie-titre { font-size: var(--fs-xl); font-weight: var(--fw-semibold); }
+.partie-option > summary small { color: var(--muted); font-size: var(--fs-sm); }
+.partie-option > :not(summary) { margin-inline: var(--sp-6); }
+.partie-option[open] { padding-bottom: var(--sp-6); }
+@media (max-width: 760px) {
+  .partie-option > summary { padding: var(--sp-4); padding-inline-end: var(--sp-10); }
+  .partie-option > summary::after { inset-inline-end: var(--sp-4); }
+  .partie-option > :not(summary) { margin-inline: var(--sp-4); }
+  .partie-option[open] { padding-bottom: var(--sp-4); }
+}

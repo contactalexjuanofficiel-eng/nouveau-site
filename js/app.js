@@ -575,34 +575,27 @@ function listeManquante(manque) {
     `<li><a href="#/parametres?champ=${esc(m.champ)}">${esc(m.texte)}</a></li>`).join('')}</ul>`;
 }
 
-// Bloque l'action si le profil n'est pas complet. Renvoie true si on peut continuer.
-async function profilPret() {
-  if (!Abonnement.peutModifier()) {
-    Abonnement.refuserModification();
-    return false;
-  }
-  const manque = profilManquant();
-  // Un administrateur peut tout tester, même avec un profil incomplet.
-  if (!manque.length || (typeof Compte !== 'undefined' && Compte.estAdmin?.())) return true;
-  const ok = await ask(
-    `Avant de faire un devis ou une facture, complétez « Mon entreprise » : vos documents doivent comporter les mentions obligatoires. ` +
-    `Il manque : ${manque.map((m) => m.texte).join(' ; ')}.`,
-    'Compléter mon entreprise');
-  if (ok) go('#/parametres?champ=' + manque[0].champ);
+// Créer ou modifier : seul l'abonnement compte (après l'essai, lecture seule).
+// On peut découvrir l'appli et préparer ses devis avant d'avoir tout rempli.
+function peutCreer() {
+  if (Abonnement.peutModifier()) return true;
+  Abonnement.refuserModification();
   return false;
 }
 
-// Écran affiché à la place de toute l'application tant que le profil est incomplet.
-function pageBloquee() {
+// Télécharger, imprimer ou envoyer un document : il doit porter les mentions
+// obligatoires, donc « Mon entreprise » doit être complète. Renvoie true si c'est bon.
+async function profilPret() {
+  if (!peutCreer()) return false;
   const manque = profilManquant();
-  view.innerHTML = `
-    <div class="card gate">
-      <h1>Bienvenue sur Devizo 👋</h1>
-      <p>Avant de créer vos devis, vos factures et vos clients, renseignez les informations de votre entreprise.
-      En France, elles doivent obligatoirement figurer sur chaque document. Il manque encore :</p>
-      ${listeManquante(manque)}
-      <a class="btn btn-primary btn-lg" href="#/parametres?champ=${esc(manque[0].champ)}">Compléter mon entreprise</a>
-    </div>`;
+  // Un administrateur peut tout tester, même avec un profil incomplet.
+  if (!manque.length || (typeof Compte !== 'undefined' && Compte.estAdmin?.())) return true;
+  const ok = await ask(manque.length === 1
+    ? 'Votre document est presque prêt : il manque une information sur votre entreprise, obligatoire sur un devis ou une facture. Ça prend une minute.'
+    : `Votre document est presque prêt : il manque ${manque.length} informations sur votre entreprise, obligatoires sur un devis ou une facture. Ça prend une minute.`,
+  'Compléter (1 minute)', 'Plus tard');
+  if (ok) Bienvenue.ouvrir(location.hash);
+  return false;
 }
 
 function echeanceDefaut(type) {
@@ -908,7 +901,7 @@ async function createDocument(type) {
   if (creationEnCours) return; // double clic : un seul document
   creationEnCours = true;
   setTimeout(() => { creationEnCours = false; }, 800);
-  if (!(await profilPret())) return;
+  if (!peutCreer()) return;
   const doc = {
     id: newId(),
     type,
@@ -1191,7 +1184,7 @@ function sansHistorique(doc) {
 // Crée une copie du document avec un nouveau numéro, puis l'ouvre.
 async function duplicateDocument(doc) {
   if (!doc || doc.type === 'avoir') return;
-  if (!(await profilPret())) return;
+  if (!peutCreer()) return;
   const copie = {
     ...sansHistorique(doc),
     id: newId(),
@@ -1209,7 +1202,7 @@ async function duplicateDocument(doc) {
 // Avoir sur une facture : total (annule la facture) ou partiel (montants à ajuster).
 async function faireAvoir(facture) {
   if (!facture || facture.type !== 'facture' || facture.statut === 'annulee') return;
-  if (!(await profilPret())) return;
+  if (!peutCreer()) return;
   const paye = facture.statut === 'payee';
   const choix = await choisir(`Faire un avoir sur la facture ${facture.numero} ?`, [
     ['total', 'Avoir total', paye ? 'Toute la facture est remboursée au client.' : 'La facture est annulée en entier.'],
@@ -1299,7 +1292,7 @@ function incrementNumber(numero) {
 
 // Crée la facture d'un devis. ouvrir=false : reste sur la page (actions rapides de la liste).
 async function convertToInvoice(devis, ouvrir = true) {
-  if (!(await profilPret())) return null;
+  if (!peutCreer()) return null;
   const deja = data.documents.find((d) => d.devisOrigine === devis.id);
   if (deja) {
     if (await ask(`Ce devis a déjà été transformé en facture (${deja.numero}). L'ouvrir ?`, 'Ouvrir la facture')) {
@@ -1421,7 +1414,7 @@ function pageView(id) {
         <details class="menu-ligne menu-actions">
           <summary class="btn">Plus d'actions <span class="chevron" aria-hidden="true">▾</span></summary>
           <div class="menu-ligne-liste">
-            <button type="button" onclick="window.print()">Imprimer</button>
+            <button type="button" id="imprimer">Imprimer</button>
             ${isFacture && doc.statut !== 'annulee' ? `<button type="button" data-avoir="${esc(doc.id)}">Faire un avoir</button>` : ''}
             ${isAvoir ? '' : '<button type="button" id="duplicate">Dupliquer</button>'}
             <button type="button" class="danger" id="delete">Supprimer</button>
@@ -1429,6 +1422,10 @@ function pageView(id) {
         </details>
       </div>
     </div>
+    ${profilManquant().length ? `<div class="doc-incomplet no-print" role="status">
+      <p><strong>Ce document n'est pas encore prêt à être envoyé.</strong> Il manque des informations sur votre entreprise, obligatoires sur un devis ou une facture.</p>
+      <button type="button" class="btn btn-primary btn-sm" id="completer-profil">Compléter (1 minute)</button>
+    </div>` : ''}
     ${avoirs.length ? `<p class="historique no-print">${avoirs.map((a) => `Avoir <a href="#/voir/${esc(a.id)}">${esc(a.numero)}</a> de ${euro(computeTotals(a).ttc)} TTC (${esc(STATUTS.avoir[a.statut] || a.statut)})`).join(' · ')}</p>` : ''}
     ${isAvoir && factureOrigine ? `<p class="historique no-print">Avoir sur la facture <a href="#/voir/${esc(factureOrigine.id)}">${esc(factureOrigine.numero)}</a> du ${dateFr(factureOrigine.date)}</p>` : ''}
     ${(doc.envois || []).length || doc.signature ? `<ul class="historique no-print">
@@ -1509,6 +1506,8 @@ function pageView(id) {
     render();
   });
   document.getElementById('duplicate')?.addEventListener('click', () => duplicateDocument(doc));
+  document.getElementById('imprimer')?.addEventListener('click', async () => { if (await profilPret()) window.print(); });
+  document.getElementById('completer-profil')?.addEventListener('click', () => Bienvenue.ouvrir(location.hash));
   document.getElementById('delete').addEventListener('click', async () => {
     if (await deleteDocument(doc)) go('#/documents');
   });
@@ -1575,7 +1574,7 @@ function pageClientForm(id, retour) {
       return;
     }
     enCours = true;
-    if (!(await profilPret())) { enCours = false; return; }
+    if (!peutCreer()) { enCours = false; return; }
     values.adresse = composeAdresse(values);
     if (isNew) {
       const created = { id: newId(), ...values };
@@ -1605,7 +1604,7 @@ function pageSettings(champ) {
 
   view.innerHTML = `
     <div class="page-head"><h1>Mon entreprise</h1></div>
-    <p class="intro">Ces informations apparaissent sur tous vos devis et factures. Les champs marqués * sont obligatoires : sans eux, vous ne pouvez pas créer de devis.</p>
+    <p class="intro">Ces informations apparaissent sur vos devis et factures. Seuls les champs marqués * sont obligatoires ; le reste se règle quand vous voulez.</p>
     <div class="card checklist" id="checklist"></div>
 
     <form id="settings-form" novalidate>
@@ -1711,8 +1710,8 @@ function pageSettings(champ) {
         </div>
       </section>
 
-      <section class="card">
-        <h2>Paiement</h2>
+      <details class="card partie-option">
+        <summary><span class="partie-titre">Paiement</span><small>IBAN, délai et moyens de paiement, pénalités de retard</small></summary>
         <div class="grid-2">
           <div>
             <label for="delaiPaiement">Délai de paiement des factures</label>
@@ -1740,10 +1739,10 @@ function pageSettings(champ) {
           <textarea id="penalites" name="penalites" rows="2" placeholder="${esc(PENALITES_DEFAUT)}">${esc(e.penalites)}</textarea>
           <small class="hint">Laissez vide pour utiliser le texte proposé. L'indemnité de 40 € est ajoutée automatiquement pour les clients professionnels.</small>
         </div>
-      </section>
+      </details>
 
-      <section class="card">
-        <h2>Devis</h2>
+      <details class="card partie-option">
+        <summary><span class="partie-titre">Devis</span><small>Durée de validité, acompte, conditions par défaut</small></summary>
         <div class="grid-2">
           <div>
             <label for="validiteDevis">Durée de validité</label>
@@ -1761,7 +1760,7 @@ function pageSettings(champ) {
           <label for="conditionsDevis">Conditions pré-remplies sur chaque nouveau devis</label>
           <textarea id="conditionsDevis" name="conditionsDevis" rows="3" placeholder="Ex : Délai d'intervention : 2 semaines après acceptation. Le matériel reste la propriété de l'entreprise jusqu'au paiement complet.">${esc(e.conditionsDevis)}</textarea>
         </div>
-      </section>
+      </details>
 
       <section class="card">
         <h2>Assurance et mentions légales</h2>
@@ -1780,8 +1779,8 @@ function pageSettings(champ) {
           <textarea id="mentions" name="mentions" rows="2">${esc(e.mentions)}</textarea></div>
       </section>
 
-      <section class="card">
-        <h2>Fiscalité</h2>
+      <details class="card partie-option">
+        <summary><span class="partie-titre">Fiscalité</span><small>Régime et taux utilisés pour les estimations du tableau de bord</small></summary>
         <p class="hint" style="margin-top:0">Sert à estimer vos cotisations, vos impôts et ce qu'il vous reste dans le tableau de bord.</p>
         <div class="grid-2">
           <div>
@@ -1805,26 +1804,26 @@ function pageSettings(champ) {
         </div>
         <label class="checkbox field" id="field-vl"><input type="checkbox" name="versementLiberatoire" ${checked(e.versementLiberatoire)}> J'ai opté pour le versement libératoire de l'impôt sur le revenu</label>
         <small class="hint" id="hint-fiscal"></small>
-      </section>
+      </details>
 
-      <section class="card">
-        <h2>Numérotation</h2>
+      <details class="card partie-option">
+        <summary><span class="partie-titre">Numérotation</span><small>Préfixes des numéros de devis et de factures</small></summary>
         <div class="grid-2">
           <div><label for="prefixeDevis">Préfixe des devis</label><input id="prefixeDevis" name="prefixeDevis" maxlength="6" value="${esc(e.prefixeDevis)}"></div>
           <div><label for="prefixeFacture">Préfixe des factures</label><input id="prefixeFacture" name="prefixeFacture" maxlength="6" value="${esc(e.prefixeFacture)}"></div>
         </div>
         <small class="hint" id="hint-numeros"></small>
-      </section>
+      </details>
 
-      <section class="card">
-        <h2>Sauvegarde de vos données</h2>
+      <details class="card partie-option">
+        <summary><span class="partie-titre">Sauvegarde de vos données</span><small>Télécharger ou restaurer une sauvegarde</small></summary>
         <p class="hint">Vos devis, factures et clients sont enregistrés sur cet appareil. Téléchargez régulièrement une sauvegarde pour ne rien perdre, ou pour passer sur un autre appareil.</p>
         <div class="actions">
           <button type="button" class="btn" id="export">Télécharger une sauvegarde</button>
           <label class="btn" for="import-input">Restaurer une sauvegarde</label>
           <input id="import-input" type="file" accept="application/json,.json" hidden>
         </div>
-      </section>
+      </details>
 
       <div class="save-bar" id="save-bar">
         <span id="saved" class="hint" role="status"></span>
@@ -1845,8 +1844,10 @@ function pageSettings(champ) {
 
   // Va au premier champ obligatoire encore vide.
   function champSuivant(manque) {
-    const el = $(manque[0].champ);
+    const el = $(manque[0].champ === 'logo' ? 'logo-choisir' : manque[0].champ);
     if (!el) return;
+    const partie = el.closest('details');
+    if (partie) partie.open = true; // champ dans une partie repliée
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     el.focus({ preventScroll: true });
     el.classList.add('missing');
@@ -1940,10 +1941,10 @@ function pageSettings(champ) {
       (actuel.nonDecennale ? 0 : 1);
     $('checklist').className = 'card checklist ' + (manque.length ? '' : 'done');
     $('checklist').innerHTML = manque.length
-      ? `<div class="checklist-head"><strong>Encore ${manque.length} information${manque.length > 1 ? 's' : ''} obligatoire${manque.length > 1 ? 's' : ''} avant votre premier devis</strong>
+      ? `<div class="checklist-head"><strong>Encore ${manque.length} information${manque.length > 1 ? 's' : ''} obligatoire${manque.length > 1 ? 's' : ''} pour pouvoir envoyer vos documents</strong>
            <div class="progress"><span style="width:${Math.round(((total - manque.length) / total) * 100)}%"></span></div></div>
          <ul class="todo">${manque.map((m) => `<li><button type="button" class="link" data-champ="${esc(m.champ)}">${esc(m.texte)}</button></li>`).join('')}</ul>`
-      : `<strong>✓ Toutes les mentions obligatoires sont renseignées.</strong> Vous pouvez créer vos devis et factures.`;
+      : `<strong>✓ Toutes les mentions obligatoires sont renseignées.</strong> Vos devis et factures sont prêts à être envoyés.`;
     form.querySelectorAll('.missing').forEach((el) => {
       if (!manque.some((m) => m.champ === el.id)) el.classList.remove('missing');
     });
@@ -2138,7 +2139,7 @@ function pageSettings(champ) {
   brancherAdresse(form, () => form.dispatchEvent(new Event('input')));
   refresh();
   lancerVerif();
-  if (champ && $(champ)) {
+  if (champ && $(champ === 'logo' ? 'logo-choisir' : champ)) {
     // Ouvre la partie TVA si c'est elle qui manque.
     if (champ === 'numeroTva') $('tva-options').hidden = false;
     setTimeout(() => champSuivant([{ champ }]), 50);
@@ -2163,9 +2164,6 @@ function majPastille() {
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
   const navParrain = document.getElementById('nav-parrainage');
   if (navParrain) navParrain.hidden = !(typeof Compte !== 'undefined' && Compte.actif && Compte.connecte());
-  // Les autres pages sont verrouillées tant que le profil est incomplet (sauf pour un administrateur).
-  const libre = typeof Compte !== 'undefined' && Compte.estAdmin?.();
-  document.querySelectorAll(':is(.nav, .tabbar) a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"]):not([href="#/parrainage"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
 }
 
 function pageNotFound() {
@@ -2213,9 +2211,13 @@ function render() {
   if (parts[0] !== 'assistance') window.dernierePageAssistance = location.hash || '#/';
   if (['', 'documents', 'voir'].includes(parts[0] ?? '')) Envoi.synchroniserSignatures();
 
-  // Tant que « Mon entreprise » est incomplet, seule cette page est accessible.
-  const bloque = profilManquant().length > 0 && !(typeof Compte !== 'undefined' && Compte.estAdmin?.());
-  if (bloque && !['parametres', 'compte', 'abonnement', 'assistance', 'parrainage'].includes(parts[0])) return pageBloquee();
+  // Compte neuf : démarrage guidé en 3 écrans (une seule fois, « Plus tard » possible).
+  if (parts[0] === undefined && Bienvenue.doitAfficher()) {
+    history.replaceState(null, '', location.pathname + '#/bienvenue');
+    parts[0] = 'bienvenue';
+  }
+  document.body.classList.toggle('mode-accueil', parts[0] === 'bienvenue');
+  if (parts[0] === 'bienvenue') return Bienvenue.page();
 
   // Abonnement : lecture seule après l'essai, fonctions réservées à la formule Pro.
   if (!Abonnement.peutModifier() && (parts[0] === 'modifier' || (parts[0] === 'clients' && parts[1]))) {
@@ -2274,7 +2276,7 @@ document.addEventListener('click', async (e) => {
   if (dejaPaye) devisPaye(getDocument(dejaPaye));
   if (envoyer) Envoi.ouvrir(getDocument(envoyer), 'envoi');
   if (relancer) Envoi.ouvrir(getDocument(relancer), 'relance');
-  if (pdf && getDocument(pdf)) {
+  if (pdf && getDocument(pdf) && (await profilPret())) {
     const texte = cible.textContent;
     cible.disabled = true;
     cible.textContent = 'Création du PDF…';
