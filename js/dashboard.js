@@ -375,7 +375,7 @@ function pageDashboard() {
 
     <section class="card">
       <div class="card-head">
-        <h2>Jour par jour · ${MOIS_COURTS[now.getMonth()].replace('.', '')} ${now.getFullYear()}</h2>
+        <h2>Jour par jour · <span data-no-trad>${now.toLocaleDateString(document.documentElement.lang || 'fr', { month: 'long', year: 'numeric' })}</span></h2>
         <p class="card-sub" id="jours-resume"></p>
       </div>
       <div class="chart-box" id="chart-jours"></div>

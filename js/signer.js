@@ -31,7 +31,7 @@
          ${Object.entries(t.tvaParTaux || {}).filter(([, v]) => v).map(([taux, v]) => `<div><span>TVA ${tauxFr(taux)} %</span><span>${euro(v)}</span></div>`).join('')}
          <div class="grand"><span>Total TTC</span><span>${euro(t.ttc)}</span></div>`;
     return `
-      <div class="doc">
+      <div class="doc" dir="ltr" lang="fr">
         <div class="doc-head">
           <div>
             ${e.logo ? `<img class="doc-logo" src="${esc(e.logo)}" alt="">` : ''}

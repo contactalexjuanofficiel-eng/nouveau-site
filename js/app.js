@@ -1411,7 +1411,7 @@ function pageView(id) {
       <h1>${libelleType(doc)} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
         <button class="btn btn-primary" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
-        <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e-mail</button>
+        <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e‑mail</button>
         ${isDevis ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut === 'a-payer' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
         ${isAvoir && doc.statut === 'a-rembourser' ? `<button class="btn" data-statut-doc="${esc(doc.id)}" data-valeur="rembourse">Marquer remboursé</button>` : ''}
@@ -1435,7 +1435,7 @@ function pageView(id) {
       ${doc.signature ? `<li>✍ Signé en ligne par <strong>${esc(doc.signature.nom)}</strong> le ${esc(new Date(doc.signature.le).toLocaleString('fr-FR'))}</li>` : ''}
     </ul>` : ''}
 
-    <div class="doc">
+    <div class="doc" dir="ltr" lang="fr">
       <div class="doc-head">
         <div>
           ${e.logo && Abonnement.aAcces('pro') ? `<img class="doc-logo" src="${esc(e.logo)}" alt="">` : ''}
@@ -1825,8 +1825,8 @@ function pageSettings(champ) {
         </div>
       </section>
 
-      <div class="save-bar">
-        <span id="saved" class="hint"></span>
+      <div class="save-bar" id="save-bar">
+        <span id="saved" class="hint" role="status"></span>
         <button class="btn btn-primary" type="submit">Enregistrer</button>
       </div>
     </form>
@@ -1989,6 +1989,7 @@ function pageSettings(champ) {
     refresh();
     $('saved').className = 'hint warn';
     $('saved').textContent = 'Modifications non enregistrées';
+    $('save-bar').classList.add('modifie'); // la barre ne flotte en bas que s'il y a quelque chose à enregistrer
   });
 
   $('tva-calc').addEventListener('click', async () => {
@@ -2071,6 +2072,7 @@ function pageSettings(champ) {
     data.entreprise = collect();
     saveData();
     const manque = profilManquant();
+    $('save-bar').classList.remove('modifie');
     $('saved').className = 'hint ' + (manque.length ? 'warn' : 'ok');
     $('saved').textContent = manque.length
       ? `✓ Enregistré · il manque encore ${manque.length} information${manque.length > 1 ? 's' : ''}`

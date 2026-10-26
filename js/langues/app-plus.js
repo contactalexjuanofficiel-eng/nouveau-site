@@ -1,6 +1,7 @@
 // Compléments de traduction de l'appli (textes ajoutés après la première traduction).
 window.DEVIZO_TRAD_APP_PLUS = {
   en: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} collected excl. VAT this month · best day: the {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "See all ({0}) →", "Devis {0}": "Quote {0}", "Facture {0}": "Invoice {0}", "Avoir {0}": "Credit note {0}", "Plus d'actions": "More actions", "Choisir un logo": "Choose a logo", "Changer le logo": "Change logo", "Retirer le logo": "Remove logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Card, invoices and cancellation, on the secure Stripe page.", "Faire un autre devis": "Do another quote",
     // Navigation (refonte)
@@ -62,6 +63,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Signing in with Google…",
   },
   es: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} cobrados sin IVA este mes · mejor día: el {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Ver todo ({0}) →", "Devis {0}": "Presupuesto {0}", "Facture {0}": "Factura {0}", "Avoir {0}": "Abono {0}", "Plus d'actions": "Más acciones", "Choisir un logo": "Elegir un logo", "Changer le logo": "Cambiar el logo", "Retirer le logo": "Quitar el logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Tarjeta, facturas y cancelación, en la página segura de Stripe.", "Faire un autre devis": "Hacer otro presupuesto",
     // Navigation (refonte)
@@ -123,6 +125,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectando con Google…",
   },
   pt: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} recebidos sem IVA este mês · melhor dia: dia {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Ver tudo ({0}) →", "Devis {0}": "Orçamento {0}", "Facture {0}": "Fatura {0}", "Avoir {0}": "Nota de crédito {0}", "Plus d'actions": "Mais ações", "Choisir un logo": "Escolher um logótipo", "Changer le logo": "Alterar o logótipo", "Retirer le logo": "Remover o logótipo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Cartão, faturas e cancelamento, na página segura da Stripe.", "Faire un autre devis": "Fazer outro orçamento",
     // Navigation (refonte)
@@ -184,6 +187,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "A ligar com o Google…",
   },
   it: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} incassati IVA esclusa questo mese · giorno migliore: il {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Vedi tutto ({0}) →", "Devis {0}": "Preventivo {0}", "Facture {0}": "Fattura {0}", "Avoir {0}": "Nota di credito {0}", "Plus d'actions": "Altre azioni", "Choisir un logo": "Scegli un logo", "Changer le logo": "Cambia logo", "Retirer le logo": "Rimuovi il logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Carta, fatture e disdetta, sulla pagina sicura di Stripe.", "Faire un autre devis": "Fai un altro preventivo",
     // Navigation (refonte)
@@ -245,6 +249,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Accesso con Google…",
   },
   de: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} netto eingenommen diesen Monat · bester Tag: der {1}. ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Alle anzeigen ({0}) →", "Devis {0}": "Angebot {0}", "Facture {0}": "Rechnung {0}", "Avoir {0}": "Gutschrift {0}", "Plus d'actions": "Weitere Aktionen", "Choisir un logo": "Logo auswählen", "Changer le logo": "Logo ändern", "Retirer le logo": "Logo entfernen", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Karte, Rechnungen und Kündigung auf der sicheren Stripe-Seite.", "Faire un autre devis": "Weiteres Angebot erstellen",
     // Navigation (refonte)
@@ -306,6 +311,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Anmeldung mit Google…",
   },
   ar: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} محصّلة دون ضريبة هذا الشهر · أفضل يوم: {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "عرض الكل ({0}) ←", "Devis {0}": "عرض سعر {0}", "Facture {0}": "فاتورة {0}", "Avoir {0}": "إشعار دائن {0}", "Plus d'actions": "إجراءات أخرى", "Choisir un logo": "اختيار شعار", "Changer le logo": "تغيير الشعار", "Retirer le logo": "إزالة الشعار", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "البطاقة والفواتير والإلغاء، على صفحة Stripe الآمنة.", "Faire un autre devis": "إنشاء عرض سعر آخر",
     // Navigation (refonte)
@@ -367,6 +373,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "جارٍ تسجيل الدخول باستخدام Google…",
   },
   tr: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "Bu ay KDV hariç {0} tahsil edildi · en iyi gün: {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Tümünü gör ({0}) →", "Devis {0}": "Teklif {0}", "Facture {0}": "Fatura {0}", "Avoir {0}": "İade faturası {0}", "Plus d'actions": "Diğer işlemler", "Choisir un logo": "Logo seç", "Changer le logo": "Logoyu değiştir", "Retirer le logo": "Logoyu kaldır", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Kart, faturalar ve iptal, güvenli Stripe sayfasında.", "Faire un autre devis": "Başka bir teklif hazırla",
     // Navigation (refonte)
@@ -428,6 +435,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Google ile giriş yapılıyor…",
   },
   ro: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} încasați fără TVA luna aceasta · cea mai bună zi: {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Vezi tot ({0}) →", "Devis {0}": "Deviz {0}", "Facture {0}": "Factură {0}", "Avoir {0}": "Factură de stornare {0}", "Plus d'actions": "Mai multe acțiuni", "Choisir un logo": "Alege un logo", "Changer le logo": "Schimbă logoul", "Retirer le logo": "Elimină logoul", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Card, facturi și reziliere, pe pagina securizată Stripe.", "Faire un autre devis": "Fă alt deviz",
     // Navigation (refonte)
@@ -489,6 +497,7 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectare cu Google…",
   },
   pl: {
+    "{0} encaissés HT ce mois-ci · meilleur jour : le {1} ({2})": "{0} netto wpłynęło w tym miesiącu · najlepszy dzień: {1} ({2})",
     // Corrections après tests
     "Voir tout ({0}) →": "Zobacz wszystko ({0}) →", "Devis {0}": "Oferta {0}", "Facture {0}": "Faktura {0}", "Avoir {0}": "Korekta {0}", "Plus d'actions": "Więcej działań", "Choisir un logo": "Wybierz logo", "Changer le logo": "Zmień logo", "Retirer le logo": "Usuń logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Karta, faktury i rezygnacja na bezpiecznej stronie Stripe.", "Faire un autre devis": "Zrób kolejną ofertę",
     // Navigation (refonte)

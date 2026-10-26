@@ -132,7 +132,9 @@ img, svg { max-width: 100%; }
   body.app-shell:not(.sans-compte) .topbar .logo-icone { width: 26px; height: 26px; }
   body.app-shell:not(.sans-compte) .nav-titre { margin: var(--sp-1) auto; }
   body.app-shell:not(.sans-compte) .nav { gap: 0; }
-  body.app-shell:not(.sans-compte) .nav a { height: 32px; }
+  body.app-shell:not(.sans-compte) .topbar .nav { gap: 0; }
+  body.app-shell:not(.sans-compte) .nav a { height: 30px; min-height: 0; }
+  body.app-shell:not(.sans-compte) .nav-titre { display: none; }
   body.app-shell:not(.sans-compte) .nav a .ico { width: 20px; height: 20px; }
   body.app-shell:not(.sans-compte) .topbar .btn-deco-haut { width: 34px; height: 34px; min-height: 0; }
 }
@@ -175,11 +177,11 @@ img, svg { max-width: 100%; }
   body.app-shell .topbar .nav::before { content: ""; grid-column: 1 / -1; justify-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); margin-bottom: var(--sp-1); }
   .menu-open .nav { transform: translateY(var(--glisse, 0px)) !important; visibility: visible !important; transition: transform var(--dur-slow) var(--ease), visibility 0s !important; }
   body.app-shell .topbar .nav-titre { grid-column: 1 / -1; margin: var(--sp-2) var(--sp-1) 0; }
-  body.app-shell .topbar .nav { grid-auto-rows: auto; }
-  body.app-shell .topbar .nav a { height: 100%; }
   /* Menu ouvert : la barre du haut est assombrie comme le reste de la page. */
-  body.menu-ouvert .topbar > :not(.nav) { opacity: .35; pointer-events: none; }
-  body.app-shell .topbar .nav a { min-height: var(--h-lg); font-size: var(--fs-base); padding: var(--sp-2) var(--sp-3); background: var(--bg); }
+  body.menu-ouvert .topbar { box-shadow: inset 0 0 0 100vmax var(--overlay); }
+  body.menu-ouvert .topbar > :not(.nav) { pointer-events: none; }
+  /* Tuiles de même hauteur, même quand un libellé passe sur 2 lignes. */
+  body.app-shell .topbar .nav a { min-height: 56px; font-size: var(--fs-base); padding: var(--sp-2) var(--sp-3); background: var(--bg); }
   body.app-shell .topbar .nav a.active { background: var(--primary-soft); }
   body.menu-ouvert .topbar { z-index: var(--z-overlay); }
   .menu-open .nav.glisse { transition: none !important; }
@@ -260,8 +262,8 @@ img, svg { max-width: 100%; }
   .btn-sm { min-height: var(--touch); }
 }
 /* Bouton qui supprime pour de bon (fenêtre de confirmation) : rouge plein. */
-.btn-danger-plein { background: var(--danger); border-color: var(--danger); color: #fff; }
-.btn-danger-plein:hover { background: color-mix(in srgb, var(--danger) 88%, #000); border-color: transparent; color: #fff; }
+.btn-danger-plein { background: var(--danger); border-color: var(--danger); color: var(--on-primary); }
+.btn-danger-plein:hover { background: color-mix(in srgb, var(--danger) 88%, #000); border-color: transparent; color: var(--on-primary); }
 
 .link {
   color: var(--text); background: none; border: 0; padding: 0; font: inherit;
@@ -312,6 +314,7 @@ input[type="date"] { min-height: var(--h-md); }
 .hint.ok { color: var(--success); }
 .hint.warn { color: var(--warning); }
 .input-row { display: flex; gap: var(--sp-2); }
+@media (max-width: 760px) { .input-row { flex-wrap: wrap; } .input-row > input { flex: 1 1 100%; } .input-row > .btn { width: 100%; } }
 .input-row input { flex: 1; min-width: 0; }
 .input-row .btn { white-space: nowrap; }
 
@@ -341,15 +344,23 @@ input[type="date"] { min-height: var(--h-md); }
 .logo-preview img { max-width: 100%; max-height: 100%; }
 .logo-preview span { color: var(--muted); font-size: var(--fs-sm); }
 
-.save-bar {
-  position: sticky; bottom: var(--sp-3); z-index: var(--z-sticky);
-  display: flex; justify-content: flex-end; align-items: center; gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--card); border: 1px solid var(--border); border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
-}
+/* Bouton « Enregistrer » : à sa place en bas du formulaire. Il ne flotte en bas de
+   l'écran (barre compacte) que quand il y a des modifications à enregistrer. */
+.save-bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--sp-3); margin-top: var(--sp-2); }
 .save-bar .hint { margin: 0; }
-@media (max-width: 760px) { .save-bar { bottom: calc(var(--h-tabbar) + env(safe-area-inset-bottom, 0px) + var(--sp-2)); } }
+.save-bar.modifie {
+  position: sticky; bottom: var(--sp-3); z-index: var(--z-sticky);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r-xl);
+  box-shadow: var(--sh-lg); animation: monte var(--dur) var(--ease);
+}
+.save-bar.modifie .hint { margin-inline-end: auto; }
+@media (max-width: 760px) {
+  .save-bar .btn { flex: 1 1 auto; }
+  .save-bar:not(.modifie) .hint:empty { display: none; }
+  .save-bar.modifie { bottom: calc(var(--h-tabbar) + env(safe-area-inset-bottom, 0px) + var(--sp-2)); }
+  .save-bar.modifie .btn { flex: none; }
+}
 
 input.missing, textarea.missing, select.missing { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-soft); }
 
@@ -513,6 +524,7 @@ dialog.envoi h2 { margin: 0 0 var(--sp-4); font-size: var(--fs-xl); }
 dialog.envoi label:not(.checkbox) { display: block; margin: var(--sp-3) 0 var(--sp-1-5); }
 dialog.envoi input:not([type=checkbox]), dialog.envoi textarea { width: 100%; }
 dialog.envoi .checkbox { margin-top: var(--sp-3); }
+dialog.envoi .checkbox input { flex: none; }
 dialog.envoi .actions { margin-top: var(--sp-4); }
 /* Téléphone : « Envoyer » reste visible en bas de la fenêtre, même quand le message est long. */
 @media (max-width: 760px) {
@@ -742,7 +754,7 @@ dialog.envoi .actions { margin-top: var(--sp-4); }
 .barlist-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .barlist-track { height: 10px; }
 .barlist-bar { display: block; height: 100%; border-radius: 0 var(--r-xs) var(--r-xs) 0; }
-.barlist-value { font-variant-numeric: tabular-nums; color: var(--muted); }
+.barlist-value { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 6ch; text-align: end; }
 
 #chart-tip {
   position: fixed; z-index: var(--z-toast); pointer-events: none; max-width: 260px;
@@ -903,3 +915,8 @@ dialog.envoi .actions { margin-top: var(--sp-4); }
   .page-head > .actions > details > summary { width: 100%; justify-content: center; }
   .billing-toggle button { min-height: var(--touch); }
 }
+
+/* Arabe : le document reste en français (gauche à droite) ; numéros et montants gardent leur ordre. */
+[dir=rtl] .doc { direction: ltr; text-align: start; }
+[dir=rtl] td, [dir=rtl] .barlist-value, [dir=rtl] .big, [dir=rtl] .stat .value, [dir=rtl] .legend strong { unicode-bidi: plaintext; }
+@media (max-width: 760px) { .page-head > .actions > :only-child { grid-column: 1 / -1; } }
