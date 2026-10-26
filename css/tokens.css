@@ -161,7 +161,7 @@
   --on-primary: #ffffff;
   --text: var(--gray-900);
   --text-2: var(--gray-600);   /* texte secondaire */
-  --muted: var(--gray-500);    /* aides, légendes */
+  --muted: #626a7c;            /* aides, légendes (contraste ≥ 4,5 sur le fond) */
   --faint: var(--gray-400);
   --bg: var(--gray-50);        /* fond de l'appli */
   --bg-2: var(--gray-100);     /* zones en retrait, survols */

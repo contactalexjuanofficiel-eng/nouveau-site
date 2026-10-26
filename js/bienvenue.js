@@ -59,7 +59,7 @@ const Bienvenue = (() => {
   }
 
   function etapes(n) {
-    const noms = ['Entreprise', 'Activité', 'Premier devis'];
+    const noms = ['Entreprise', 'Activité', "C'est prêt"];
     return `<ol class="onb-etapes" aria-label="Étapes">${noms.map((nom, i) =>
       `<li class="${i + 1 < n ? 'fait' : i + 1 === n ? 'actif' : ''}"${i + 1 === n ? ' aria-current="step"' : ''}><span>${i + 1 < n ? '✓' : i + 1}</span>${nom}</li>`).join('')}</ol>`;
   }
@@ -100,7 +100,7 @@ const Bienvenue = (() => {
           </div>
           <p class="auth-erreur" id="onb-erreur" role="alert" hidden></p>
           <div class="onb-actions"><button class="btn btn-primary btn-lg" type="submit">Continuer</button></div>
-          <button type="button" class="onb-lien" data-siret>← Retrouver mon entreprise avec le SIRET</button>
+          <button type="button" class="onb-lien" data-siret><span aria-hidden="true">←</span> Retrouver mon entreprise avec le SIRET</button>
         </form>` : `
         <form class="onb-form" id="onb-recherche" novalidate>
           <label for="onb-siret">Votre numéro SIRET</label>
@@ -231,6 +231,8 @@ const Bienvenue = (() => {
       saveData();
       etape2();
     });
+    // Une seule action principale : la recherche passe en bouton secondaire.
+    document.querySelector('#onb-recherche button[type=submit]')?.classList.remove('btn-primary');
     zone.querySelector('[data-cest-moi]').focus();
   }
 
@@ -267,7 +269,7 @@ const Bienvenue = (() => {
         <fieldset class="onb-question">
           <legend>Facturez-vous la TVA ?</legend>
           <div class="onb-choix">
-            <label class="choice"><input type="radio" name="tva" value="non" ${franchise ? 'checked' : ''}><span><strong>Non</strong><small>Franchise en base : la mention « TVA non applicable, art. 293 B du CGI » est ajoutée toute seule</small></span></label>
+            <label class="choice"><input type="radio" name="tva" value="non" ${franchise ? 'checked' : ''}><span><strong>Non</strong><small>Franchise en base : la mention « <bdi dir="ltr">TVA non applicable, art. 293 B du CGI</bdi> » est ajoutée toute seule</small></span></label>
             <label class="choice"><input type="radio" name="tva" value="oui" ${!franchise ? 'checked' : ''}><span><strong>Oui</strong><small>Les prix sont affichés HT et TTC</small></span></label>
           </div>
           <div id="onb-tva-champ" ${franchise ? 'hidden' : ''}>
@@ -289,7 +291,7 @@ const Bienvenue = (() => {
         <p class="auth-erreur" id="onb-erreur" role="alert" hidden></p>
         <div class="onb-actions">
           <button class="btn btn-primary btn-lg" type="submit">Continuer</button>
-          <button type="button" class="onb-lien" data-retour>← Retour</button>
+          <button type="button" class="onb-lien" data-retour><span aria-hidden="true">←</span> Retour</button>
         </div>
       </form>`);
 
@@ -314,6 +316,13 @@ const Bienvenue = (() => {
         ...(fd.get('formeJuridique') ? { formeJuridique: fd.get('formeJuridique') } : {}),
       };
       const manque = [];
+      const invalide = (champ, oui) => {
+        const el = form.querySelector(`[name=${champ}]`);
+        if (el) oui ? el.setAttribute('aria-invalid', 'true') : el.removeAttribute('aria-invalid');
+      };
+      invalide('numeroTva', tva && !checkTva(valeurs.numeroTva));
+      invalide('assureur', !nonDecennale && !valeurs.assureur);
+      invalide('numeroContrat', !nonDecennale && !valeurs.numeroContrat);
       if (tva && !checkTva(valeurs.numeroTva)) manque.push('un n° de TVA valide (FR + 11 caractères)');
       if (!nonDecennale && (!valeurs.assureur || !valeurs.numeroContrat)) manque.push("le nom de l'assureur et le n° de contrat (ou cochez la case si vous n'êtes pas concerné)");
       if (manque.length) {

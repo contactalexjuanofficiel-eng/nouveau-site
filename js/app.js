@@ -1401,10 +1401,14 @@ function pageView(id) {
 
   view.innerHTML = `
     ${backLink()}
+    ${profilManquant().length ? `<div class="doc-incomplet no-print" role="status">
+      <p><strong>Ce document n'est pas encore prêt à être envoyé.</strong> Il manque des informations sur votre entreprise, obligatoires sur un devis ou une facture.</p>
+      <button type="button" class="btn btn-primary btn-sm" id="completer-profil">Compléter (1 minute)</button>
+    </div>` : ''}
     <div class="page-head no-print">
       <h1>${libelleType(doc)} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
-        <button class="btn btn-primary" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
+        <button class="btn ${profilManquant().length ? '' : 'btn-primary'}" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
         <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e‑mail</button>
         ${isDevis ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut === 'a-payer' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
@@ -1422,10 +1426,6 @@ function pageView(id) {
         </details>
       </div>
     </div>
-    ${profilManquant().length ? `<div class="doc-incomplet no-print" role="status">
-      <p><strong>Ce document n'est pas encore prêt à être envoyé.</strong> Il manque des informations sur votre entreprise, obligatoires sur un devis ou une facture.</p>
-      <button type="button" class="btn btn-primary btn-sm" id="completer-profil">Compléter (1 minute)</button>
-    </div>` : ''}
     ${avoirs.length ? `<p class="historique no-print">${avoirs.map((a) => `Avoir <a href="#/voir/${esc(a.id)}">${esc(a.numero)}</a> de ${euro(computeTotals(a).ttc)} TTC (${esc(STATUTS.avoir[a.statut] || a.statut)})`).join(' · ')}</p>` : ''}
     ${isAvoir && factureOrigine ? `<p class="historique no-print">Avoir sur la facture <a href="#/voir/${esc(factureOrigine.id)}">${esc(factureOrigine.numero)}</a> du ${dateFr(factureOrigine.date)}</p>` : ''}
     ${(doc.envois || []).length || doc.signature ? `<ul class="historique no-print">

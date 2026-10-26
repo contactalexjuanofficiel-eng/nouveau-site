@@ -48,7 +48,7 @@
   border: 1.5px solid var(--bandeau-ink); transition: transform .15s ease;
 }
 .l-pill:hover { transform: translateY(-1px); }
-.l-pill-plein { background: var(--bandeau-ink); color: var(--bandeau); }
+.l-pill-plein { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 .l-pill-contour { background: transparent; color: var(--bandeau-ink); }
 @media (max-width: 1239px) {
   .l-header-inner { gap: 24px; }
@@ -263,7 +263,7 @@
   padding: 8px 18px; border-radius: 999px;
 }
 .billing-toggle button.active { background: var(--primary); color: var(--on-primary); }
-.billing-toggle .save { font-size: .78rem; font-weight: 700; color: var(--success); margin-inline-start: 4px; }
+.billing-toggle .save { font-size: .78rem; font-weight: 700; color: color-mix(in srgb, var(--success) 75%, var(--text)); margin-inline-start: 4px; }
 .billing-toggle button.active .save { color: inherit; opacity: .85; }
 
 .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
@@ -385,7 +385,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .l-langue summary::-webkit-details-marker { display: none; }
 .l-langue summary:hover, .l-langue[open] summary { background: color-mix(in srgb, var(--bandeau-ink) 10%, transparent); }
 .l-header:has(.l-langue[open]) { z-index: 80; } /* au-dessus du bandeau cookies */
-.l-langue summary { min-height: 44px; min-width: 40px; justify-content: center; }
+.l-langue summary { min-height: var(--touch); min-width: var(--touch); justify-content: center; }
 .l-langue-liste {
   position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 20;
   list-style: none; margin: 0; padding: 6px; min-width: 180px;
@@ -472,7 +472,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .l-nav .l-nav-gratuit:hover { background: #178a4d; color: #fff; }
 .hero-gratuit { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 12px 16px; border-radius: 14px; max-width: 540px;
   background: var(--success-soft); color: var(--text); text-decoration: none; border: 1px solid rgba(30, 158, 90, .3); }
-.hero-gratuit strong { color: var(--success); }
+.hero-gratuit strong { color: color-mix(in srgb, var(--success) 75%, var(--text)); }
 .hero-gratuit:hover { border-color: var(--success); }
 .hero-gratuit span:last-child { margin-left: auto; color: var(--success); font-weight: 700; }
 @media (max-width: 1599px) { .l-nav .l-nav-gratuit small { display: none; } .l-nav .l-nav-gratuit { padding: 8px 14px; } }
@@ -508,7 +508,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 /* Lien vers une section : le titre n'est pas caché sous le bandeau du haut. */
 .landing section[id] { scroll-margin-top: 90px; }
 @media (max-width: 960px) { .landing section[id] { scroll-margin-top: 12px; } }
-@media (max-width: 420px) { .l-header { --marge-bandeau: 16px; } }
+@media (max-width: 420px) and (min-width: 381px) { .l-header { --marge-bandeau: 16px; } }
 
 /* ====================================================================
    Refonte de l'accueil : téléphone d'abord
@@ -522,9 +522,9 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   .hero h1 { order: 2; font-size: clamp(2rem, 9vw, 2.6rem); margin-bottom: 14px; }
   .hero .lead { order: 3; font-size: 1.02rem; margin-bottom: 20px; }
   .hero-cta { order: 4; }
-  .hero-video { order: 5; margin: 28px auto 0; width: min(260px, 70vw); }
-  .hero-gratuit { order: 6; margin-top: 24px; }
-  .hero .trust { order: 7; justify-content: center; }
+  .hero-video { order: 6; margin: 28px auto 0; width: min(260px, 70vw); }
+  .hero-gratuit { order: 7; margin-top: 24px; }
+  .hero .trust { order: 5; justify-content: center; margin-top: 16px; }
   .hero-cta .btn { flex: 1 1 100%; justify-content: center; }
 }
 
@@ -566,6 +566,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   .feat p { display: none; font-size: .9rem; line-height: 1.45; margin-top: 8px; }
   .feat.ouverte, .feat:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .feat.ouverte p { display: block; }
+  /* Signe « + » : on peut toucher la carte pour lire le détail. */
+  .feat { position: relative; }
+  .feat::after { content: "+"; position: absolute; top: 12px; inset-inline-end: 14px; color: var(--muted); font-weight: 700; font-size: 1.1rem; line-height: 1; }
+  .feat.ouverte::after { content: "−"; }
 }
 
 /* Tarifs sur téléphone : un onglet par formule (Pro affiché d'abord), une seule carte à la fois. */
@@ -573,7 +577,12 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 @media (max-width: 900px) {
   .plans-onglets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 460px; margin: 0 0 20px; padding: 4px; border-radius: 14px; background: var(--bg-2); }
   .plans-onglets button { min-height: 44px; border: 0; border-radius: 10px; background: none; color: var(--text-2); font: inherit; font-weight: 600; cursor: pointer; }
-  .plans-onglets button[aria-selected="true"] { background: var(--card); color: var(--text); box-shadow: var(--sh-sm); }
+  .plans-onglets button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); box-shadow: var(--sh-sm); }
   .plans.avec-onglets .plan:not(.plan-choisi) { display: none; }
   .plans.avec-onglets .plan { margin-top: 12px; }
 }
+
+/* Relecture design : en-tête et titres */
+.l-pill-court { min-height: var(--touch); }
+.hero h1, .section-title { text-wrap: balance; }
+@media (min-width: 561px) { .l-nav .l-nav-mobile { display: none !important; } }

@@ -6,7 +6,7 @@
  * Utilise data, infosDocument, euro, dateFr, tauxFr... d'app.js.
  */
 const Pdf = (() => {
-  const VERSION = '?v=100';
+  const VERSION = '?v=101';
   const MARGE = 15;
   const BLEU = [31, 94, 255];
   const GRIS = [107, 115, 133];

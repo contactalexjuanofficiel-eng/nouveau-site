@@ -15,5 +15,7 @@
   document.getElementById('l-nav')?.addEventListener('click', (e) => { if (e.target.closest('a')) ouvrir(false); });
   document.addEventListener('click', (e) => { if (!entete.contains(e.target) || e.target === entete) ouvrir(false); }); // dehors ou sur le voile
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ouvrir(false); });
+  // Ouvrir la liste des langues referme le menu (sinon elle s'ouvre dessous).
+  document.getElementById('langue')?.addEventListener('toggle', (e) => { if (e.target.open) ouvrir(false); });
   matchMedia('(min-width: 961px)').addEventListener('change', (e) => { if (e.matches) ouvrir(false); });
 })();

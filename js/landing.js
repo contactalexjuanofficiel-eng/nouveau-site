@@ -77,9 +77,22 @@ const ETAPES_TABLEAU = [
   }
 
   // Fonctionnalités sur téléphone : toucher une carte affiche son détail.
-  document.querySelectorAll('.feat').forEach((carte) => carte.addEventListener('click', () => {
-    if (matchMedia('(max-width: 600px)').matches) carte.classList.toggle('ouverte');
-  }));
+  const petit = matchMedia('(max-width: 600px)');
+  document.querySelectorAll('.feat').forEach((carte) => {
+    const basculer = () => {
+      if (!petit.matches) return;
+      carte.classList.toggle('ouverte');
+      carte.setAttribute('aria-expanded', String(carte.classList.contains('ouverte')));
+    };
+    const regler = () => {
+      if (petit.matches) { carte.setAttribute('role', 'button'); carte.tabIndex = 0; carte.setAttribute('aria-expanded', String(carte.classList.contains('ouverte'))); }
+      else { carte.removeAttribute('role'); carte.removeAttribute('tabindex'); carte.removeAttribute('aria-expanded'); }
+    };
+    regler();
+    petit.addEventListener('change', regler);
+    carte.addEventListener('click', basculer);
+    carte.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); basculer(); } });
+  });
 
   // Tarifs sur téléphone : onglets Solo / Pro / Entreprise.
   const onglets = document.querySelectorAll('.plans-onglets [data-plan]');
