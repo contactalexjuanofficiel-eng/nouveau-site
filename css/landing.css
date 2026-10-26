@@ -55,23 +55,29 @@
   .l-nav { gap: 18px; }
   .l-pill-contour { display: none; }
 }
-/* Tablette et téléphone : les liens passent sur une 2e ligne qui défile de côté. */
+/* Tablette et téléphone : en-tête sur une seule ligne, les liens dans un menu ☰ qui se déplie. */
+.l-burger, .l-nav-mobile { display: none; }
 @media (max-width: 960px) {
-  .l-header-inner { flex-wrap: wrap; row-gap: 0; }
-  .l-nav {
-    order: 3; flex: 1 1 100%; gap: 6px; overflow-x: auto; scrollbar-width: none;
-    margin-inline: calc(var(--marge-bandeau) * -1); padding: 8px var(--marge-bandeau) 0;
-  }
-  .l-nav::-webkit-scrollbar { display: none; }
-  .l-nav a { flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px;
-    background: color-mix(in srgb, var(--bandeau-ink) 7%, transparent); font-size: .92rem; white-space: nowrap; }
   .l-header-inner { padding-block: 10px; }
-  /* Sur la 2e ligne qui défile, tous les liens restent visibles. */
-  .l-nav a[href="#pilotage"], .l-nav a[href="#faq"] { display: inline-flex !important; }
-  /* Le bandeau ne suit plus le défilement : il ne mange pas l'écran du téléphone
-     (la barre « Essai gratuit » du bas reste toujours accessible). */
-  .l-header { position: relative; }
+  .l-burger {
+    display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-inline-end: -6px;
+    border: 0; border-radius: 10px; background: none; color: var(--bandeau-ink); cursor: pointer;
+  }
+  .l-burger:hover, .l-header.menu-ouvert .l-burger { background: color-mix(in srgb, var(--bandeau-ink) 10%, transparent); }
+  .l-nav {
+    display: none; position: absolute; inset-inline: 0; top: 100%; z-index: 30;
+    flex-direction: column; gap: 2px; padding: 8px var(--marge-bandeau) 16px;
+    background: var(--bandeau); border-top: 1px solid color-mix(in srgb, var(--bandeau-ink) 12%, transparent);
+    box-shadow: 0 18px 30px -12px var(--shadow);
+  }
+  .l-header.menu-ouvert .l-nav { display: flex; animation: l-menu .18s ease; }
+  .l-nav a, .l-nav .l-nav-mobile { display: flex !important; align-items: center; min-height: 48px; padding: 0 12px; border-radius: 10px; font-size: 1.05rem; }
+  .l-nav a:hover { background: color-mix(in srgb, var(--bandeau-ink) 8%, transparent); text-decoration: none; }
+  .l-nav .l-nav-gratuit { justify-content: center; margin-bottom: 6px; min-height: 48px; }
+  .l-nav .l-nav-mobile { border-top: 1px solid color-mix(in srgb, var(--bandeau-ink) 12%, transparent); border-radius: 0; margin-top: 6px; padding-top: 6px; font-weight: 600; }
 }
+@keyframes l-menu { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 560px) { .l-header .l-login { display: none; } }
 @media (max-width: 360px) { .l-header .logo-texte { display: none; } }
 .l-pill-court { display: none; }
 @media (max-width: 560px) {
@@ -476,3 +482,71 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .landing section[id] { scroll-margin-top: 90px; }
 @media (max-width: 960px) { .landing section[id] { scroll-margin-top: 12px; } }
 @media (max-width: 420px) { .l-header { --marge-bandeau: 16px; } }
+
+/* ====================================================================
+   Refonte de l'accueil : téléphone d'abord
+   ==================================================================== */
+/* Accroche sur téléphone : titre, boutons, puis la vidéo de l'appli tout de suite. */
+@media (max-width: 860px) {
+  .hero { padding-block: 28px 40px; }
+  .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .hero-text { display: contents; }
+  .hero .eyebrow { order: 1; font-size: .85rem; }
+  .hero h1 { order: 2; font-size: clamp(2rem, 9vw, 2.6rem); margin-bottom: 14px; }
+  .hero .lead { order: 3; font-size: 1.02rem; margin-bottom: 20px; }
+  .hero-cta { order: 4; }
+  .hero-video { order: 5; margin: 28px auto 0; width: min(260px, 70vw); }
+  .hero-gratuit { order: 6; margin-top: 24px; }
+  .hero .trust { order: 7; justify-content: center; }
+  .hero-cta .btn { flex: 1 1 100%; justify-content: center; }
+}
+
+/* Bande « garanties » : uniquement des faits vérifiables. */
+.garanties { border-block: 1px solid var(--border); background: var(--card); }
+.garanties ul { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 24px; list-style: none; margin: 0 auto; padding-block: 22px; }
+.garanties li { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: .95rem; color: var(--text); }
+.garanties svg { flex: none; width: 22px; height: 22px; padding: 7px; box-sizing: content-box; border-radius: 10px; background: var(--primary-soft); color: var(--primary);
+  fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 960px) { .garanties ul { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .garanties li { font-size: .88rem; } .garanties svg { width: 18px; height: 18px; padding: 6px; } }
+
+/* Sans / avec Devizo */
+.aa-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.aa-carte { border-radius: 18px; padding: 28px; border: 1px solid var(--border); }
+.aa-avant { background: var(--card); }
+.aa-avec { background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+.aa-titre { margin: 0 0 16px; font-weight: 700; font-size: 1.15rem; }
+.aa-avant .aa-titre { color: var(--muted); }
+.aa-avec .aa-titre { color: var(--primary); }
+.aa-carte ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.aa-carte li { position: relative; padding-inline-start: 34px; line-height: 1.45; }
+.aa-carte li::before { position: absolute; inset-inline-start: 0; top: -1px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-size: .8rem; font-weight: 800; }
+.aa-avant li { color: var(--muted); }
+.aa-avant li::before { content: "✕"; background: var(--danger-soft); color: var(--danger); }
+.aa-avec li { color: var(--text); font-weight: 500; }
+.aa-avec li::before { content: "✓"; background: var(--primary); color: var(--on-primary); }
+@media (max-width: 760px) { .aa-grille { grid-template-columns: 1fr; } .aa-carte { padding: 22px; } }
+
+/* Fonctionnalités : une icône par carte ; sur téléphone, cartes compactes. */
+.feat-ico { display: block; box-sizing: content-box; width: 22px; height: 22px; padding: 10px; margin-bottom: 14px; border-radius: 12px; background: var(--primary-soft); color: var(--primary);
+  fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Téléphone : grille de 2 colonnes, icône + titre ; le détail s'ouvre d'un toucher. */
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .feat { padding: 14px; border-radius: 14px; cursor: pointer; }
+  .feat-ico { margin-bottom: 10px; width: 20px; height: 20px; padding: 8px; }
+  .feat h3 { font-size: .98rem; line-height: 1.3; margin: 0; }
+  .feat p { display: none; font-size: .9rem; line-height: 1.45; margin-top: 8px; }
+  .feat.ouverte, .feat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .feat.ouverte p { display: block; }
+}
+
+/* Tarifs sur téléphone : un onglet par formule (Pro affiché d'abord), une seule carte à la fois. */
+.plans-onglets { display: none; }
+@media (max-width: 900px) {
+  .plans-onglets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 460px; margin: 0 0 20px; padding: 4px; border-radius: 14px; background: var(--bg-2); }
+  .plans-onglets button { min-height: 44px; border: 0; border-radius: 10px; background: none; color: var(--text-2); font: inherit; font-weight: 600; cursor: pointer; }
+  .plans-onglets button[aria-selected="true"] { background: var(--card); color: var(--text); box-shadow: var(--sh-sm); }
+  .plans.avec-onglets .plan:not(.plan-choisi) { display: none; }
+  .plans.avec-onglets .plan { margin-top: 12px; }
+}

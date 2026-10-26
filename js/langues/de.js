@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.de = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Ein sauberes PDF, bereit zum Versand an den Kunden.",
  "tour.facture.t": "Rechnung",
- "tour.facture.p": "Angebot angenommen? Ein Klick, und die Rechnung wird mit der richtigen Nummer erstellt."
+ "tour.facture.p": "Angebot angenommen? Ein Klick, und die Rechnung wird mit der richtigen Nummer erstellt.",
+ // Accueil (refonte)
+ "g.1": "Daten in Frankreich gehostet",
+ "g.2": "Pflichtangaben automatisch",
+ "g.3": "Online-Unterschrift der Angebote",
+ "g.4": "Funktioniert auch ohne Netz auf der Baustelle",
+ "aa.eyebrow": "Warum Devizo",
+ "aa.titre": "Schluss mit Angeboten am Sonntagabend.",
+ "aa.avant": "Ohne Devizo",
+ "aa.avec": "Mit Devizo",
+ "aa.a1": "Angebote abends in Word getippt, nach der Baustelle",
+ "aa.a2": "Eine vergessene Angabe, und die Rechnung ist nicht konform",
+ "aa.a3": "Zahlungserinnerungen von Hand geschrieben",
+ "aa.a4": "Keine Ahnung, was nach den Abgaben übrig bleibt",
+ "aa.b1": "Das Angebot beim Kunden erstellt, in 2 Minuten, am Handy",
+ "aa.b2": "Pflichtangaben werden automatisch ergänzt",
+ "aa.b3": "Online-Unterschrift und Erinnerung mit einem Klick",
+ "aa.b4": "Was Ihnen bleibt, live berechnet",
+ "p.reco": "Empfohlen",
 };
 window.DEVIZO_TRAD.de['nav.essaiCourt'] = "Gratis testen";
 window.DEVIZO_TRAD.de['tour.dvaleur.t'] = "Was Ihnen bleibt";

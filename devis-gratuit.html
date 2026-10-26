@@ -20,26 +20,30 @@
   <link rel="icon" href="img/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/logo-180.png">
   <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="css/tokens.css?v=98">
-  <link rel="stylesheet" href="css/style.css?v=98">
-  <link rel="stylesheet" href="css/landing.css?v=98">
-  <link rel="stylesheet" href="css/seo.css?v=98">
+  <link rel="stylesheet" href="css/tokens.css?v=99">
+  <link rel="stylesheet" href="css/style.css?v=99">
+  <link rel="stylesheet" href="css/landing.css?v=99">
+  <link rel="stylesheet" href="css/seo.css?v=99">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://devizo-app.fr/#organisation","name":"Devizo","url":"https://devizo-app.fr/","logo":"https://devizo-app.fr/img/logo-512.png","email":"contact@devizo-app.fr"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://devizo-app.fr/"},{"@type":"ListItem","position":2,"name":"Devis gratuit en ligne"}]},{"@type":"WebApplication","name":"Générateur de devis gratuit Devizo","url":"https://devizo-app.fr/devis-gratuit.html","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://devizo-app.fr/#organisation"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Le générateur de devis est-il vraiment gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui, jusqu'à 3 devis par mois. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document. Pour faire plus de devis, et des factures, créez un compte Devizo : 14 jours gratuits, sans carte bancaire."}},{"@type":"Question","name":"Mes informations sont-elles enregistrées ?","acceptedAnswer":{"@type":"Answer","text":"Non. Rien n'est envoyé sur nos serveurs : le devis reste uniquement sur votre appareil, dans votre navigateur. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."}},{"@type":"Question","name":"Le devis est-il conforme à la loi ?","acceptedAnswer":{"@type":"Answer","text":"Le PDF contient les mentions principales d'un devis d'artisan : vos coordonnées et votre SIRET, celles du client, la date et la durée de validité, le détail des prestations avec les prix unitaires HT, la TVA ou la mention « TVA non applicable, art. 293 B du CGI », l'assurance décennale et la zone « Bon pour accord ». Selon votre métier, d'autres mentions peuvent être nécessaires : consultez notre guide des mentions obligatoires."}},{"@type":"Question","name":"Puis-je faire une facture avec ce générateur ?","acceptedAnswer":{"@type":"Answer","text":"Non, le générateur gratuit fait uniquement des devis. Les factures demandent une numérotation qui se suit sans trou et une conservation pendant 10 ans : c'est ce que fait l'appli Devizo, qui transforme un devis accepté en facture en un clic. Essai gratuit 14 jours, sans carte bancaire."}},{"@type":"Question","name":"Quel taux de TVA mettre sur un devis de travaux ?","acceptedAnswer":{"@type":"Answer","text":"En général 10 % pour des travaux d'amélioration ou d'entretien dans un logement de plus de 2 ans, 5,5 % pour la rénovation énergétique, et 20 % dans le neuf ou pour un professionnel. En micro-entreprise sous le seuil de franchise, cochez « Je ne facture pas la TVA »."}}]}]}</script>
 </head>
 <body class="landing seo">
   <header class="l-header">
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
-      <nav class="l-nav" aria-label="Navigation principale">
+      <nav class="l-nav" id="l-nav" aria-label="Navigation principale">
         <a class="l-nav-gratuit" href="devis-gratuit.html"><span class="roule"><span class="roule-a"><span>Devis gratuit</span><small>sans inscription</small></span><span class="roule-b" aria-hidden="true">Faire mon devis →</span></span></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
+        <a class="l-nav-mobile" href="app.html#connexion">Connexion</a>
       </nav>
       <div class="l-actions">
         <a class="l-login" href="app.html#connexion">Connexion</a>
         <a class="l-pill l-pill-plein l-pill-long" href="app.html#inscription">Essai gratuit 14 jours</a>
         <a class="l-pill l-pill-plein l-pill-court" href="app.html#inscription">Essai gratuit</a>
+        <button type="button" class="l-burger" aria-expanded="false" aria-controls="l-nav" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -129,7 +133,7 @@
       </div>
     </section>
   </main>
-  <script src="js/devis-gratuit.js?v=98" defer></script>
+  <script src="js/devis-gratuit.js?v=99" defer></script>
 
   <footer class="l-footer seo-pied">
     <div class="l-wrap">
@@ -149,9 +153,10 @@
       <p class="seo-copy">© 2026 Devizo</p>
     </div>
   </footer>
-  <script src="js/config.js?v=98"></script>
-  <script src="js/parrainage.js?v=98" defer></script>
-  <script src="js/stats.js?v=98" defer></script>
-  <script src="js/cookies.js?v=98" defer></script>
+  <script src="js/menu-site.js?v=99" defer></script>
+  <script src="js/config.js?v=99"></script>
+  <script src="js/parrainage.js?v=99" defer></script>
+  <script src="js/stats.js?v=99" defer></script>
+  <script src="js/cookies.js?v=99" defer></script>
 </body>
 </html>

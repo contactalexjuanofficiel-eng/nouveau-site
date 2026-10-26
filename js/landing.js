@@ -67,12 +67,31 @@ const ETAPES_TABLEAU = [
 
   // Barre « Essai gratuit » en bas de l'écran du téléphone, dès que les boutons du haut ne sont plus visibles.
   const barre = document.querySelector('.barre-essai');
-  const boutonsHaut = document.querySelector('.hero-cta');
+  // Elle n'apparaît qu'une fois toute l'accroche passée : elle ne cache jamais la vidéo.
+  const boutonsHaut = document.querySelector('.hero');
   if (barre && boutonsHaut && 'IntersectionObserver' in window) {
     barre.hidden = false;
     new IntersectionObserver(([e]) => {
       barre.classList.toggle('visible', !e.isIntersecting && e.boundingClientRect.top < 0);
     }).observe(boutonsHaut);
+  }
+
+  // Fonctionnalités sur téléphone : toucher une carte affiche son détail.
+  document.querySelectorAll('.feat').forEach((carte) => carte.addEventListener('click', () => {
+    if (matchMedia('(max-width: 600px)').matches) carte.classList.toggle('ouverte');
+  }));
+
+  // Tarifs sur téléphone : onglets Solo / Pro / Entreprise.
+  const onglets = document.querySelectorAll('.plans-onglets [data-plan]');
+  const cartes = document.querySelectorAll('.plans .plan');
+  if (onglets.length && cartes.length === onglets.length) {
+    const montrer = (i) => {
+      onglets.forEach((o, k) => o.setAttribute('aria-selected', String(k === i)));
+      cartes.forEach((c, k) => c.classList.toggle('plan-choisi', k === i));
+    };
+    document.querySelector('.plans').classList.add('avec-onglets');
+    onglets.forEach((o, i) => o.addEventListener('click', () => montrer(i)));
+    montrer(1);
   }
 
   if (!('IntersectionObserver' in window) || reduceMotion) return;
@@ -238,3 +257,4 @@ function visite(zone, steps, { badge = null, attente = 2800 } = {}) {
   }
   run();
 }
+

@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.ro = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Un PDF curat, gata de trimis clientului.",
  "tour.facture.t": "Factură",
- "tour.facture.p": "Ofertă acceptată? Un clic și factura este creată cu numărul corect."
+ "tour.facture.p": "Ofertă acceptată? Un clic și factura este creată cu numărul corect.",
+ // Accueil (refonte)
+ "g.1": "Date găzduite în Franța",
+ "g.2": "Mențiuni obligatorii automate",
+ "g.3": "Semnarea online a devizelor",
+ "g.4": "Funcționează și fără semnal pe șantier",
+ "aa.eyebrow": "De ce Devizo",
+ "aa.titre": "Gata cu devizele duminică seara.",
+ "aa.avant": "Fără Devizo",
+ "aa.avec": "Cu Devizo",
+ "aa.a1": "Devize scrise în Word seara, după șantier",
+ "aa.a2": "O mențiune uitată și factura nu este conformă",
+ "aa.a3": "Reamintiri de plată scrise de mână",
+ "aa.a4": "Nicio idee ce rămâne după contribuții",
+ "aa.b1": "Devizul făcut la client, în 2 minute, pe telefon",
+ "aa.b2": "Mențiunile obligatorii adăugate singure",
+ "aa.b3": "Semnătură online și reamintire dintr-un clic",
+ "aa.b4": "Ce vă rămâne, calculat în timp real",
+ "p.reco": "Recomandat",
 };
 window.DEVIZO_TRAD.ro['nav.essaiCourt'] = "Test gratuit";
 window.DEVIZO_TRAD.ro['tour.dvaleur.t'] = "Ce vă rămâne";

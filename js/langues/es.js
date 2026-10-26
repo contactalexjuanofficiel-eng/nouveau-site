@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.es = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Un PDF limpio, listo para enviar al cliente.",
  "tour.facture.t": "Factura",
- "tour.facture.p": "¿Presupuesto aceptado? Un clic y la factura se crea con el número correcto."
+ "tour.facture.p": "¿Presupuesto aceptado? Un clic y la factura se crea con el número correcto.",
+ // Accueil (refonte)
+ "g.1": "Datos alojados en Francia",
+ "g.2": "Menciones obligatorias automáticas",
+ "g.3": "Firma en línea de los presupuestos",
+ "g.4": "Funciona incluso sin cobertura en la obra",
+ "aa.eyebrow": "Por qué Devizo",
+ "aa.titre": "Se acabaron los presupuestos el domingo por la noche.",
+ "aa.avant": "Sin Devizo",
+ "aa.avec": "Con Devizo",
+ "aa.a1": "Presupuestos escritos en Word por la noche, tras la obra",
+ "aa.a2": "Una mención olvidada y la factura no es conforme",
+ "aa.a3": "Recordatorios de impagos escritos a mano",
+ "aa.a4": "Ni idea de lo que queda tras las cotizaciones",
+ "aa.b1": "El presupuesto hecho en casa del cliente, en 2 minutos, en el móvil",
+ "aa.b2": "Las menciones obligatorias se añaden solas",
+ "aa.b3": "Firma en línea y recordatorio en un clic",
+ "aa.b4": "Lo que le queda, calculado en directo",
+ "p.reco": "Recomendado",
 };
 window.DEVIZO_TRAD.es['nav.essaiCourt'] = "Prueba gratis";
 window.DEVIZO_TRAD.es['tour.dvaleur.t'] = "Lo que te queda";

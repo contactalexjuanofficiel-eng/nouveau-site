@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.pl = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Czysty PDF, gotowy do wysłania klientowi.",
  "tour.facture.t": "Faktura",
- "tour.facture.p": "Wycena zaakceptowana? Jedno kliknięcie i faktura powstaje z właściwym numerem."
+ "tour.facture.p": "Wycena zaakceptowana? Jedno kliknięcie i faktura powstaje z właściwym numerem.",
+ // Accueil (refonte)
+ "g.1": "Dane przechowywane we Francji",
+ "g.2": "Obowiązkowe informacje automatycznie",
+ "g.3": "Podpis ofert online",
+ "g.4": "Działa nawet bez zasięgu na budowie",
+ "aa.eyebrow": "Dlaczego Devizo",
+ "aa.titre": "Koniec z ofertami w niedzielę wieczorem.",
+ "aa.avant": "Bez Devizo",
+ "aa.avec": "Z Devizo",
+ "aa.a1": "Oferty pisane w Wordzie wieczorem, po pracy",
+ "aa.a2": "Jedna zapomniana informacja i faktura jest niezgodna",
+ "aa.a3": "Przypomnienia o płatności pisane ręcznie",
+ "aa.a4": "Brak pojęcia, ile zostaje po składkach",
+ "aa.b1": "Oferta u klienta, w 2 minuty, na telefonie",
+ "aa.b2": "Obowiązkowe informacje dodawane same",
+ "aa.b3": "Podpis online i przypomnienie jednym kliknięciem",
+ "aa.b4": "Ile Ci zostaje, liczone na bieżąco",
+ "p.reco": "Polecane",
 };
 window.DEVIZO_TRAD.pl['nav.essaiCourt'] = "Wypróbuj";
 window.DEVIZO_TRAD.pl['tour.dvaleur.t'] = "Ile Ci zostaje";

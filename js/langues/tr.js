@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.tr = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Müşteriye göndermeye hazır temiz bir PDF.",
  "tour.facture.t": "Fatura",
- "tour.facture.p": "Teklif kabul edildi mi? Tek tık, fatura doğru numarayla oluşturulur."
+ "tour.facture.p": "Teklif kabul edildi mi? Tek tık, fatura doğru numarayla oluşturulur.",
+ // Accueil (refonte)
+ "g.1": "Veriler Fransa'da barındırılıyor",
+ "g.2": "Zorunlu bilgiler otomatik",
+ "g.3": "Tekliflerin çevrimiçi imzası",
+ "g.4": "Şantiyede çekmese bile çalışır",
+ "aa.eyebrow": "Neden Devizo",
+ "aa.titre": "Pazar akşamı teklif hazırlamaya son.",
+ "aa.avant": "Devizo olmadan",
+ "aa.avec": "Devizo ile",
+ "aa.a1": "İşten sonra akşam Word'de yazılan teklifler",
+ "aa.a2": "Unutulan bir bilgi ve fatura uygun değil",
+ "aa.a3": "Elle yazılan ödeme hatırlatmaları",
+ "aa.a4": "Primlerden sonra ne kaldığını bilmemek",
+ "aa.b1": "Teklif müşterinin yanında, 2 dakikada, telefondan",
+ "aa.b2": "Zorunlu bilgiler kendiliğinden eklenir",
+ "aa.b3": "Çevrimiçi imza ve tek tıkla hatırlatma",
+ "aa.b4": "Size kalan tutar, anında hesaplanır",
+ "p.reco": "Önerilen",
 };
 window.DEVIZO_TRAD.tr['nav.essaiCourt'] = "Ücretsiz dene";
 window.DEVIZO_TRAD.tr['tour.dvaleur.t'] = "Elinizde kalan";

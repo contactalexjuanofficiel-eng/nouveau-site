@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.it = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Un PDF pulito, pronto da inviare al cliente.",
  "tour.facture.t": "Fattura",
- "tour.facture.p": "Preventivo accettato? Un clic e la fattura viene creata con il numero giusto."
+ "tour.facture.p": "Preventivo accettato? Un clic e la fattura viene creata con il numero giusto.",
+ // Accueil (refonte)
+ "g.1": "Dati ospitati in Francia",
+ "g.2": "Diciture obbligatorie automatiche",
+ "g.3": "Firma online dei preventivi",
+ "g.4": "Funziona anche senza rete in cantiere",
+ "aa.eyebrow": "Perché Devizo",
+ "aa.titre": "Basta preventivi la domenica sera.",
+ "aa.avant": "Senza Devizo",
+ "aa.avec": "Con Devizo",
+ "aa.a1": "Preventivi scritti su Word la sera, dopo il cantiere",
+ "aa.a2": "Una dicitura dimenticata e la fattura non è conforme",
+ "aa.a3": "Solleciti di pagamento scritti a mano",
+ "aa.a4": "Nessuna idea di cosa resta dopo i contributi",
+ "aa.b1": "Il preventivo fatto dal cliente, in 2 minuti, dal telefono",
+ "aa.b2": "Le diciture obbligatorie aggiunte da sole",
+ "aa.b3": "Firma online e sollecito in un clic",
+ "aa.b4": "Quello che ti resta, calcolato in diretta",
+ "p.reco": "Consigliato",
 };
 window.DEVIZO_TRAD.it['nav.essaiCourt'] = "Prova gratis";
 window.DEVIZO_TRAD.it['tour.dvaleur.t'] = "Quanto ti resta";

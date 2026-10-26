@@ -20,26 +20,30 @@
   <link rel="icon" href="img/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/logo-180.png">
   <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="css/tokens.css?v=98">
-  <link rel="stylesheet" href="css/style.css?v=98">
-  <link rel="stylesheet" href="css/landing.css?v=98">
-  <link rel="stylesheet" href="css/seo.css?v=98">
+  <link rel="stylesheet" href="css/tokens.css?v=99">
+  <link rel="stylesheet" href="css/style.css?v=99">
+  <link rel="stylesheet" href="css/landing.css?v=99">
+  <link rel="stylesheet" href="css/seo.css?v=99">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://devizo-app.fr/#organisation","name":"Devizo","url":"https://devizo-app.fr/","logo":"https://devizo-app.fr/img/logo-512.png","email":"contact@devizo-app.fr"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://devizo-app.fr/"},{"@type":"ListItem","position":2,"name":"Outils gratuits","item":"https://devizo-app.fr/devis-gratuit.html"},{"@type":"ListItem","position":3,"name":"Vérifier un SIRET"}]},{"@type":"WebApplication","name":"Vérifier un SIRET (Devizo)","url":"https://devizo-app.fr/verifier-siret.html","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@id":"https://devizo-app.fr/#organisation"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"D'où viennent les informations ?","acceptedAnswer":{"@type":"Answer","text":"De l'annuaire des entreprises de l'État (données publiques de l'INSEE), consulté au moment de votre recherche. Devizo ne garde aucune trace du numéro recherché."}},{"@type":"Question","name":"Pourquoi un SIRET valide est-il introuvable ?","acceptedAnswer":{"@type":"Answer","text":"L'entreprise peut être très récente, ou avoir demandé que ses informations ne soient pas diffusées. Il peut aussi s'agir d'une erreur qui respecte par hasard la clé de contrôle."}},{"@type":"Question","name":"Comment est vérifiée la clé de contrôle ?","acceptedAnswer":{"@type":"Answer","text":"Les 14 chiffres d'un SIRET respectent une formule (l'algorithme de Luhn) qui permet de repérer la plupart des fautes de frappe, sans même interroger l'annuaire."}}]}]}</script>
 </head>
 <body class="landing seo">
   <header class="l-header">
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
-      <nav class="l-nav" aria-label="Navigation principale">
+      <nav class="l-nav" id="l-nav" aria-label="Navigation principale">
         <a class="l-nav-gratuit" href="devis-gratuit.html"><span class="roule"><span class="roule-a"><span>Devis gratuit</span><small>sans inscription</small></span><span class="roule-b" aria-hidden="true">Faire mon devis →</span></span></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
+        <a class="l-nav-mobile" href="app.html#connexion">Connexion</a>
       </nav>
       <div class="l-actions">
         <a class="l-login" href="app.html#connexion">Connexion</a>
         <a class="l-pill l-pill-plein l-pill-long" href="app.html#inscription">Essai gratuit 14 jours</a>
         <a class="l-pill l-pill-plein l-pill-court" href="app.html#inscription">Essai gratuit</a>
+        <button type="button" class="l-burger" aria-expanded="false" aria-controls="l-nav" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -97,7 +101,7 @@
       </div>
     </section>
   </main>
-  <script src="js/outils.js?v=98" defer></script>
+  <script src="js/outils.js?v=99" defer></script>
 
   <footer class="l-footer seo-pied">
     <div class="l-wrap">
@@ -117,9 +121,10 @@
       <p class="seo-copy">© 2026 Devizo</p>
     </div>
   </footer>
-  <script src="js/config.js?v=98"></script>
-  <script src="js/parrainage.js?v=98" defer></script>
-  <script src="js/stats.js?v=98" defer></script>
-  <script src="js/cookies.js?v=98" defer></script>
+  <script src="js/menu-site.js?v=99" defer></script>
+  <script src="js/config.js?v=99"></script>
+  <script src="js/parrainage.js?v=99" defer></script>
+  <script src="js/stats.js?v=99" defer></script>
+  <script src="js/cookies.js?v=99" defer></script>
 </body>
 </html>

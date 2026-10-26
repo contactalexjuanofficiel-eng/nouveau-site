@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.en = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "A clean PDF, ready to send to the client.",
  "tour.facture.t": "Invoice",
- "tour.facture.p": "Quote accepted? One click, and the invoice is created with the right number."
+ "tour.facture.p": "Quote accepted? One click, and the invoice is created with the right number.",
+ // Accueil (refonte)
+ "g.1": "Data hosted in France",
+ "g.2": "Mandatory mentions added automatically",
+ "g.3": "Online signature of quotes",
+ "g.4": "Works even without signal on site",
+ "aa.eyebrow": "Why Devizo",
+ "aa.titre": "No more quotes on Sunday evening.",
+ "aa.avant": "Without Devizo",
+ "aa.avec": "With Devizo",
+ "aa.a1": "Quotes typed in Word at night, after work",
+ "aa.a2": "One forgotten mention, and the invoice is not compliant",
+ "aa.a3": "Payment reminders written by hand",
+ "aa.a4": "No idea what is left after social charges",
+ "aa.b1": "The quote made at the client's, in 2 minutes, on your phone",
+ "aa.b2": "Mandatory mentions added automatically",
+ "aa.b3": "Online signature and reminders in one click",
+ "aa.b4": "What you have left, calculated live",
+ "p.reco": "Recommended",
 };
 window.DEVIZO_TRAD.en['nav.essaiCourt'] = "Free trial";
 window.DEVIZO_TRAD.en['tour.dvaleur.t'] = "What you have left";

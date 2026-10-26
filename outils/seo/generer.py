@@ -72,16 +72,20 @@ def tete(titre, description, chemin, ld, type_og='website'):
   <header class="l-header">
     <div class="l-wrap l-header-inner">
       <a class="logo" href="index.html" aria-label="Devizo, accueil"><img class="logo-icone" src="img/logo.svg" alt="" width="32" height="32"><span class="logo-texte">Devizo</span></a>
-      <nav class="l-nav" aria-label="Navigation principale">
+      <nav class="l-nav" id="l-nav" aria-label="Navigation principale">
         <a class="l-nav-gratuit" href="devis-gratuit.html"><span class="roule"><span class="roule-a"><span>Devis gratuit</span><small>sans inscription</small></span><span class="roule-b" aria-hidden="true">Faire mon devis →</span></span></a>
         <a href="index.html#fonctionnalites">Fonctionnalités</a>
         <a href="index.html#tarifs">Tarifs</a>
         <a href="guide-mentions-obligatoires-devis.html">Guides</a>
+        <a class="l-nav-mobile" href="app.html#connexion">Connexion</a>
       </nav>
       <div class="l-actions">
         <a class="l-login" href="app.html#connexion">Connexion</a>
         <a class="l-pill l-pill-plein l-pill-long" href="app.html#inscription">Essai gratuit 14 jours</a>
         <a class="l-pill l-pill-plein l-pill-court" href="app.html#inscription">Essai gratuit</a>
+        <button type="button" class="l-burger" aria-expanded="false" aria-controls="l-nav" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -121,6 +125,7 @@ def pied():
       <p class="seo-copy">© 2026 Devizo</p>
     </div>
   </footer>
+  <script src="js/menu-site.js?v={VERSION}" defer></script>
   <script src="js/config.js?v={VERSION}"></script>
   <script src="js/parrainage.js?v={VERSION}" defer></script>
   <script src="js/stats.js?v={VERSION}" defer></script>

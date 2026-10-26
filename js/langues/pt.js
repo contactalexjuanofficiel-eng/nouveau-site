@@ -139,7 +139,25 @@ window.DEVIZO_TRAD.pt = {
  "tour.pdf.t": "PDF",
  "tour.pdf.p": "Um PDF limpo, pronto a enviar ao cliente.",
  "tour.facture.t": "Fatura",
- "tour.facture.p": "Orçamento aceite? Um clique e a fatura é criada com o número certo."
+ "tour.facture.p": "Orçamento aceite? Um clique e a fatura é criada com o número certo.",
+ // Accueil (refonte)
+ "g.1": "Dados alojados em França",
+ "g.2": "Menções obrigatórias automáticas",
+ "g.3": "Assinatura online dos orçamentos",
+ "g.4": "Funciona mesmo sem rede na obra",
+ "aa.eyebrow": "Porquê o Devizo",
+ "aa.titre": "Acabaram-se os orçamentos ao domingo à noite.",
+ "aa.avant": "Sem o Devizo",
+ "aa.avec": "Com o Devizo",
+ "aa.a1": "Orçamentos escritos no Word à noite, depois da obra",
+ "aa.a2": "Uma menção esquecida e a fatura não está conforme",
+ "aa.a3": "Lembretes de pagamento escritos à mão",
+ "aa.a4": "Nenhuma ideia do que sobra depois das contribuições",
+ "aa.b1": "O orçamento feito em casa do cliente, em 2 minutos, no telemóvel",
+ "aa.b2": "As menções obrigatórias são adicionadas sozinhas",
+ "aa.b3": "Assinatura online e lembrete num clique",
+ "aa.b4": "O que lhe sobra, calculado em direto",
+ "p.reco": "Recomendado",
 };
 window.DEVIZO_TRAD.pt['nav.essaiCourt'] = "Teste grátis";
 window.DEVIZO_TRAD.pt['tour.dvaleur.t'] = "O que lhe sobra";
