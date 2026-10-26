@@ -2159,6 +2159,34 @@ document.addEventListener('click', (e) => {
   if (topbar.classList.contains('menu-open') && !topbar.contains(e.target) && !burger?.contains(e.target)) menuOuvert(false);
 });
 
+// Le menu « Plus » se ferme en le faisant glisser vers le bas, comme sur iPhone.
+// Tant qu'il est ouvert, la page derrière ne défile pas.
+const feuille = document.getElementById('menu-principal');
+let glisse = null;
+feuille?.addEventListener('touchstart', (e) => {
+  if (!topbar.classList.contains('menu-open')) return;
+  glisse = { y: e.touches[0].clientY, t: Date.now(), dy: 0, haut: feuille.scrollTop <= 0 };
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  if (!topbar.classList.contains('menu-open')) return;
+  if (!feuille.contains(e.target)) { e.preventDefault(); return; }
+  if (!glisse) return;
+  const dy = e.touches[0].clientY - glisse.y;
+  // On ne tire la feuille que si son contenu est déjà en haut et qu'on glisse vers le bas.
+  if (!glisse.haut || dy <= 0) { glisse.dy = 0; feuille.style.removeProperty('--glisse'); return; }
+  e.preventDefault();
+  glisse.dy = dy;
+  feuille.classList.add('glisse');
+  feuille.style.setProperty('--glisse', dy + 'px');
+}, { passive: false });
+feuille?.addEventListener('touchend', () => {
+  if (!glisse) return;
+  const { dy, t } = glisse; glisse = null;
+  feuille.classList.remove('glisse');
+  feuille.style.removeProperty('--glisse');
+  if (dy > 80 || (dy > 30 && dy / (Date.now() - t) > 0.5)) menuOuvert(false);
+});
+
 window.addEventListener('hashchange', () => {
   menuOuvert(false);
   render();

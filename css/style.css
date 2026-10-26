@@ -162,12 +162,15 @@ img, svg { max-width: 100%; }
     transition: transform var(--dur-slow) var(--ease), visibility 0s linear var(--dur-slow);
   }
   body.app-shell .topbar .nav::before { content: ""; grid-column: 1 / -1; justify-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); margin-bottom: var(--sp-1); }
-  .menu-open .nav { transform: none !important; visibility: visible !important; transition: transform var(--dur-slow) var(--ease), visibility 0s !important; }
+  .menu-open .nav { transform: translateY(var(--glisse, 0px)) !important; visibility: visible !important; transition: transform var(--dur-slow) var(--ease), visibility 0s !important; }
   body.app-shell .topbar .nav-titre { grid-column: 1 / -1; margin: var(--sp-2) var(--sp-1) 0; }
   body.app-shell .topbar .nav a { min-height: var(--h-lg); font-size: var(--fs-base); padding: var(--sp-2) var(--sp-3); background: var(--bg); }
   body.app-shell .topbar .nav a.active { background: var(--primary-soft); }
   body.menu-ouvert .topbar { z-index: var(--z-overlay); }
-  body.menu-ouvert .tabbar { z-index: calc(var(--z-overlay) + 1); }
+  .menu-open .nav.glisse { transition: none !important; }
+  body.app-shell .topbar .nav { overscroll-behavior: contain; }
+  body.menu-ouvert { overflow: hidden; }
+  body.app-shell.menu-ouvert:not(.sans-compte) .tabbar { z-index: calc(var(--z-overlay) + 1); }
   body.menu-ouvert::after { content: ""; position: fixed; inset: 0; z-index: calc(var(--z-overlay) - 1); background: var(--overlay); animation: fondu var(--dur) var(--ease); }
 }
 @keyframes fondu { from { opacity: 0; } }
