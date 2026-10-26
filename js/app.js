@@ -585,7 +585,7 @@ function peutCreer() {
 
 // Télécharger, imprimer ou envoyer un document : il doit porter les mentions
 // obligatoires, donc « Mon entreprise » doit être complète. Renvoie true si c'est bon.
-async function profilPret() {
+async function profilPret(action = null) {
   if (!peutCreer()) return false;
   const manque = profilManquant();
   // Un administrateur peut tout tester, même avec un profil incomplet.
@@ -594,7 +594,7 @@ async function profilPret() {
     ? 'Votre document est presque prêt : il manque une information sur votre entreprise, obligatoire sur un devis ou une facture. Ça prend une minute.'
     : `Votre document est presque prêt : il manque ${manque.length} informations sur votre entreprise, obligatoires sur un devis ou une facture. Ça prend une minute.`,
   'Compléter (1 minute)', 'Plus tard');
-  if (ok) Bienvenue.ouvrir(location.hash);
+  if (ok) Bienvenue.ouvrir(location.hash, action);
   return false;
 }
 
@@ -1506,7 +1506,22 @@ function pageView(id) {
     render();
   });
   document.getElementById('duplicate')?.addEventListener('click', () => duplicateDocument(doc));
-  document.getElementById('imprimer')?.addEventListener('click', async () => { if (await profilPret()) window.print(); });
+  document.getElementById('imprimer')?.addEventListener('click', async () => { if (await profilPret({ type: 'imprimer', id: doc.id })) window.print(); });
+  // Retour du démarrage guidé : l'action demandée avant (PDF, impression, envoi) reprend toute seule.
+  let apres = null;
+  try {
+    apres = JSON.parse(sessionStorage.getItem('devizo-action-apres') || 'null');
+    sessionStorage.removeItem('devizo-action-apres');
+  } catch (err) {
+    // stockage indisponible
+  }
+  if (apres?.id === doc.id && !profilManquant().length) {
+    setTimeout(() => {
+      if (apres.action === 'pdf') Pdf.document(doc);
+      else if (apres.action === 'imprimer') window.print();
+      else if (apres.action === 'envoi' || apres.action === 'relance') Envoi.ouvrir(doc, apres.action);
+    }, 300);
+  }
   document.getElementById('completer-profil')?.addEventListener('click', () => Bienvenue.ouvrir(location.hash));
   document.getElementById('delete').addEventListener('click', async () => {
     if (await deleteDocument(doc)) go('#/documents');
@@ -2276,7 +2291,7 @@ document.addEventListener('click', async (e) => {
   if (dejaPaye) devisPaye(getDocument(dejaPaye));
   if (envoyer) Envoi.ouvrir(getDocument(envoyer), 'envoi');
   if (relancer) Envoi.ouvrir(getDocument(relancer), 'relance');
-  if (pdf && getDocument(pdf) && (await profilPret())) {
+  if (pdf && getDocument(pdf) && (await profilPret({ type: 'pdf', id: pdf }))) {
     const texte = cible.textContent;
     cible.disabled = true;
     cible.textContent = 'Création du PDF…';

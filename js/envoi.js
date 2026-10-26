@@ -100,7 +100,7 @@ const Envoi = (() => {
       if (await ask("L'envoi par e-mail, la signature en ligne et les relances sont inclus dans les formules Pro et Entreprise.", 'Voir les formules', 'Plus tard')) go('#/abonnement');
       return;
     }
-    if (!(await profilPret())) return;
+    if (!(await profilPret({ type: mode === 'relance' ? 'relance' : 'envoi', id: doc.id }))) return;
     const client = docClient(doc) || {};
     const { objet, message } = messageType(doc, mode);
     const devis = doc.type === 'devis' && mode === 'envoi';

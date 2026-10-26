@@ -18,15 +18,17 @@ const Bienvenue = (() => {
 
   // L'annuaire écrit tout en majuscules (« 12 RUE DES LILAS ») : on remet une
   // casse normale (« 12 rue des Lilas »), sauf si le texte contient déjà des minuscules.
-  const PETITS = new Set(['de', 'des', 'du', 'la', 'le', 'les', 'et', 'à', 'au', 'aux', 'en', 'sur', 'sous']);
+  const PETITS = new Set(['de', 'des', 'du', 'la', 'le', 'les', 'l', 'd', 'et', 'à', 'au', 'aux', 'en', 'sur', 'sous']);
+  const SIGLES = new Set(['sarl', 'sas', 'sasu', 'eurl', 'ei', 'eirl', 'sa', 'sci', 'snc', 'scop', 'btp', 'za', 'zi', 'zac']);
   const VOIES = new Set(['rue', 'avenue', 'av', 'boulevard', 'bd', 'chemin', 'route', 'impasse', 'allée', 'allee', 'place', 'quai', 'cours', 'passage', 'square', 'lieu-dit', 'lotissement', 'résidence', 'zone', 'za', 'zi']);
   function casse(texte, adresse = false) {
     const t = String(texte || '').trim();
     if (!t || /[a-zà-ÿ]/.test(t)) return t;
-    return t.toLowerCase().split(/(\s+|-|')/).map((m, i) => {
-      if (/^(\s+|-|')$/.test(m) || !m) return m;
-      if (i > 0 && (PETITS.has(m) || (adresse && VOIES.has(m)))) return m;
-      if (m === 'za' || m === 'zi') return m.toUpperCase();
+    return t.toLowerCase().split(/(\s+|-|'|\(|\))/).map((m, i, tout) => {
+      if (/^(\s+|-|'|\(|\))$/.test(m) || !m) return m;
+      if (SIGLES.has(m)) return m.toUpperCase();
+      const apresParenthese = tout[i - 1] === '(';
+      if (i > 0 && !apresParenthese && (PETITS.has(m) || (adresse && VOIES.has(m)))) return m;
       return m.charAt(0).toUpperCase() + m.slice(1);
     }).join('');
   }
@@ -35,28 +37,50 @@ const Bienvenue = (() => {
   // Affiché tout seul à la première ouverture d'un compte neuf.
   const doitAfficher = () => !e().accueilVu && profilManquant().length > 0 && !data.documents.length;
 
+  // Document en attente : { hash, action, id, le } (action = pdf, imprimer, envoi…).
+  // Valable 30 minutes et seulement tant qu'on reste dans le démarrage guidé.
+  function lireRetour() {
+    try {
+      const r = JSON.parse(sessionStorage.getItem(RETOUR) || 'null');
+      return r && Date.now() - r.le < 30 * 60000 ? r : null;
+    } catch (err) {
+      return null;
+    }
+  }
+  function oublierRetour() {
+    try { sessionStorage.removeItem(RETOUR); } catch (err) { /* rien */ }
+  }
+
+  let fin = false;
   function terminer(hash) {
     e().accueilVu = true;
     saveData();
-    let retour = '';
-    try {
-      retour = sessionStorage.getItem(RETOUR) || '';
-      sessionStorage.removeItem(RETOUR);
-    } catch (err) {
-      // stockage indisponible
-    }
-    go(hash || retour || '#/');
+    const retour = lireRetour();
+    oublierRetour();
+    fin = true;
+    if (!hash && retour) {
+      // L'action demandée (télécharger, imprimer, envoyer) reprend toute seule.
+      if (retour.action) {
+        try { sessionStorage.setItem('devizo-action-apres', JSON.stringify(retour)); } catch (err) { /* rien */ }
+      }
+      go(retour.hash);
+    } else go(hash || '#/');
+    fin = false;
   }
 
-  // Appelé quand un document ne peut pas encore être téléchargé ou envoyé.
-  function ouvrir(retour) {
+  // Appelé quand un document ne peut pas encore être téléchargé, imprimé ou envoyé.
+  function ouvrir(hash, action = null) {
     try {
-      if (retour) sessionStorage.setItem(RETOUR, retour);
+      if (hash) sessionStorage.setItem(RETOUR, JSON.stringify({ hash, action: action?.type || '', id: action?.id || '', le: Date.now() }));
     } catch (err) {
       // stockage indisponible
     }
     go('#/bienvenue');
   }
+  // Quitter le démarrage autrement (retour arrière, lien) : on oublie le document en attente.
+  window.addEventListener('hashchange', (ev) => {
+    if (!fin && ev.oldURL.includes('#/bienvenue') && !location.hash.startsWith('#/bienvenue')) oublierRetour();
+  });
 
   function etapes(n) {
     const noms = ['Entreprise', 'Activité', "C'est prêt"];
@@ -119,7 +143,8 @@ const Bienvenue = (() => {
     const recherche = document.getElementById('onb-recherche');
     if (recherche) {
       const champ = document.getElementById('onb-siret');
-      if (trouve && trouve.siret === champ.value.replace(/\s/g, '')) afficherTrouve();
+      // Résultat déjà trouvé pour ce SIRET (retour depuis la saisie à la main) : on le réaffiche.
+      if (trouve && ['actif', 'ferme'].includes(trouve.statut) && trouve.siret === champ.value.replace(/\s/g, '')) afficherTrouve();
       recherche.addEventListener('submit', async (ev) => {
         ev.preventDefault();
         const siret = champ.value.replace(/\s/g, '');
@@ -162,14 +187,14 @@ const Bienvenue = (() => {
         const v = Object.fromEntries(new FormData(formManuel));
         v.siret = v.siret.replace(/\s/g, '');
         const manque = [];
-        if (!v.nom.trim()) manque.push("le nom de l'entreprise");
-        if (!v.rue.trim() || !/^\d{5}$/.test(v.codePostal.trim()) || !v.ville.trim()) manque.push("l'adresse complète");
-        if (!checkSiret(v.siret)) manque.push('un SIRET valide (14 chiffres)');
-        if (SOCIETES.includes(v.formeJuridique) && !String(v.capital || '').trim()) manque.push('le capital social');
+        if (!v.nom.trim()) manque.push("Le nom de l'entreprise");
+        if (!v.rue.trim() || !/^\d{5}$/.test(v.codePostal.trim()) || !v.ville.trim()) manque.push("L'adresse complète (rue, code postal, ville)");
+        if (!checkSiret(v.siret)) manque.push('Un SIRET valide (14 chiffres)');
+        if (SOCIETES.includes(v.formeJuridique) && !String(v.capital || '').trim()) manque.push('Le capital social');
         if (manque.length) {
           const err = document.getElementById('onb-erreur');
           err.classList.remove('info');
-          err.textContent = 'Il manque ' + manque.join(', ') + '.';
+          err.innerHTML = listeManque(manque);
           err.hidden = false;
           return;
         }
@@ -181,6 +206,9 @@ const Bienvenue = (() => {
       });
     }
   }
+
+  // Ce qui manque, en liste : chaque ligne est traduite séparément.
+  const listeManque = (manque) => `<span>Il manque :</span><ul class="onb-manque">${manque.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>`;
 
   function erreurRecherche(texte) {
     document.getElementById('onb-resultat').innerHTML = `<p class="auth-erreur" role="alert">${esc(texte)}</p>`;
@@ -323,11 +351,11 @@ const Bienvenue = (() => {
       invalide('numeroTva', tva && !checkTva(valeurs.numeroTva));
       invalide('assureur', !nonDecennale && !valeurs.assureur);
       invalide('numeroContrat', !nonDecennale && !valeurs.numeroContrat);
-      if (tva && !checkTva(valeurs.numeroTva)) manque.push('un n° de TVA valide (FR + 11 caractères)');
-      if (!nonDecennale && (!valeurs.assureur || !valeurs.numeroContrat)) manque.push("le nom de l'assureur et le n° de contrat (ou cochez la case si vous n'êtes pas concerné)");
+      if (tva && !checkTva(valeurs.numeroTva)) manque.push('Un n° de TVA valide (FR + 11 caractères)');
+      if (!nonDecennale && (!valeurs.assureur || !valeurs.numeroContrat)) manque.push("L'assureur et le n° de contrat (ou cochez la case si vous n'êtes pas concerné)");
       if (manque.length) {
         const err = document.getElementById('onb-erreur');
-        err.textContent = 'Il manque ' + manque.join(', ') + '.';
+        err.innerHTML = listeManque(manque);
         err.hidden = false;
         return;
       }
@@ -354,12 +382,7 @@ const Bienvenue = (() => {
   function etape3() {
     const manque = profilManquant();
     const m = (window.DEVIZO_METIERS || []).find((x) => x.slug === e().metier);
-    let retour = '';
-    try {
-      retour = sessionStorage.getItem(RETOUR) || '';
-    } catch (err) {
-      // stockage indisponible
-    }
+    const retour = lireRetour();
     cadre(3, `
       <div class="onb-fini">
         <p class="onb-fini-icone" aria-hidden="true">🎉</p>
@@ -367,7 +390,7 @@ const Bienvenue = (() => {
         <ul class="onb-bilan">
           ${manque.length ? manque.map((x) => `<li class="manque"><a href="#/parametres?champ=${esc(x.champ)}">${esc(x.texte)}</a></li>`).join('')
             : '<li>Vos devis et factures auront toutes les mentions obligatoires</li>'}
-          ${ajoutees && m ? `<li>${ajoutees} prestations de ${esc(m.nom.toLowerCase())} ajoutées à votre catalogue (prix indicatifs, à adapter)</li>` : ''}
+          ${ajoutees && m ? `<li>${ajoutees} prestations ${/^[aeiouyéèêh]/i.test(m.nom) ? "d'" : 'de '}${esc(m.nom.toLowerCase())} ajoutées à votre catalogue (prix indicatifs, à adapter)</li>` : ''}
           <li>14 jours pour tout essayer, sans carte bancaire</li>
         </ul>
         <div class="onb-actions onb-actions-centre">
@@ -385,14 +408,13 @@ const Bienvenue = (() => {
     });
     view.querySelector('[data-retour-doc]')?.addEventListener('click', () => terminer());
     view.querySelector('[data-decouvrir]').addEventListener('click', () => {
-      try { sessionStorage.removeItem(RETOUR); } catch (err) { /* rien */ }
+      oublierRetour();
       terminer('#/');
     });
   }
 
   function page() {
-    if (identiteComplete() && profilManquant().length) etape2();
-    else if (!profilManquant().length && e().accueilVu) etape3();
+    if (!profilManquant().length) etape3();
     else if (identiteComplete()) etape2();
     else etape1();
   }

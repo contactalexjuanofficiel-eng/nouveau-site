@@ -1051,3 +1051,5 @@ body.mode-accueil .container { max-width: var(--w-form); padding-block: var(--sp
   .partie-option[open] { padding-bottom: var(--sp-4); }
 }
 [dir=rtl] .onb-lien > span[aria-hidden] { display: inline-block; transform: scaleX(-1); }
+[dir=rtl] select { background-position: left 10px center; }
+.onb-manque { margin: var(--sp-1) 0 0; padding-inline-start: var(--sp-5); }
