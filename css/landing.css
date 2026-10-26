@@ -270,10 +270,11 @@
 
 /* ---------- Appel final et pied de page ---------- */
 .final-cta { background: var(--band); color: var(--band-ink); text-align: center; padding-block: 72px; }
-.final-cta h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 8px; }
+.final-cta h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 8px; color: var(--band-ink); }
 .final-cta p { color: var(--band-muted); margin: 0 0 28px; }
 .btn-light { background: #ffffff; color: #0f1b3d; border-color: #ffffff; font-weight: 600; }
 .btn-light:hover { background: #e8efff; }
+a.btn.btn-light, .seo-guide a.btn-light, .seo-pied a.btn-light { color: #0f1b3d; }
 
 .l-footer { padding-block: 32px; border-top: 1px solid var(--border); color: var(--muted); }
 .l-footer-inner { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }

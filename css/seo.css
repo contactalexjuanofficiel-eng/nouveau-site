@@ -47,7 +47,7 @@
 .seo-guide ul { padding-left: 1.2em; }
 .seo-guide li { margin-bottom: 6px; }
 .seo-guide a { color: var(--primary); }
-.seo-guide .btn-primary { color: #fff; }
+.seo-guide .btn-primary { color: var(--on-primary); }
 .seo-encart { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;
   background: var(--primary-soft); border-radius: 14px; padding: 16px 20px; margin: 8px 0 24px; }
 .seo-encart p { margin: 0; flex: 1 1 280px; }
@@ -65,7 +65,7 @@
 .seo-pied ul a:hover { color: var(--primary); }
 .seo-pied p { margin: 10px 0 14px; }
 .seo-pied .seo-copy { margin: 24px 0 0; font-size: .85rem; }
-.seo-pied .btn-primary { color: #fff; }
+.seo-pied .btn-primary { color: var(--on-primary); }
 
 @media (max-width: 960px) {
   .seo-atouts { grid-template-columns: 1fr 1fr; }
