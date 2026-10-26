@@ -978,8 +978,9 @@ body.mode-accueil .container { max-width: var(--w-form); padding-block: var(--sp
 #onb-tva-champ { margin-top: var(--sp-2); }
 
 .onb-fini { text-align: center; }
-.onb-fini-icone { margin: 0 0 var(--sp-2); font-size: 3rem; line-height: 1; }
-.onb-bilan { display: grid; gap: var(--sp-3); max-width: 420px; margin: var(--sp-5) auto 0; padding: 0; list-style: none; text-align: start; }
+.onb-fini-icone { display: grid; place-items: center; width: var(--h-xl); height: var(--h-xl); margin: 0 auto var(--sp-4); border-radius: 50%; background: var(--success-soft); color: var(--success); }
+.onb-fini-icone .ico { width: var(--sp-6); height: var(--sp-6); }
+.onb-bilan { display: grid; gap: var(--sp-3); max-width: var(--w-narrow); margin: var(--sp-5) auto 0; padding: 0; list-style: none; text-align: start; }
 .onb-bilan li { position: relative; padding-inline-start: var(--sp-8); line-height: var(--lh-normal); }
 .onb-bilan li::before { content: "✓"; position: absolute; inset-inline-start: 0; top: -1px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--success-soft); color: var(--success); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
 .onb-bilan li.manque::before { content: "!"; background: var(--warning-soft); color: var(--warning); }
@@ -1004,14 +1005,14 @@ body.mode-accueil .container { max-width: var(--w-form); padding-block: var(--sp
 .demarrage-tete { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
 .demarrage-tete h2 { margin: 0 0 var(--sp-1); font-size: var(--fs-xl); }
 .demarrage-tete .hint { margin: 0; }
-.demarrage-masquer { flex: none; width: var(--touch); height: var(--touch); margin: calc(var(--sp-2) * -1); border: 0; border-radius: var(--r-md); background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.demarrage-masquer { flex: none; display: grid; place-items: center; width: var(--touch); height: var(--touch); margin: calc(var(--sp-2) * -1); border: 0; border-radius: var(--r-md); background: none; color: var(--muted); font: inherit; cursor: pointer; }
 .demarrage-masquer:hover { background: var(--bg-2); color: var(--text); }
 .demarrage-jauge { height: var(--sp-1-5); margin: var(--sp-4) 0 var(--sp-2); border-radius: var(--r-full); background: var(--border); overflow: hidden; }
 .demarrage-jauge span { display: block; height: 100%; border-radius: inherit; background: var(--success); transition: width var(--dur-slow) var(--ease); }
 .demarrage-liste { display: grid; margin: 0; padding: 0; list-style: none; }
-.demarrage-liste li { display: flex; align-items: center; gap: var(--sp-3); min-height: 52px; padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+.demarrage-liste li { display: flex; align-items: center; gap: var(--sp-3); min-height: calc(var(--h-lg) + var(--sp-1)); padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
 .demarrage-liste li:last-child { border-bottom: 0; }
-.demarrage-coche { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--border-strong); border-radius: 50%; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.demarrage-coche { flex: none; display: grid; place-items: center; width: var(--sp-6); height: var(--sp-6); border: 2px solid var(--border-strong); border-radius: 50%; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
 .demarrage-liste li.fait .demarrage-coche { border-color: var(--success); background: var(--success); color: var(--on-primary); }
 .demarrage-texte { flex: 1; font-size: var(--fs-base); }
 .demarrage-liste li.fait .demarrage-texte { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border-strong); }
@@ -1053,3 +1054,13 @@ body.mode-accueil .container { max-width: var(--w-form); padding-block: var(--sp
 [dir=rtl] .onb-lien > span[aria-hidden] { display: inline-block; transform: scaleX(-1); }
 [dir=rtl] select { background-position: left 10px center; }
 .onb-manque { margin: var(--sp-1) 0 0; padding-inline-start: var(--sp-5); }
+
+/* Téléphone : cibles tactiles de 44 px minimum dans la barre du haut et les cases à cocher. */
+@media (max-width: 760px) {
+  .btn-deco-haut { width: var(--touch); height: var(--touch); }
+  .topbar .logo { min-height: var(--touch); }
+  /* Zone tactile agrandie sans changer l'aspect de la pastille. */
+  .sync { position: relative; }
+  .sync::after { content: ""; position: absolute; inset: calc(var(--sp-2-5) * -1) calc(var(--sp-1) * -1); }
+  .checkbox { min-height: var(--touch); }
+}

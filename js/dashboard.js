@@ -291,7 +291,7 @@ function carteDemarrage() {
           <h2 id="demarrage-titre">Bien démarrer avec Devizo</h2>
           <p class="hint">${faites} sur ${etapes.length} · quelques minutes pour être prêt à envoyer vos devis</p>
         </div>
-        <button type="button" class="demarrage-masquer" data-masquer-demarrage aria-label="Masquer">✕</button>
+        <button type="button" class="demarrage-masquer" data-masquer-demarrage aria-label="Masquer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <div class="demarrage-jauge" role="progressbar" aria-valuemin="0" aria-valuemax="${etapes.length}" aria-valuenow="${faites}"><span style="width:${(faites / etapes.length) * 100}%"></span></div>
       <ol class="demarrage-liste">
