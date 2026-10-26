@@ -351,7 +351,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .l-langue summary::-webkit-details-marker { display: none; }
 .l-langue summary:hover, .l-langue[open] summary { background: color-mix(in srgb, var(--bandeau-ink) 10%, transparent); }
 .l-header:has(.l-langue[open]) { z-index: 80; } /* au-dessus du bandeau cookies */
-.l-langue summary { min-height: 44px; justify-content: center; }
+.l-langue summary { min-height: 44px; min-width: 40px; justify-content: center; }
 .l-langue-liste {
   position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 20;
   list-style: none; margin: 0; padding: 6px; min-width: 180px;

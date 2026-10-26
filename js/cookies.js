@@ -53,7 +53,7 @@
     }
     /* Téléphone : bandeau compact en bas, qui ne cache pas le bouton principal de l'accueil. */
     @media (max-width: 560px) {
-      .cookies { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); width: auto; padding: 12px 14px; }
+      .cookies { left: 8px; right: 8px; top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto; width: auto; padding: 12px 14px; }
       .cookies-titre { display: none; }
       .cookies p { font-size: .85rem; line-height: 1.4; }
       .cookies-actions { margin-top: 8px; }

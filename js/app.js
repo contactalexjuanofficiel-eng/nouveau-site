@@ -926,20 +926,22 @@ async function createDocument(type) {
   };
   data.documents.push(doc);
   saveData();
+  documentNeuf = { id: doc.id, copie: JSON.stringify(doc) };
   go('#/modifier/' + doc.id);
 }
 
-// Document tout juste créé puis abandonné sans rien remplir (bouton retour) : on le
-// retire, s'il est le dernier de sa série, pour ne pas laisser une facture à 0 € ni un trou.
-let documentEnCours = null;
+// Document tout juste créé (bouton « + Nouveau ») puis abandonné sans aucune
+// modification : on le retire, s'il est le dernier de sa série, pour ne pas laisser
+// une facture à 0 € ni un trou. Un document existant n'est jamais concerné.
+let documentNeuf = null; // { id, copie } : le document créé et son contenu de départ
 function retirerSiVide() {
-  const doc = documentEnCours && getDocument(documentEnCours);
-  documentEnCours = null;
-  // Toujours sur ce document, ou parti ajouter un client pour lui : on le garde.
+  const doc = documentNeuf && getDocument(documentNeuf.id);
+  // Toujours sur ce document, ou parti ajouter un client pour lui : on attend.
   if (!doc || location.hash.includes(doc.id)) return;
-  const vide = !doc.objet && !doc.notes && !doc.lignes.some((l) => (l.description || '').trim() || lireNombre(l.prixUnitaire));
+  const intact = JSON.stringify(doc) === documentNeuf.copie;
+  documentNeuf = null;
   const dernier = nextNumber(doc.type) === incrementNumber(doc.numero);
-  if (vide && dernier && doc.type !== 'avoir' && !doc.envois?.length) {
+  if (intact && dernier) {
     data.documents = data.documents.filter((d) => d.id !== doc.id);
     saveData();
   }
@@ -949,7 +951,6 @@ window.addEventListener('hashchange', retirerSiVide);
 function pageEdit(id) {
   const doc = getDocument(id);
   if (!doc) return pageNotFound();
-  documentEnCours = doc.id;
   const franchise = data.entreprise.franchiseTva;
   const isFacture = doc.type === 'facture';
   const isAvoir = doc.type === 'avoir';
@@ -2296,6 +2297,7 @@ burger?.addEventListener('click', () => menuOuvert(!topbar.classList.contains('m
 // Téléphone tourné à l'horizontale (passage au menu latéral) : le menu « Plus » se ferme.
 matchMedia('(max-width: 760px)').addEventListener('change', (e) => { if (!e.matches) menuOuvert(false); });
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.menu-ligne[open]').forEach((m) => m.removeAttribute('open'));
   if (e.key === 'Escape') menuOuvert(false);
 });
 document.addEventListener('click', (e) => {

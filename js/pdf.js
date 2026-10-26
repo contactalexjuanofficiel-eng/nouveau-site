@@ -6,7 +6,7 @@
  * Utilise data, infosDocument, euro, dateFr, tauxFr... d'app.js.
  */
 const Pdf = (() => {
-  const VERSION = '?v=94';
+  const VERSION = '?v=95';
   const MARGE = 15;
   const BLEU = [31, 94, 255];
   const GRIS = [107, 115, 133];
@@ -38,6 +38,7 @@ const Pdf = (() => {
   // ni les émojis : les espaces sont remplacées et les caractères qu'elles ne savent
   // pas dessiner sont retirés (sinon ils deviennent des signes illisibles, « Ø=Þ »).
   const txt = (v) => String(v ?? '').replace(/[\u00a0\u202f\u2009]/g, ' ')
+    .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, (c) => ({ ł: 'l', Ł: 'L', ı: 'i', đ: 'd', Đ: 'D', ß: 'ss' }[c] ?? c.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))
     .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, '').replace(/ {2,}/g, ' ');
   // Nom de fichier sans accents ni caractères interdits (certains navigateurs les refusent).
   const nomFichier = (s) => txt(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '')

@@ -300,6 +300,7 @@
   }
   // Espaces fines remplacées et émojis retirés : la police du PDF ne sait pas les dessiner.
   const txt = (v) => String(v ?? '').replace(/[\u00a0\u202f\u2009]/g, ' ')
+    .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, (c) => ({ ł: 'l', Ł: 'L', ı: 'i', đ: 'd', Đ: 'D', ß: 'ss' }[c] ?? c.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))
     .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, '').replace(/ {2,}/g, ' ');
 
   async function fairePdf() {

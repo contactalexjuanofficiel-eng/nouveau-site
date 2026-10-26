@@ -289,13 +289,16 @@ function pageCatalogue(params) {
   document.getElementById('cat-ajout').addEventListener('click', () => go('#/catalogue?ajout=1'));
   const form = document.getElementById('cat-form');
   if (ouvert) setTimeout(() => form.description.focus(), 50);
+  let enCours = false;
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    if (enCours) return; // double clic : une seule prestation
     const v = Object.fromEntries(new FormData(form));
     if (!v.description.trim() || v.prixUnitaire === '') {
       await ask('Indiquez au moins la description et le prix HT de la prestation.', "D'accord", false);
       return;
     }
+    enCours = true;
     const valeurs = {
       description: v.description.trim(),
       unite: v.unite,
