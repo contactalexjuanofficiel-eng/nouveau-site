@@ -51,7 +51,15 @@
       .cookies p { color: #9aa2b5; }
       .cookies-actions a { color: #8eadff; }
     }
-    @media (max-width: 560px) { .cookies { left: 16px; right: 16px; width: auto; } }
+    /* Téléphone : bandeau compact en bas, qui ne cache pas le bouton principal de l'accueil. */
+    @media (max-width: 560px) {
+      .cookies { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); width: auto; padding: 12px 14px; }
+      .cookies-titre { display: none; }
+      .cookies p { font-size: .85rem; line-height: 1.4; }
+      .cookies-actions { margin-top: 8px; }
+      .cookies-actions a { padding: 10px 0; }
+      .cookies-actions button { min-height: 44px; padding: 0 20px; }
+    }
     @keyframes cookies-in { from { opacity: 0; transform: translateY(16px); } }
     @media (prefers-reduced-motion: reduce) { .cookies { animation: none; } }
     @media print { .cookies { display: none; } }`;

@@ -1,6 +1,8 @@
 // Compléments de traduction de l'appli (textes ajoutés après la première traduction).
 window.DEVIZO_TRAD_APP_PLUS = {
   en: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "See all ({0}) →", "Devis {0}": "Quote {0}", "Facture {0}": "Invoice {0}", "Avoir {0}": "Credit note {0}", "Plus d'actions": "More actions", "Choisir un logo": "Choose a logo", "Changer le logo": "Change logo", "Retirer le logo": "Remove logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Card, invoices and cancellation, on the secure Stripe page.", "Faire un autre devis": "Do another quote",
     // Navigation (refonte)
     "Activité": "Activity", "Réglages": "Settings", "Accueil": "Home", "Plus": "More", "Menu principal": "Main menu", "Navigation rapide": "Quick navigation",
     'Devis & factures': 'Quotes & invoices',
@@ -60,6 +62,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Signing in with Google…",
   },
   es: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Ver todo ({0}) →", "Devis {0}": "Presupuesto {0}", "Facture {0}": "Factura {0}", "Avoir {0}": "Abono {0}", "Plus d'actions": "Más acciones", "Choisir un logo": "Elegir un logo", "Changer le logo": "Cambiar el logo", "Retirer le logo": "Quitar el logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Tarjeta, facturas y cancelación, en la página segura de Stripe.", "Faire un autre devis": "Hacer otro presupuesto",
     // Navigation (refonte)
     "Activité": "Actividad", "Réglages": "Ajustes", "Accueil": "Inicio", "Plus": "Más", "Menu principal": "Menú principal", "Navigation rapide": "Navegación rápida",
     'Devis & factures': 'Presupuestos y facturas',
@@ -119,6 +123,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectando con Google…",
   },
   pt: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Ver tudo ({0}) →", "Devis {0}": "Orçamento {0}", "Facture {0}": "Fatura {0}", "Avoir {0}": "Nota de crédito {0}", "Plus d'actions": "Mais ações", "Choisir un logo": "Escolher um logótipo", "Changer le logo": "Alterar o logótipo", "Retirer le logo": "Remover o logótipo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Cartão, faturas e cancelamento, na página segura da Stripe.", "Faire un autre devis": "Fazer outro orçamento",
     // Navigation (refonte)
     "Activité": "Atividade", "Réglages": "Definições", "Accueil": "Início", "Plus": "Mais", "Menu principal": "Menu principal", "Navigation rapide": "Navegação rápida",
     'Devis & factures': 'Orçamentos e faturas',
@@ -178,6 +184,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "A ligar com o Google…",
   },
   it: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Vedi tutto ({0}) →", "Devis {0}": "Preventivo {0}", "Facture {0}": "Fattura {0}", "Avoir {0}": "Nota di credito {0}", "Plus d'actions": "Altre azioni", "Choisir un logo": "Scegli un logo", "Changer le logo": "Cambia logo", "Retirer le logo": "Rimuovi il logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Carta, fatture e disdetta, sulla pagina sicura di Stripe.", "Faire un autre devis": "Fai un altro preventivo",
     // Navigation (refonte)
     "Activité": "Attività", "Réglages": "Impostazioni", "Accueil": "Home", "Plus": "Altro", "Menu principal": "Menu principale", "Navigation rapide": "Navigazione rapida",
     'Devis & factures': 'Preventivi e fatture',
@@ -237,6 +245,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Accesso con Google…",
   },
   de: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Alle anzeigen ({0}) →", "Devis {0}": "Angebot {0}", "Facture {0}": "Rechnung {0}", "Avoir {0}": "Gutschrift {0}", "Plus d'actions": "Weitere Aktionen", "Choisir un logo": "Logo auswählen", "Changer le logo": "Logo ändern", "Retirer le logo": "Logo entfernen", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Karte, Rechnungen und Kündigung auf der sicheren Stripe-Seite.", "Faire un autre devis": "Weiteres Angebot erstellen",
     // Navigation (refonte)
     "Activité": "Aktivität", "Réglages": "Einstellungen", "Accueil": "Start", "Plus": "Mehr", "Menu principal": "Hauptmenü", "Navigation rapide": "Schnellnavigation",
     'Devis & factures': 'Angebote & Rechnungen',
@@ -296,6 +306,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Anmeldung mit Google…",
   },
   ar: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "عرض الكل ({0}) ←", "Devis {0}": "عرض سعر {0}", "Facture {0}": "فاتورة {0}", "Avoir {0}": "إشعار دائن {0}", "Plus d'actions": "إجراءات أخرى", "Choisir un logo": "اختيار شعار", "Changer le logo": "تغيير الشعار", "Retirer le logo": "إزالة الشعار", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "البطاقة والفواتير والإلغاء، على صفحة Stripe الآمنة.", "Faire un autre devis": "إنشاء عرض سعر آخر",
     // Navigation (refonte)
     "Activité": "النشاط", "Réglages": "الإعدادات", "Accueil": "الرئيسية", "Plus": "المزيد", "Menu principal": "القائمة الرئيسية", "Navigation rapide": "تنقل سريع",
     'Devis & factures': 'عروض الأسعار والفواتير',
@@ -355,6 +367,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "جارٍ تسجيل الدخول باستخدام Google…",
   },
   tr: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Tümünü gör ({0}) →", "Devis {0}": "Teklif {0}", "Facture {0}": "Fatura {0}", "Avoir {0}": "İade faturası {0}", "Plus d'actions": "Diğer işlemler", "Choisir un logo": "Logo seç", "Changer le logo": "Logoyu değiştir", "Retirer le logo": "Logoyu kaldır", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Kart, faturalar ve iptal, güvenli Stripe sayfasında.", "Faire un autre devis": "Başka bir teklif hazırla",
     // Navigation (refonte)
     "Activité": "Etkinlik", "Réglages": "Ayarlar", "Accueil": "Ana sayfa", "Plus": "Daha fazla", "Menu principal": "Ana menü", "Navigation rapide": "Hızlı gezinme",
     'Devis & factures': 'Teklifler ve faturalar',
@@ -414,6 +428,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Google ile giriş yapılıyor…",
   },
   ro: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Vezi tot ({0}) →", "Devis {0}": "Deviz {0}", "Facture {0}": "Factură {0}", "Avoir {0}": "Factură de stornare {0}", "Plus d'actions": "Mai multe acțiuni", "Choisir un logo": "Alege un logo", "Changer le logo": "Schimbă logoul", "Retirer le logo": "Elimină logoul", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Card, facturi și reziliere, pe pagina securizată Stripe.", "Faire un autre devis": "Fă alt deviz",
     // Navigation (refonte)
     "Activité": "Activitate", "Réglages": "Setări", "Accueil": "Acasă", "Plus": "Mai mult", "Menu principal": "Meniu principal", "Navigation rapide": "Navigare rapidă",
     'Devis & factures': 'Devize și facturi',
@@ -473,6 +489,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectare cu Google…",
   },
   pl: {
+    // Corrections après tests
+    "Voir tout ({0}) →": "Zobacz wszystko ({0}) →", "Devis {0}": "Oferta {0}", "Facture {0}": "Faktura {0}", "Avoir {0}": "Korekta {0}", "Plus d'actions": "Więcej działań", "Choisir un logo": "Wybierz logo", "Changer le logo": "Zmień logo", "Retirer le logo": "Usuń logo", "Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.": "Karta, faktury i rezygnacja na bezpiecznej stronie Stripe.", "Faire un autre devis": "Zrób kolejną ofertę",
     // Navigation (refonte)
     "Activité": "Aktywność", "Réglages": "Ustawienia", "Accueil": "Start", "Plus": "Więcej", "Menu principal": "Menu główne", "Navigation rapide": "Szybka nawigacja",
     'Devis & factures': 'Kosztorysy i faktury',

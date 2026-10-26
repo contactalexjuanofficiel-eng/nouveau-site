@@ -153,6 +153,21 @@ const Compte = (() => {
     }
   }
 
+  // Modifications pas encore envoyées : on garde sur l'appareil la dernière
+  // version en ligne connue (« base »). Si l'appli est fermée avant le retour
+  // du réseau, à la réouverture les modifications d'ici sont fusionnées avec
+  // la version en ligne au lieu d'être écrasées.
+  const ATTENTE = 'devizo-a-envoyer';
+  function noterAttente() {
+    try { localStorage.setItem(ATTENTE, JSON.stringify({ espace: espaceId, base })); } catch (e) { /* rien */ }
+  }
+  function lireAttente() {
+    try { return JSON.parse(localStorage.getItem(ATTENTE) || 'null'); } catch (e) { return null; }
+  }
+  function effacerAttente() {
+    try { localStorage.removeItem(ATTENTE); } catch (e) { /* rien */ }
+  }
+
   function remplacerDonnees(d) {
     data = completer(d);
     garderSurAppareil();
@@ -177,6 +192,7 @@ const Compte = (() => {
     garderSurAppareil();
     base = structuredClone(serveur);
     versionBrute = ligne.mis_a_jour;
+    if (lireAttente()) noterAttente();
     return renumerotes;
   }
 
@@ -213,6 +229,8 @@ const Compte = (() => {
         if (!res.error && res.data?.length) {
           versionBrute = res.data[0].mis_a_jour;
           base = copie;
+          // Plus rien en attente, sauf si une modification est arrivée pendant l'envoi.
+          if (JSON.stringify(data) === JSON.stringify(copie)) effacerAttente(); else noterAttente();
           break;
         }
         // Quelqu'un a enregistré entre-temps : on fusionne puis on réessaie.
@@ -238,6 +256,7 @@ const Compte = (() => {
   // Appelé par saveData() à chaque modification.
   function modifie() {
     if (!utilisateur) return;
+    noterAttente();
     setEtat('envoi');
     clearTimeout(minuteurEnvoi);
     minuteurEnvoi = setTimeout(envoyer, 800);
@@ -270,8 +289,16 @@ const Compte = (() => {
       if (error) return; // formule Entreprise pas encore installée dans la base
       equipe = res;
       if (equipe?.role === 'membre') espaceId = equipe.proprietaire;
+      try { localStorage.setItem('devizo-equipe-connue', JSON.stringify({ u: utilisateur.id, equipe })); } catch (e) { /* rien */ }
     } catch (e) {
-      // pas de réseau
+      // Pas de réseau : on reprend la dernière équipe connue sur cet appareil.
+      try {
+        const memo = JSON.parse(localStorage.getItem('devizo-equipe-connue') || 'null');
+        if (memo?.u === utilisateur.id) {
+          equipe = memo.equipe;
+          if (equipe?.role === 'membre') espaceId = equipe.proprietaire;
+        }
+      } catch (err) { /* rien */ }
     }
   }
 
@@ -366,7 +393,14 @@ const Compte = (() => {
     await proposerInvitations();
     try {
       const ligne = await lireEnLigne();
-      if (ligne) {
+      const attente = lireAttente();
+      if (ligne && attente?.espace === espaceId) {
+        // Des modifications faites ici n'avaient pas été envoyées : on les garde.
+        base = attente.base ? completer(attente.base) : null;
+        appliquerDistant(ligne);
+        await envoyer();
+      } else if (ligne) {
+        effacerAttente();
         remplacerDonnees(ligne.donnees);
         base = structuredClone(data);
         versionBrute = ligne.mis_a_jour;
@@ -431,6 +465,9 @@ const Compte = (() => {
   }
 
   function oublierSession() {
+    effacerAttente();
+    if (typeof Abonnement !== 'undefined') Abonnement.oublier();
+    try { localStorage.removeItem('devizo-equipe-connue'); } catch (e) { /* rien */ }
     utilisateur = null;
     admin = false;
     equipe = null;
@@ -470,8 +507,14 @@ const Compte = (() => {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') rafraichir();
   });
-  window.addEventListener('online', () => {
+  window.addEventListener('online', async () => {
     if (etat === 'erreur') envoyer();
+    // Le réseau revient : on relit l'abonnement sans attendre que l'onglet reprenne le focus.
+    if (!utilisateur) return;
+    const avant = Abonnement.etat();
+    await chargerEquipe();
+    await Abonnement.charger(client, utilisateur, equipe);
+    if (Abonnement.etat() !== avant) renderApp();
   });
   window.addEventListener('beforeunload', (e) => {
     if (utilisateur && (minuteurEnvoi || envoiEnCours)) {

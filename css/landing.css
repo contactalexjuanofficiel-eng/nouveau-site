@@ -54,7 +54,18 @@
   .l-nav { gap: 18px; }
   .l-pill-contour { display: none; }
 }
-@media (max-width: 960px) { .l-nav { display: none; } }
+/* Tablette et téléphone : les liens passent sur une 2e ligne qui défile de côté. */
+@media (max-width: 960px) {
+  .l-header-inner { flex-wrap: wrap; row-gap: 0; }
+  .l-nav {
+    order: 3; flex: 1 1 100%; gap: 6px; overflow-x: auto; scrollbar-width: none;
+    margin-inline: calc(clamp(20px, 3.5vw, 64px) * -1); padding: 8px clamp(20px, 3.5vw, 64px) 0;
+  }
+  .l-nav::-webkit-scrollbar { display: none; }
+  .l-nav a { flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--bandeau-ink) 7%, transparent); font-size: .92rem; white-space: nowrap; }
+  .l-header-inner { padding-block: 10px; }
+}
 @media (max-width: 360px) { .l-header .logo-texte { display: none; } }
 .l-pill-court { display: none; }
 @media (max-width: 560px) {
@@ -319,7 +330,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 @media (max-width: 860px) { .pilot-grid { grid-template-columns: 1fr; gap: 32px; } }
 
 .price-ttc { margin: 0 0 20px; color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
-.l-login { white-space: nowrap; }
+.l-login { white-space: nowrap; display: inline-flex; align-items: center; min-height: 44px; }
 
 /* Le devis d'exemple est un document français : il garde le sens de lecture gauche-droite. */
 .mock { direction: ltr; }
@@ -333,6 +344,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 }
 .l-langue summary::-webkit-details-marker { display: none; }
 .l-langue summary:hover, .l-langue[open] summary { background: color-mix(in srgb, var(--bandeau-ink) 10%, transparent); }
+.l-header:has(.l-langue[open]) { z-index: 80; } /* au-dessus du bandeau cookies */
+.l-langue summary { min-height: 44px; min-width: 44px; justify-content: center; }
 .l-langue-liste {
   position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 20;
   list-style: none; margin: 0; padding: 6px; min-width: 180px;
@@ -443,4 +456,11 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .l-nav-gratuit:hover::after { left: 130%; transition: left .6s ease; }
 @media (prefers-reduced-motion: reduce) {
   .l-nav-gratuit .roule-a, .l-nav-gratuit .roule-b, .l-nav-gratuit, .l-nav-gratuit:hover::after { transition: none; }
+}
+
+/* Téléphone : la liste des langues s'ouvre sous le bandeau, sur toute la largeur. */
+@media (max-width: 560px) {
+  .l-langue { position: static; }
+  .l-langue-liste { top: 100%; inset-inline: 12px; min-width: 0; max-height: 70vh; overflow-y: auto; }
+  .l-langue-liste button { min-height: 44px; }
 }

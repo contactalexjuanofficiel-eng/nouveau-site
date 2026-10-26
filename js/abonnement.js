@@ -41,6 +41,7 @@ const Abonnement = (() => {
   let client = null;
   let user = null;
   let infos = null; // ligne de la table « abonnements »
+  const MEMO = 'devizo-abonnement-connu';
   let equipe = null; // réponse de mon_equipe() : titulaire ou membre d'une équipe
   let periode = 'mois';
 
@@ -55,12 +56,30 @@ const Abonnement = (() => {
       infos = equipe.abonnement || null;
       return;
     }
+    let lu = false;
     try {
       const { data: ligne, error } = await c.from('abonnements').select('*').eq('user_id', u.id).maybeSingle();
-      if (!error) infos = ligne || null;
+      if (!error) { infos = ligne || null; lu = true; }
     } catch (e) {
-      // pas de réseau : on garde la dernière information connue
+      // pas de réseau
     }
+    // Sans réseau, on reprend le dernier abonnement connu sur cet appareil :
+    // un abonné doit pouvoir faire son devis au chantier, même hors ligne.
+    try {
+      if (lu) localStorage.setItem(MEMO, JSON.stringify({ u: u.id, infos }));
+      else {
+        const memo = JSON.parse(localStorage.getItem(MEMO) || 'null');
+        if (memo?.u === u.id) infos = memo.infos;
+      }
+    } catch (e) {
+      // stockage indisponible
+    }
+  }
+
+  function oublier() {
+    infos = null;
+    equipe = null;
+    try { localStorage.removeItem(MEMO); } catch (e) { /* rien */ }
   }
 
   // Offre de l'administrateur : 'essai' (essai prolongé) ou 'cadeau' (formule offerte).
@@ -244,7 +263,8 @@ const Abonnement = (() => {
       const resilie = infos.statut === 'canceled' || infos.fin_prevue === true;
       return `<p class="big">Formule ${FORMULES[e].nom} <small>${resilie ? `résiliée, active jusqu'au ${fin}` : fin ? `renouvellement le ${fin}` : 'active'}</small></p>
         ${infos.statut === 'past_due' ? '<p class="status bad">⚠ Le dernier paiement a échoué : mettez à jour votre carte.</p>' : ''}
-        ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement (carte, factures, résiliation)</a>` : ''}
+        ${lienPortail() ? `<a class="btn" href="${esc(lienPortail())}" target="_blank" rel="noopener">Gérer mon abonnement</a>
+          <p class="hint">Carte bancaire, factures et résiliation, sur la page sécurisée de Stripe.</p>` : ''}
         ${e === 'equipe' ? '<p class="hint">⚡ Assistance prioritaire : <a href="#/assistance">écrivez-nous depuis la page Assistance</a>, votre demande est traitée en premier.</p>' : ''}`;
     }
     if (e === 'expire') {
@@ -346,7 +366,7 @@ const Abonnement = (() => {
   }
 
   return {
-    charger, etat, peutModifier, aAcces, majBandeau, page, pageUpsell, carteUpsell,
+    charger, oublier, etat, peutModifier, aAcces, majBandeau, page, pageUpsell, carteUpsell,
     pageLectureSeule, refuserModification, resume, joursEssaiRestants,
   };
 })();

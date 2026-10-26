@@ -72,10 +72,21 @@ function brancherCatalogue(linesEl, doc, renderLines) {
       <li><button type="button" data-k="${k}">
         <span>${esc(p.description)}</span><small>${esc(libellePrix(p))}</small>
       </button></li>`).join('');
-    const r = input.getBoundingClientRect();
-    liste.style.left = r.left + window.scrollX + 'px';
-    liste.style.top = r.bottom + window.scrollY + 4 + 'px';
-    liste.style.width = Math.max(r.width, Math.min(360, window.innerWidth - 32)) + 'px';
+    if (window.innerWidth <= 1099) {
+      // Téléphone et tablette : la liste s'insère sous la description, dans la fiche,
+      // au lieu de recouvrir les champs Qté et Unité (un tap à côté la choisissait).
+      liste.classList.add('cat-suggestions-dans-ligne');
+      liste.removeAttribute('style');
+      input.insertAdjacentElement('afterend', liste);
+    } else {
+      liste.classList.remove('cat-suggestions-dans-ligne');
+      if (liste.parentElement !== document.body) document.body.appendChild(liste);
+      const r = input.getBoundingClientRect();
+      const largeur = Math.min(Math.max(r.width, 360), window.innerWidth - 32);
+      liste.style.left = Math.min(r.left, window.innerWidth - 16 - largeur) + window.scrollX + 'px';
+      liste.style.top = r.bottom + window.scrollY + 4 + 'px';
+      liste.style.width = largeur + 'px';
+    }
     liste.hidden = false;
   }
 
@@ -210,6 +221,8 @@ function pageCatalogue(params) {
   const enEdition = params?.get('modifier') ? catalogue().find((p) => p.id === params.get('modifier')) : null;
   const ouvert = Boolean(enEdition || params?.get('ajout'));
   const franchise = data.entreprise.franchiseTva;
+  // Colonne « Catégorie » seulement si au moins une prestation en a une.
+  const avecCategories = catalogue().some((x) => (x.categorie || '').trim());
   const p = enEdition || { description: '', unite: 'u', prixUnitaire: '', tva: Number(data.entreprise.tvaDefaut) || 20, categorie: '' };
   const categories = [...new Set(catalogue().map((x) => x.categorie).filter(Boolean))].sort();
   const recherche = params?.get('q') || '';
@@ -230,7 +243,7 @@ function pageCatalogue(params) {
         <div><label for="cat-unite">Unité</label>
           <select id="cat-unite" name="unite">${UNITES.map((u) => `<option ${u === p.unite ? 'selected' : ''}>${u}</option>`).join('')}</select></div>
         <div><label for="cat-prix">Prix unitaire HT (€) *</label>
-          <input id="cat-prix" name="prixUnitaire" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(p.prixUnitaire)}"></div>
+          <input id="cat-prix" name="prixUnitaire" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(saisieNombre(p.prixUnitaire))}"></div>
         ${franchise ? '' : `<div><label for="cat-tva">TVA</label>
           <select id="cat-tva" name="tva">${[20, 10, 5.5, 2.1, 0].map((t) => `<option value="${t}" ${Number(p.tva) === t ? 'selected' : ''}>${tauxFr(t)} %</option>`).join('')}</select></div>`}
         <div><label for="cat-categorie">Catégorie (facultatif)</label>
@@ -246,8 +259,8 @@ function pageCatalogue(params) {
     <section class="card">
       ${catalogue().length ? `
         <input type="search" id="cat-filtre" class="cat-filtre" placeholder="Rechercher une prestation…" value="${esc(recherche)}" autocomplete="off">
-        <div class="table-wrap"><table>
-          <thead><tr><th>Prestation</th><th>Catégorie</th><th class="num">Prix HT</th>${franchise ? '' : '<th class="num">TVA</th>'}<th class="num">Actions</th></tr></thead>
+        <div class="table-wrap"><table class="liste-fiches">
+          <thead><tr><th>Prestation</th>${avecCategories ? '<th>Catégorie</th>' : ''}<th class="num">Prix HT</th>${franchise ? '' : '<th class="num">TVA</th>'}<th class="num">Actions</th></tr></thead>
           <tbody id="cat-lignes"></tbody>
         </table></div>`
         : `<p class="empty">Votre catalogue est vide. Ajoutez vos prestations les plus courantes : vos devis iront deux fois plus vite.</p>`}
@@ -261,10 +274,10 @@ function pageCatalogue(params) {
       .slice().sort((a, b) => (a.categorie || '~').localeCompare(b.categorie || '~') || a.description.localeCompare(b.description));
     tbody.innerHTML = res.length ? res.map((x) => `<tr>
       <td>${esc(x.description)}</td>
-      <td>${esc(x.categorie || '—')}</td>
-      <td class="num">${euro(Number(x.prixUnitaire) || 0)} <small>/ ${esc(x.unite)}</small></td>
-      ${franchise ? '' : `<td class="num">${tauxFr(x.tva)} %</td>`}
-      <td><div class="row-actions">
+      ${avecCategories ? `<td>${esc(x.categorie || '—')}</td>` : ''}
+      <td class="num fiche-total" data-label="Prix HT">${euro(Number(x.prixUnitaire) || 0)} <small class="nowrap">/ ${esc(x.unite)}</small></td>
+      ${franchise ? '' : `<td class="num" data-label="TVA">${tauxFr(x.tva)} %</td>`}
+      <td class="fiche-actions"><div class="row-actions">
         <a class="btn btn-sm" href="#/catalogue?modifier=${esc(x.id)}">Modifier</a>
         <button class="btn btn-sm btn-danger" data-suppr-cat="${esc(x.id)}">Supprimer</button>
       </div></td></tr>`).join('')
@@ -286,7 +299,7 @@ function pageCatalogue(params) {
     const valeurs = {
       description: v.description.trim(),
       unite: v.unite,
-      prixUnitaire: Number(v.prixUnitaire) || 0,
+      prixUnitaire: lireNombre(v.prixUnitaire),
       tva: franchise ? Number(p.tva) : Number(v.tva),
       categorie: (v.categorie || '').trim(),
     };

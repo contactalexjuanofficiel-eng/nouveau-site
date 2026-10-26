@@ -104,6 +104,58 @@ function newId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// Moment du dernier changement d'écran (page ou fenêtre). Un 2e tap arrivé juste
+// après (double tap) ne doit pas déclencher un bouton du nouvel écran.
+let ecranChange = 0;
+document.addEventListener('click', (e) => {
+  if (e.isTrusted && Date.now() - ecranChange < 350) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+
+// Comportement commun des fenêtres : se ferment en touchant le fond, en glissant
+// vers le bas sur téléphone, ou quand on change de page (bouton retour).
+function fenetreTactile(dialog, annuler = () => dialog.close()) {
+  ecranChange = Date.now();
+  dialog.dataset.page = location.hash;
+  // Pas de clavier qui surgit à l'ouverture sur téléphone.
+  if (matchMedia('(pointer: coarse)').matches && document.activeElement?.matches?.('input, textarea')) document.activeElement.blur();
+  dialog.addEventListener('click', (e) => {
+    if (e.target !== dialog) return;
+    const r = dialog.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) annuler();
+  });
+  let g = null;
+  dialog.addEventListener('touchstart', (e) => {
+    g = innerWidth <= 760 && dialog.scrollTop <= 0 && !e.target.closest('input, textarea, select')
+      ? { y: e.touches[0].clientY, t: Date.now(), dy: 0 } : null;
+  }, { passive: true });
+  dialog.addEventListener('touchmove', (e) => {
+    if (!g) return;
+    g.dy = Math.max(0, e.touches[0].clientY - g.y);
+    dialog.style.transition = 'none';
+    dialog.style.transform = `translateY(${g.dy}px)`;
+  }, { passive: true });
+  dialog.addEventListener('touchend', () => {
+    if (!g) return;
+    const { dy, t } = g;
+    g = null;
+    dialog.style.transition = '';
+    dialog.style.transform = '';
+    if (dy > 100 || (dy > 40 && dy / (Date.now() - t) > 0.5)) annuler();
+  });
+}
+window.addEventListener('hashchange', () => {
+  ecranChange = Date.now();
+  document.querySelectorAll('dialog[open]').forEach((d) => {
+    if (d.dataset.page !== undefined && d.dataset.page !== location.hash) d.close();
+  });
+});
+
+// Boutons qui effacent quelque chose : en rouge.
+const ACTION_DANGER = /^(Supprimer|Tout effacer|Effacer|Retirer|Résilier|Quitter)/;
+
 // Fenêtre de confirmation intégrée à la page. withCancel : false, true ou le texte du bouton d'annulation.
 function ask(message, okLabel = 'Confirmer', withCancel = true) {
   return new Promise((resolve) => {
@@ -113,10 +165,11 @@ function ask(message, okLabel = 'Confirmer', withCancel = true) {
       <p>${esc(message)}</p>
       <div class="actions">
         ${withCancel ? `<button class="btn" value="non">${esc(typeof withCancel === 'string' ? withCancel : 'Annuler')}</button>` : ''}
-        <button class="btn btn-primary" value="oui">${esc(okLabel)}</button>
+        <button class="btn ${ACTION_DANGER.test(okLabel) ? 'btn-danger-plein' : 'btn-primary'}" value="oui">${esc(okLabel)}</button>
       </div>`;
     dialog.addEventListener('click', (e) => {
-      if (e.target.value) dialog.close(e.target.value);
+      const b = e.target.closest('button');
+      if (b?.value) dialog.close(b.value);
     });
     dialog.addEventListener('close', () => {
       dialog.remove();
@@ -124,6 +177,7 @@ function ask(message, okLabel = 'Confirmer', withCancel = true) {
     });
     document.body.appendChild(dialog);
     dialog.showModal();
+    fenetreTactile(dialog, () => dialog.close('non'));
   });
 }
 
@@ -149,6 +203,7 @@ function choisir(message, options, details = '') {
     });
     document.body.appendChild(dialog);
     dialog.showModal();
+    fenetreTactile(dialog, () => dialog.close(''));
   });
 }
 
@@ -276,6 +331,8 @@ function newLine() {
 function checkSiret(value) {
   const d = String(value).replace(/\s/g, '');
   if (!/^\d{14}$/.test(d)) return false;
+  // La Poste (SIREN 356 000 000) : ses établissements suivent une autre règle.
+  if (d.startsWith('356000000') && [...d].reduce((a, c) => a + Number(c), 0) % 5 === 0) return true;
   let sum = 0;
   for (let i = 0; i < 14; i++) {
     let n = Number(d[i]);
@@ -557,20 +614,44 @@ function echeanceDefaut(type) {
 // Calculs
 // ====================================================================
 
+// Arrondi au centime (au plus proche, 0,005 vers le haut), sans les erreurs
+// de calcul des nombres à virgule (1,5 × 3,33 = 4,995 → 5,00).
+function arrondi(n) {
+  const c = Math.round(Number((Math.abs(n) * 100).toFixed(6)));
+  return (Math.sign(n) * c) / 100;
+}
+
+// Nombres saisis à la française : « 12,5 » et « 1 234,56 » sont acceptés.
+// Les champs de montants sont en texte (clavier décimal), car un champ
+// « number » ignore la virgule sur certains téléphones.
+function lireNombre(v) {
+  if (typeof v === 'number') return v;
+  const n = parseFloat(String(v ?? '').replace(/[\s\u00a0\u202f]/g, '').replace(',', '.'));
+  return Number.isFinite(n) ? n : 0;
+}
+const saisieNombre = (n) => (n === '' || n === null || n === undefined ? '' : String(n).replace('.', ','));
+
+// Chaque ligne est arrondie au centime, puis la TVA de chaque taux : les
+// montants affichés s'additionnent toujours exactement (HT + TVA = TTC).
+const montantLigne = (line) => arrondi(lireNombre(line.quantite) * lireNombre(line.prixUnitaire));
+
 function computeTotals(doc) {
   const franchise = data.entreprise.franchiseTva;
   let ht = 0;
-  const tvaParTaux = {};
+  const baseParTaux = {};
   for (const line of doc.lignes) {
-    const montant = (Number(line.quantite) || 0) * (Number(line.prixUnitaire) || 0);
+    const montant = montantLigne(line);
     ht += montant;
     if (!franchise) {
       const taux = Number(line.tva) || 0;
-      tvaParTaux[taux] = (tvaParTaux[taux] || 0) + (montant * taux) / 100;
+      baseParTaux[taux] = (baseParTaux[taux] || 0) + montant;
     }
   }
-  const tva = Object.values(tvaParTaux).reduce((a, b) => a + b, 0);
-  return { ht, tvaParTaux, tva, ttc: ht + tva };
+  ht = arrondi(ht);
+  const tvaParTaux = {};
+  for (const [taux, base] of Object.entries(baseParTaux)) tvaParTaux[taux] = arrondi((base * Number(taux)) / 100);
+  const tva = arrondi(Object.values(tvaParTaux).reduce((a, b) => a + b, 0));
+  return { ht, tvaParTaux, tva, ttc: arrondi(ht + tva) };
 }
 
 // ====================================================================
@@ -822,7 +903,11 @@ function pageDocuments(filtre) {
   `;
 }
 
+let creationEnCours = false;
 async function createDocument(type) {
+  if (creationEnCours) return; // double clic : un seul document
+  creationEnCours = true;
+  setTimeout(() => { creationEnCours = false; }, 800);
   if (!(await profilPret())) return;
   const doc = {
     id: newId(),
@@ -844,9 +929,27 @@ async function createDocument(type) {
   go('#/modifier/' + doc.id);
 }
 
+// Document tout juste créé puis abandonné sans rien remplir (bouton retour) : on le
+// retire, s'il est le dernier de sa série, pour ne pas laisser une facture à 0 € ni un trou.
+let documentEnCours = null;
+function retirerSiVide() {
+  const doc = documentEnCours && getDocument(documentEnCours);
+  documentEnCours = null;
+  // Toujours sur ce document, ou parti ajouter un client pour lui : on le garde.
+  if (!doc || location.hash.includes(doc.id)) return;
+  const vide = !doc.objet && !doc.notes && !doc.lignes.some((l) => (l.description || '').trim() || lireNombre(l.prixUnitaire));
+  const dernier = nextNumber(doc.type) === incrementNumber(doc.numero);
+  if (vide && dernier && doc.type !== 'avoir' && !doc.envois?.length) {
+    data.documents = data.documents.filter((d) => d.id !== doc.id);
+    saveData();
+  }
+}
+window.addEventListener('hashchange', retirerSiVide);
+
 function pageEdit(id) {
   const doc = getDocument(id);
   if (!doc) return pageNotFound();
+  documentEnCours = doc.id;
   const franchise = data.entreprise.franchiseTva;
   const isFacture = doc.type === 'facture';
   const isAvoir = doc.type === 'avoir';
@@ -872,7 +975,7 @@ function pageEdit(id) {
               ${data.clients.map((c) => `<option value="${esc(c.id)}" ${c.id === doc.clientId ? 'selected' : ''}>${esc(c.nom)}</option>`).join('')}
               ${doc.clientArchive && !getClient(doc.clientId) ? `<option value="${esc(doc.clientId)}" selected>${esc(doc.clientArchive.nom)} (supprimé du carnet)</option>` : ''}
             </select>
-            <small><a href="#/clients/nouveau?retour=${esc(doc.id)}">+ Ajouter un client</a></small>
+            <a class="lien-action" href="#/clients/nouveau?retour=${esc(doc.id)}">+ Ajouter un client</a>
           </div>
           <div>
             <label for="objet">Objet</label>
@@ -956,15 +1059,15 @@ function pageEdit(id) {
     linesEl.innerHTML = doc.lignes.map((l, i) => `
       <tr data-i="${i}">
         <td class="l-desc"><input data-field="description" value="${esc(l.description)}" placeholder="Ex : Pose d'un lavabo"></td>
-        <td data-label="Qté"><input data-field="quantite" type="number" step="any" min="0" value="${esc(l.quantite)}"></td>
+        <td data-label="Qté"><input data-field="quantite" type="text" inputmode="decimal" autocomplete="off" value="${esc(saisieNombre(l.quantite))}"></td>
         <td data-label="Unité"><select data-field="unite">
           ${['u', 'h', 'jour', 'm²', 'm', 'ml', 'forfait', 'kg', 'lot'].map((u) => `<option ${u === l.unite ? 'selected' : ''}>${u}</option>`).join('')}
         </select></td>
-        <td data-label="Prix unit. HT"><input data-field="prixUnitaire" type="number" step="0.01" min="0" value="${esc(l.prixUnitaire)}"></td>
+        <td data-label="Prix unit. HT"><input data-field="prixUnitaire" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(saisieNombre(l.prixUnitaire))}"></td>
         ${franchise ? '' : `<td data-label="TVA %"><select data-field="tva">
           ${tauxProposes(l.tva).map((t) => `<option value="${t}" ${Number(l.tva) === t ? 'selected' : ''}>${tauxFr(t)}</option>`).join('')}
         </select></td>`}
-        <td class="num line-total" data-label="Total HT">${euro(l.quantite * l.prixUnitaire)}</td>
+        <td class="num line-total" data-label="Total HT">${euro(montantLigne(l))}</td>
         <td class="l-act">${etoileLigne(l, i)}</td>
         <td class="l-act"><button type="button" class="btn btn-sm btn-danger" data-remove="${i}" title="Supprimer la ligne">✕</button></td>
       </tr>`).join('');
@@ -998,8 +1101,8 @@ function pageEdit(id) {
     const field = e.target.dataset.field;
     if (!row || !field) return;
     const line = doc.lignes[row.dataset.i];
-    line[field] = ['quantite', 'prixUnitaire', 'tva'].includes(field) ? Number(e.target.value) : e.target.value;
-    row.querySelector('.line-total').textContent = euro(line.quantite * line.prixUnitaire);
+    line[field] = ['quantite', 'prixUnitaire', 'tva'].includes(field) ? lireNombre(e.target.value) : e.target.value;
+    row.querySelector('.line-total').textContent = euro(montantLigne(line));
     renderTotals();
     saveData();
   });
@@ -1019,9 +1122,18 @@ function pageEdit(id) {
     linesEl.querySelector('tr:last-child input').focus();
   });
 
+  // Date du document vidée : elle reprend la date du jour (un devis ou une facture doit être daté).
+  form.date?.addEventListener('change', (e) => {
+    if (!e.target.value) {
+      e.target.value = doc.date = today();
+      saveData();
+    }
+  });
+
   form.addEventListener('input', (e) => {
     if (e.target.closest('#lines')) return;
     if (e.target.name) {
+      if (e.target.name === 'date' && !e.target.value) return;
       // Un autre client est choisi : la copie de l'ancien client n'est plus utile.
       if (e.target.name === 'clientId' && e.target.value !== doc.clientId) delete doc.clientArchive;
       doc[e.target.name] = e.target.value;
@@ -1067,12 +1179,20 @@ function totalsHtml(t, doc) {
     ${ligneAcompte}`;
 }
 
+// Champs qui décrivent la vie d'un document (signature, envois, paiement) :
+// ils ne doivent jamais passer sur une copie ni sur la facture créée depuis un devis.
+function sansHistorique(doc) {
+  const copie = structuredClone(doc);
+  for (const champ of ['signature', 'envois', 'datePaiement', 'devisOrigine', 'factureOrigine', 'numeroFactureOrigine', 'dateFactureOrigine']) delete copie[champ];
+  return copie;
+}
+
 // Crée une copie du document avec un nouveau numéro, puis l'ouvre.
 async function duplicateDocument(doc) {
   if (!doc || doc.type === 'avoir') return;
   if (!(await profilPret())) return;
   const copie = {
-    ...structuredClone(doc),
+    ...sansHistorique(doc),
     id: newId(),
     numero: nextNumber(doc.type),
     date: today(),
@@ -1080,7 +1200,6 @@ async function duplicateDocument(doc) {
     statut: doc.type === 'facture' ? 'a-payer' : 'brouillon',
     creeLe: Date.now(),
   };
-  delete copie.devisOrigine;
   data.documents.push(copie);
   saveData();
   go('#/modifier/' + copie.id);
@@ -1188,7 +1307,7 @@ async function convertToInvoice(devis, ouvrir = true) {
     return;
   }
   const facture = {
-    ...structuredClone(devis),
+    ...sansHistorique(devis),
     id: newId(),
     type: 'facture',
     numero: nextNumber('facture'),
@@ -1291,17 +1410,22 @@ function pageView(id) {
     <div class="page-head no-print">
       <h1>${libelleType(doc)} ${esc(doc.numero)} ${badge(doc)}</h1>
       <div class="actions">
-        <a class="btn" href="#/modifier/${esc(doc.id)}">Modifier</a>
         <button class="btn btn-primary" data-pdf="${esc(doc.id)}">Télécharger le PDF</button>
-        <button class="btn" onclick="window.print()">Imprimer</button>
+        <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e-mail</button>
         ${isDevis ? `<button class="btn" id="to-invoice">Transformer en facture</button>` : ''}
         ${isFacture && doc.statut === 'a-payer' ? `<button class="btn" id="mark-paid">Marquer comme payée</button>` : ''}
         ${isAvoir && doc.statut === 'a-rembourser' ? `<button class="btn" data-statut-doc="${esc(doc.id)}" data-valeur="rembourse">Marquer remboursé</button>` : ''}
-        <button class="btn" data-envoyer="${esc(doc.id)}">Envoyer par e-mail</button>
         ${Envoi.aRelancer(doc) ? `<button class="btn" data-relancer="${esc(doc.id)}">Relancer</button>` : ''}
-        ${isFacture && doc.statut !== 'annulee' ? `<button class="btn" data-avoir="${esc(doc.id)}">Faire un avoir</button>` : ''}
-        ${isAvoir ? '' : '<button class="btn" id="duplicate">Dupliquer</button>'}
-        <button class="btn btn-danger" id="delete">Supprimer</button>
+        <a class="btn" href="#/modifier/${esc(doc.id)}">Modifier</a>
+        <details class="menu-ligne menu-actions">
+          <summary class="btn">Plus d'actions <span class="chevron" aria-hidden="true">▾</span></summary>
+          <div class="menu-ligne-liste">
+            <button type="button" onclick="window.print()">Imprimer</button>
+            ${isFacture && doc.statut !== 'annulee' ? `<button type="button" data-avoir="${esc(doc.id)}">Faire un avoir</button>` : ''}
+            ${isAvoir ? '' : '<button type="button" id="duplicate">Dupliquer</button>'}
+            <button type="button" class="danger" id="delete">Supprimer</button>
+          </div>
+        </details>
       </div>
     </div>
     ${avoirs.length ? `<p class="historique no-print">${avoirs.map((a) => `Avoir <a href="#/voir/${esc(a.id)}">${esc(a.numero)}</a> de ${euro(computeTotals(a).ttc)} TTC (${esc(STATUTS.avoir[a.statut] || a.statut)})`).join(' · ')}</p>` : ''}
@@ -1326,7 +1450,7 @@ function pageView(id) {
           ${e.ape ? '<small>Code APE : ' + esc(e.ape) + '</small><br>' : ''}
           ${e.numeroTva && !e.franchiseTva ? '<small>N° TVA : ' + esc(e.numeroTva) + '</small>' : ''}
         </div>
-        <div style="text-align:right">
+        <div class="doc-meta">
           <p class="doc-title">${libelleType(doc).toUpperCase()}</p>
           <div>N° ${esc(doc.numero)}</div>
           <div>Date : ${dateFr(doc.date)}</div>
@@ -1345,7 +1469,7 @@ function pageView(id) {
         </div>
       </div>
 
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="liste-fiches">
         <thead><tr>
           <th>Description</th><th class="num">Qté</th><th class="num">Prix unit. HT</th>
           ${e.franchiseTva ? '' : '<th class="num">TVA</th>'}
@@ -1355,10 +1479,10 @@ function pageView(id) {
           ${doc.lignes.map((l) => `
             <tr>
               <td>${esc(l.description)}</td>
-              <td class="num">${esc(String(l.quantite).replace('.', ','))} ${esc(l.unite)}</td>
-              <td class="num">${euro(l.prixUnitaire)}</td>
-              ${e.franchiseTva ? '' : `<td class="num">${esc(String(l.tva).replace('.', ','))} %</td>`}
-              <td class="num">${euro(l.quantite * l.prixUnitaire)}</td>
+              <td class="num" data-label="Qté">${esc(String(l.quantite).replace('.', ','))} ${esc(l.unite)}</td>
+              <td class="num" data-label="Prix unit. HT">${euro(l.prixUnitaire)}</td>
+              ${e.franchiseTva ? '' : `<td class="num" data-label="TVA">${esc(String(l.tva).replace('.', ','))} %</td>`}
+              <td class="num fiche-total" data-label="Total HT">${euro(montantLigne(l))}</td>
             </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1397,15 +1521,15 @@ function pageClients() {
     </div>
     <div class="card">
       ${data.clients.length ? `
-        <div class="table-wrap"><table>
+        <div class="table-wrap"><table class="liste-fiches">
           <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th></th></tr></thead>
           <tbody>
             ${data.clients.map((c) => `
               <tr>
                 <td><strong>${esc(c.nom)}</strong><br><small>${esc(c.adresse).replace(/\n/g, ', ')}</small></td>
-                <td>${esc(c.telephone)}</td>
+                <td class="nowrap">${esc(c.telephone)}</td>
                 <td>${esc(c.email)}</td>
-                <td><div class="row-actions">
+                <td class="fiche-actions"><div class="row-actions">
                   <a class="btn btn-sm" href="#/clients/${esc(c.id)}">Modifier</a>
                   <button class="btn btn-sm btn-danger" data-delete-client="${esc(c.id)}">Supprimer</button>
                 </div></td>
@@ -1439,10 +1563,18 @@ function pageClientForm(id, retour) {
     </form>
   `;
 
+  let enCours = false;
   document.getElementById('client-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!(await profilPret())) return;
+    if (enCours) return; // double clic : un seul client
     const values = Object.fromEntries(new FormData(e.target));
+    values.siret = (values.siret || '').replace(/\s/g, '');
+    if (values.siret && !checkSiret(values.siret)) {
+      await ask("Le SIRET de ce client semble incorrect : vérifiez les 14 chiffres (ou laissez le champ vide pour un particulier).", "D'accord", false);
+      return;
+    }
+    enCours = true;
+    if (!(await profilPret())) { enCours = false; return; }
     values.adresse = composeAdresse(values);
     if (isNew) {
       const created = { id: newId(), ...values };
@@ -1514,9 +1646,12 @@ function pageSettings(champ) {
         <div class="logo-field">
           <div class="logo-preview" id="logo-preview">${logo ? `<img src="${esc(logo)}" alt="Logo">` : '<span>Aucun logo</span>'}</div>
           <div>
-            <label for="logo-input">Logo (affiché en haut des devis et factures)</label>
-            <input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
-            <button type="button" class="btn btn-sm btn-danger" id="logo-remove" ${logo ? '' : 'hidden'}>Retirer le logo</button>
+            <span class="label">Logo (affiché en haut des devis et factures)</span>
+            <div class="actions">
+              <label class="btn btn-sm" for="logo-input" id="logo-choisir">${logo ? 'Changer le logo' : 'Choisir un logo'}</label>
+              <input id="logo-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+              <button type="button" class="btn btn-sm btn-danger" id="logo-remove" ${logo ? '' : 'hidden'}>Retirer le logo</button>
+            </div>
           </div>
         </div>
       </section>
@@ -1765,7 +1900,7 @@ function pageSettings(champ) {
     if (document.body.contains(form) && $('siret').value.replace(/\s/g, '') === clean) {
       verif = resultat;
       afficherVerif();
-      form.dispatchEvent(new Event('input'));
+      refresh(); // met à jour la liste de ce qui manque, sans marquer « non enregistré »
     }
   }
 
@@ -1882,6 +2017,7 @@ function pageSettings(champ) {
         logo = canvas.toDataURL('image/png');
         $('logo-preview').innerHTML = `<img src="${logo}" alt="Logo">`;
         $('logo-remove').hidden = false;
+        $('logo-choisir').textContent = 'Changer le logo';
         form.dispatchEvent(new Event('input'));
       };
       img.src = reader.result;
@@ -1893,6 +2029,7 @@ function pageSettings(champ) {
     $('logo-input').value = '';
     $('logo-preview').innerHTML = '<span>Aucun logo</span>';
     $('logo-remove').hidden = true;
+    $('logo-choisir').textContent = 'Choisir un logo';
     form.dispatchEvent(new Event('input'));
   });
 
@@ -2112,6 +2249,8 @@ document.addEventListener('click', async (e) => {
   document.querySelectorAll('.menu-ligne[open]').forEach((m) => {
     if (!m.contains(e.target)) m.open = false;
   });
+  // Un choix fait dans un menu le referme.
+  e.target.closest('.menu-ligne-liste a, .menu-ligne-liste button')?.closest('.menu-ligne')?.removeAttribute('open');
   const cible = e.target.closest('[data-new], [data-duplicate], [data-delete], [data-delete-client], [data-payee], [data-statut-doc], [data-facturer], [data-devis-paye], [data-pdf], [data-envoyer], [data-relancer], [data-avoir]');
   if (!cible) {
     // Clic sur une ligne de document (hors bouton, lien ou menu) : on l'ouvre.
@@ -2152,11 +2291,13 @@ function menuOuvert(ouvert) {
   burger.setAttribute('aria-label', ouvert ? 'Fermer le menu' : 'Ouvrir le menu');
 }
 burger?.addEventListener('click', () => menuOuvert(!topbar.classList.contains('menu-open')));
+// Téléphone tourné à l'horizontale (passage au menu latéral) : le menu « Plus » se ferme.
+matchMedia('(max-width: 760px)').addEventListener('change', (e) => { if (!e.matches) menuOuvert(false); });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') menuOuvert(false);
 });
 document.addEventListener('click', (e) => {
-  if (topbar.classList.contains('menu-open') && !topbar.contains(e.target) && !burger?.contains(e.target)) menuOuvert(false);
+  if (topbar.classList.contains('menu-open') && !feuille?.contains(e.target) && !burger?.contains(e.target)) menuOuvert(false);
 });
 
 // Le menu « Plus » se ferme en le faisant glisser vers le bas, comme sur iPhone.

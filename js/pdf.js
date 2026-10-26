@@ -6,7 +6,7 @@
  * Utilise data, infosDocument, euro, dateFr, tauxFr... d'app.js.
  */
 const Pdf = (() => {
-  const VERSION = '?v=91';
+  const VERSION = '?v=92';
   const MARGE = 15;
   const BLEU = [31, 94, 255];
   const GRIS = [107, 115, 133];
@@ -34,8 +34,11 @@ const Pdf = (() => {
     return chargement;
   }
 
-  // Les polices standard des PDF ne connaissent pas les espaces fines insécables.
-  const txt = (v) => String(v ?? '').replace(/[  ]/g, ' ');
+  // Les polices standard des PDF ne connaissent pas les espaces fines insécables
+  // ni les émojis : les espaces sont remplacées et les caractères qu'elles ne savent
+  // pas dessiner sont retirés (sinon ils deviennent des signes illisibles, « Ø=Þ »).
+  const txt = (v) => String(v ?? '').replace(/[\u00a0\u202f\u2009]/g, ' ')
+    .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, '').replace(/ {2,}/g, ' ');
   // Nom de fichier sans accents ni caractères interdits (certains navigateurs les refusent).
   const nomFichier = (s) => txt(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[\\/:*?"<>|]+/g, '-').replace(/[^\x20-\x7e]/g, '').replace(/\s+/g, ' ').trim() + '.pdf';
@@ -162,7 +165,7 @@ const Pdf = (() => {
         txt(`${String(l.quantite).replace('.', ',')} ${l.unite || ''}`),
         txt(euro(l.prixUnitaire)),
         ...(tva ? [`${txt(tauxFr(l.tva))} %`] : []),
-        txt(euro(l.quantite * l.prixUnitaire)),
+        txt(euro(montantLigne(l))),
       ]),
       styles: { font: 'helvetica', fontSize: 9.5, cellPadding: 2.4, textColor: ENCRE, lineColor: [226, 230, 238] },
       headStyles: { fillColor: [244, 246, 251], textColor: GRIS, fontStyle: 'bold', fontSize: 8.5 },
@@ -212,10 +215,16 @@ const Pdf = (() => {
     if (doc.notes) {
       pdf.setFontSize(9.5);
       const lignes = pdf.splitTextToSize(txt(doc.notes), largeur - 2 * MARGE);
-      placer(lignes.length * 4.6 + 6);
+      // Notes longues (conditions générales…) : écrites ligne par ligne, sur
+      // autant de pages que nécessaire, sans déborder sur le pied de page.
+      placer(Math.min(lignes.length, 6) * 4.6 + 6);
       y += 4;
-      pdf.text(lignes, MARGE, y);
-      y += lignes.length * 4.6 + 2;
+      for (const ligne of lignes) {
+        placer(4.6);
+        pdf.text(ligne, MARGE, y);
+        y += 4.6;
+      }
+      y += 2;
     }
 
     if (isDevis) {

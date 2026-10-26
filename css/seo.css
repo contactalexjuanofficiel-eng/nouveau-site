@@ -95,7 +95,7 @@
 .gen-champ label { font-weight: 600; font-size: .92rem; }
 .gen-champ small { color: var(--muted); font-size: .8rem; }
 .gen-requis { color: var(--danger); }
-.gen input, .gen select { width: 100%; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+.gen input, .gen select { width: 100%; min-width: 0; font: inherit; font-size: max(16px, 1em); padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
 .gen input:focus, .gen select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
 .gen-case { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; cursor: pointer; }
 .gen-case input { width: 20px; height: 20px; flex: none; margin-top: 2px; }
@@ -126,6 +126,10 @@
 .gen-non { display: block; margin: 14px auto 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; }
 .seo-gratuit-texte { padding-bottom: 32px; }
 .seo-tableau { width: 100%; border-collapse: collapse; font-size: .95rem; }
+@media (max-width: 600px) {
+  .seo-tableau { font-size: var(--fs-sm); }
+  .seo-tableau th, .seo-tableau td { padding: var(--sp-2) var(--sp-1-5); }
+}
 .seo-tableau th, .seo-tableau td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
 .seo-tableau td:not(:first-child), .seo-tableau th:not(:first-child) { text-align: center; }
 .seo-tableau thead th:last-child { color: var(--primary); }

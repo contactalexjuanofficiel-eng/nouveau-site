@@ -128,6 +128,7 @@ const Envoi = (() => {
       </form>`;
     document.body.appendChild(dialog);
     dialog.showModal();
+    fenetreTactile(dialog);
     dialog.addEventListener('close', () => dialog.remove());
     dialog.querySelector('#envoi-annuler').addEventListener('click', () => dialog.close());
     const form = dialog.querySelector('#envoi-form');

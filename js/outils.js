@@ -7,7 +7,12 @@
  */
 (() => {
   const euro = (n) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number.isFinite(n) ? n : 0);
-  const nombre = (v) => Number(String(v ?? '').replace(/\s/g, '').replace(',', '.')) || 0;
+  // Montant saisi à la française (« 1 234,56 », « 1.234,56 » ou « 1234.56 ») ; jamais négatif.
+  const nombre = (v) => {
+    let t = String(v ?? '').replace(/[\s\u00a0\u202f€]/g, '');
+    if (t.includes(',') && t.includes('.')) t = t.replace(/\./g, '');
+    return Math.max(0, Number(t.replace(',', '.')) || 0);
+  };
   const tauxFr = (t) => String(t).replace('.', ',');
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const cta = (texte) => `<div class="outil-cta"><p>${texte}</p>
@@ -190,7 +195,7 @@
   if (siret) {
     const cleValide = (d) => {
       if (!/^\d{14}$/.test(d)) return false;
-      if (d.startsWith('356000000')) return d.split('').reduce((a, c) => a + Number(c), 0) % 5 === 0; // La Poste
+      if (d.startsWith('356000000') && d.split('').reduce((a, c) => a + Number(c), 0) % 5 === 0) return true; // La Poste
       let somme = 0;
       for (let i = 0; i < 14; i++) {
         let n = Number(d[i]);
@@ -232,11 +237,15 @@
         const json = await r.json();
         const ent = (json.results || []).find((x) => x.siren === d.slice(0, 9));
         if (!ent) {
-          zone.innerHTML = `<div class="outil-resultat ko"><p class="outil-taux">Introuvable</p><p>${d.length === 14 ? 'Le numéro est bien formé' : 'Ce SIREN'} mais il n'apparaît pas dans l'annuaire public des entreprises (entreprise récente, non diffusible ou numéro erroné).</p></div>`;
+          zone.innerHTML = `<div class="outil-resultat ko"><p class="outil-taux">Introuvable</p><p>${d.length === 14 ? 'Le numéro est bien formé, mais il' : 'Ce SIREN'} n'apparaît pas dans l'annuaire public des entreprises (entreprise récente, non diffusible ou numéro erroné).</p></div>`;
           return;
         }
         const etabs = [ent.siege, ...(ent.matching_etablissements || [])].filter(Boolean);
         const etab = d.length === 14 ? etabs.find((x) => x.siret === d) : ent.siege;
+        if (d.length === 14 && !etab) {
+          zone.innerHTML = `<div class="outil-resultat ko"><p class="outil-taux">Établissement introuvable</p><p>L'entreprise ${esc(ent.nom_complet || ent.siren)} existe, mais aucun de ses établissements ne porte ce numéro SIRET : vérifiez les 5 derniers chiffres.</p></div>`;
+          return;
+        }
         const ferme = ent.etat_administratif === 'C' || etab?.etat_administratif === 'F';
         const adresse = etab?.adresse || '';
         zone.innerHTML = `<div class="outil-resultat ${ferme ? 'ko' : 'ok'}">
@@ -252,7 +261,7 @@
           <p class="outil-note">Source : annuaire des entreprises de l'État (données INSEE), consulté à l'instant.</p>
         </div>`;
       } catch (e) {
-        zone.innerHTML = '<p class="outil-note">L\'annuaire officiel ne répond pas pour le moment. Le format et la clé de contrôle sont corrects ; réessayez dans quelques minutes.</p>';
+        zone.innerHTML = `<p class="outil-note">L'annuaire officiel ne répond pas pour le moment. ${d.length === 14 ? 'Le format et la clé de contrôle sont corrects ; r' : 'R'}éessayez dans quelques minutes.</p>`;
       }
     });
   }

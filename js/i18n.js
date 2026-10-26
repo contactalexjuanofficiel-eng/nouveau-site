@@ -14,7 +14,8 @@ const I18n = (() => {
   const LOCALES = { fr: 'fr-FR', en: 'en-GB', es: 'es-ES', pt: 'pt-PT', it: 'it-IT', de: 'de-DE', ar: 'ar', tr: 'tr-TR', ro: 'ro-RO', pl: 'pl-PL' };
   const CODES = new Set(LANGUES.map(([c]) => c));
   const STOCKAGE = 'devizo-langue';
-  const VERSION = '?v=40';
+  // Même numéro de version que la page (?v=N du script) : une traduction modifiée est rechargée.
+  const VERSION = (document.currentScript?.src.match(/\?v=\d+/) || ['?v=1'])[0];
   window.DEVIZO_TRAD = window.DEVIZO_TRAD || {};
 
   const originaux = new Map(); // élément -> HTML français

@@ -78,8 +78,8 @@ montants.forEach((m, i) => {
   const d = jour(-30 * (5 - i) - 5);
   profil.documents.push({ id: 'p' + i, type: 'facture', numero: 'F-2026-0' + (20 + i), clientId: ['c1', 'c2', 'c3', 'c4'][i % 4], date: d, echeance: d, statut: 'payee', datePaiement: d, creeLe: 20 + i,
     objet: 'Travaux de plomberie', lignes: [L('Travaux de plomberie', 1, 'forfait', m)] });
-  profil.depenses.push({ id: 'x' + i, date: d, fournisseur: ['Point P', 'Cedeo', 'Leroy Merlin'][i % 3], categorie: 'materiel', montantTTC: Math.round(m * 0.22), tva: 20 });
-  profil.depenses.push({ id: 'y' + i, date: d, fournisseur: 'TotalEnergies', categorie: 'carburant', montantTTC: 180, tva: 20 });
+  profil.depenses.push({ id: 'x' + i, date: d, fournisseur: ['Point P', 'Cedeo', 'Leroy Merlin'][i % 3], categorie: 'Matériaux et fournitures', montantTTC: Math.round(m * 0.22), tva: 20 });
+  profil.depenses.push({ id: 'y' + i, date: d, fournisseur: 'TotalEnergies', categorie: 'Carburant et péages', montantTTC: 180, tva: 20 });
 });
 
 

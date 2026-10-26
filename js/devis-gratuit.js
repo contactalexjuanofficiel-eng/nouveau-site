@@ -64,11 +64,25 @@
     devis: { numero: 'D-' + new Date().getFullYear() + '-001', date: aujourdhui(), echeance: plusJours(aujourdhui(), 30), objet: '',
       lignes: [{ description: '', quantite: 1, unite: 'u', prixUnitaire: '', tva: 10 }] },
   });
+  // Nouveau devis : on reprend l'entreprise du dernier devis fait sur cet appareil
+  // et on passe au numéro suivant (D-2026-001 → D-2026-002).
+  function nouveauDevis() {
+    const v = VIDE();
+    try {
+      const dernier = JSON.parse(localStorage.getItem(POUR_APPLI) || 'null');
+      if (dernier?.entreprise) v.entreprise = { ...v.entreprise, ...dernier.entreprise };
+      const m = /^(.*?)(\d+)$/.exec(dernier?.devis?.numero || '');
+      if (m) v.devis.numero = m[1] + String(Number(m[2]) + 1).padStart(m[2].length, '0');
+    } catch (e) {
+      // rien de gardé
+    }
+    return v;
+  }
   let etat;
   try {
-    etat = JSON.parse(sessionStorage.getItem(BROUILLON)) || VIDE();
+    etat = JSON.parse(sessionStorage.getItem(BROUILLON)) || nouveauDevis();
   } catch (e) {
-    etat = VIDE();
+    etat = nouveauDevis();
   }
   const garderBrouillon = () => {
     try {
@@ -78,17 +92,25 @@
     }
   };
 
+  // Arrondi au centime sans les erreurs des nombres à virgule (4,995 → 5,00).
+  const arrondi = (n) => (Math.sign(n) * Math.round(Number((Math.abs(n) * 100).toFixed(6)))) / 100;
+  const montantLigne = (l) => arrondi(nombre(l.quantite) * nombre(l.prixUnitaire));
+
+  // Lignes arrondies, puis TVA de chaque taux arrondie : HT + TVA = TTC au centime près.
   function totaux() {
     const franchise = etat.entreprise.franchiseTva;
     let ht = 0;
-    const parTaux = {};
+    const bases = {};
     for (const l of etat.devis.lignes) {
-      const m = nombre(l.quantite) * nombre(l.prixUnitaire);
+      const m = montantLigne(l);
       ht += m;
-      if (!franchise) parTaux[l.tva] = (parTaux[l.tva] || 0) + (m * Number(l.tva)) / 100;
+      if (!franchise) bases[l.tva] = (bases[l.tva] || 0) + m;
     }
-    const tva = Object.values(parTaux).reduce((a, b) => a + b, 0);
-    return { ht, parTaux, tva, ttc: ht + tva };
+    const parTaux = {};
+    for (const [taux, b] of Object.entries(bases)) parTaux[taux] = arrondi((b * Number(taux)) / 100);
+    const tva = arrondi(Object.values(parTaux).reduce((a, b) => a + b, 0));
+    ht = arrondi(ht);
+    return { ht, parTaux, tva, ttc: arrondi(ht + tva) };
   }
 
   const champ = (groupe, nom, libelle, { type = 'text', requis = false, aide = '', attrs = '' } = {}) => `
@@ -107,7 +129,7 @@
       <select class="gen-unite" data-l="unite" aria-label="Unité">${UNITES.map((u) => `<option${u === l.unite ? ' selected' : ''}>${u}</option>`).join('')}</select>
       <input class="gen-pu" data-l="prixUnitaire" inputmode="decimal" value="${esc(l.prixUnitaire)}" placeholder="0,00" aria-label="Prix unitaire HT">
       ${franchise ? '' : `<select class="gen-tva" data-l="tva" aria-label="TVA">${TAUX.map((t) => `<option value="${t}"${Number(l.tva) === t ? ' selected' : ''}>${tauxFr(t)} %</option>`).join('')}</select>`}
-      <span class="gen-total">${euro(nombre(l.quantite) * nombre(l.prixUnitaire))}</span>
+      <span class="gen-total">${euro(montantLigne(l))}</span>
       <button type="button" class="gen-suppr" data-suppr="${i}" aria-label="Supprimer la ligne"${etat.devis.lignes.length < 2 ? ' disabled' : ''}>✕</button>
     </div>`;
   }
@@ -179,14 +201,14 @@
         <p class="gen-erreur" role="alert" hidden></p>
         <button type="submit" class="btn btn-primary btn-lg gen-pdf">Télécharger le devis en PDF</button>
         <p class="gen-info">🔒 Gratuit et sans inscription, jusqu'à ${LIMITE} devis par mois (${restants() > 0 ? `encore ${restants()} ce mois-ci` : 'limite atteinte ce mois-ci'}).
-          Rien n'est enregistré sur nos serveurs : fermez l'onglet et tout est effacé.</p>
+          Rien n'est envoyé sur nos serveurs : votre devis reste uniquement sur cet appareil.</p>
       </form>`;
   }
 
   function rafraichirCalculs() {
     zone.querySelectorAll('.gen-ligne').forEach((el) => {
       const l = etat.devis.lignes[el.dataset.i];
-      el.querySelector('.gen-total').textContent = euro(nombre(l.quantite) * nombre(l.prixUnitaire));
+      el.querySelector('.gen-total').textContent = euro(montantLigne(l));
     });
     zone.querySelector('.gen-totaux').innerHTML = totauxHtml();
   }
@@ -222,14 +244,31 @@
     }
   });
 
+  // Clé de contrôle du SIRET (formule de Luhn ; règle spéciale pour La Poste).
+  function siretValide(d) {
+    if (d.startsWith('356000000') && [...d].reduce((a, c) => a + Number(c), 0) % 5 === 0) return true;
+    let somme = 0;
+    for (let i = 0; i < 14; i++) {
+      let n = Number(d[i]);
+      if (i % 2 === 0) { n *= 2; if (n > 9) n -= 9; }
+      somme += n;
+    }
+    return somme % 10 === 0;
+  }
+
   function erreurs() {
     const e = etat.entreprise;
     const manque = [];
     if (!e.nom.trim()) manque.push("le nom de l'entreprise");
     if (!e.rue.trim() || !/^\d{5}$/.test(e.codePostal.trim()) || !e.ville.trim()) manque.push("l'adresse complète de l'entreprise");
-    if (!/^\d{14}$/.test(e.siret.replace(/\s/g, ''))) manque.push('un SIRET de 14 chiffres');
+    const siret = e.siret.replace(/\s/g, '');
+    if (!/^\d{14}$/.test(siret)) manque.push('un SIRET de 14 chiffres');
+    else if (!siretValide(siret)) manque.push('un SIRET correct (celui saisi contient une faute de frappe : vérifiez les 14 chiffres)');
+    if (e.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e.email.trim())) manque.push('une adresse e-mail valide (ou laissez le champ vide)');
     if (!etat.client.nom.trim()) manque.push('le nom du client');
     if (!etat.devis.lignes.some((l) => l.description.trim() && nombre(l.prixUnitaire) > 0)) manque.push('au moins une ligne avec un prix');
+    else if (totaux().ttc <= 0) manque.push('un total supérieur à 0 €');
+    if (etat.devis.echeance && etat.devis.date && etat.devis.echeance < etat.devis.date) manque.push('une date de validité après la date du devis');
     return manque;
   }
 
@@ -253,7 +292,9 @@
       });
     return chargement;
   }
-  const txt = (v) => String(v ?? '').replace(/[  ]/g, ' ');
+  // Espaces fines remplacées et émojis retirés : la police du PDF ne sait pas les dessiner.
+  const txt = (v) => String(v ?? '').replace(/[\u00a0\u202f\u2009]/g, ' ')
+    .replace(/[^\n\r\t\x20-\x7e\xa0-\xff€œŒ’‘“”–—…•‚„ŠšŽžŸ†‡‰‹›ˆ˜™]/gu, '').replace(/ {2,}/g, ' ');
 
   async function fairePdf() {
     await chargerJsPdf();
@@ -309,7 +350,7 @@
       startY: y + 2,
       head: [tete],
       body: lignes.map((l) => [txt(l.description), txt(String(nombre(l.quantite)).replace('.', ',')), l.unite, txt(euro(nombre(l.prixUnitaire))),
-        ...(e.franchiseTva ? [] : [tauxFr(l.tva) + ' %']), txt(euro(nombre(l.quantite) * nombre(l.prixUnitaire)))]),
+        ...(e.franchiseTva ? [] : [tauxFr(l.tva) + ' %']), txt(euro(montantLigne(l)))]),
       margin: { left: M, right: M },
       styles: { font: 'helvetica', fontSize: 9.5, cellPadding: 2.4, textColor: ENCRE, lineColor: [226, 230, 238], lineWidth: 0.2 },
       headStyles: { fillColor: BLEU, textColor: 255, fontStyle: 'bold' },
@@ -381,8 +422,17 @@
       </ul>
       <a class="btn btn-lg btn-google" href="app.html#google"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg><span>Continuer avec Google</span></a>
       <a class="btn btn-primary btn-lg" href="app.html#inscription">Créer mon compte avec mon e-mail</a>
+      ${!limite && reste ? '<button type="button" class="btn btn-lg gen-autre">Faire un autre devis</button>' : ''}
       <button type="button" class="gen-non">${limite ? 'Fermer' : 'Non merci'}</button>`;
     dlg.querySelector('.gen-non').addEventListener('click', () => dlg.close());
+    // Devis suivant : même entreprise, nouveau numéro, client et lignes vides.
+    dlg.querySelector('.gen-autre')?.addEventListener('click', () => {
+      etat = nouveauDevis();
+      garderBrouillon();
+      afficher();
+      dlg.close();
+      zone.scrollIntoView({ behavior: 'smooth' });
+    });
     dlg.addEventListener('close', () => dlg.remove());
     document.body.appendChild(dlg);
     dlg.showModal();
@@ -417,7 +467,7 @@
       if (window.devizoCompter) window.devizoCompter('pdf-gratuit');
       proposerCompte();
       zone.querySelector('.gen-info').innerHTML = `🔒 Gratuit et sans inscription, jusqu'à ${LIMITE} devis par mois (${restants() > 0 ? `encore ${restants()} ce mois-ci` : 'limite atteinte ce mois-ci'}).
-          Rien n'est enregistré sur nos serveurs : fermez l'onglet et tout est effacé.`;
+          Rien n'est envoyé sur nos serveurs : votre devis reste uniquement sur cet appareil.`;
     } catch (e) {
       zoneErreur.textContent = "Le PDF n'a pas pu être créé. Vérifiez votre connexion internet et réessayez.";
       zoneErreur.hidden = false;

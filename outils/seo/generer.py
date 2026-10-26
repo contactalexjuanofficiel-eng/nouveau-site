@@ -34,7 +34,7 @@ def jsonld(obj):
 
 ORGANISATION = {
     '@type': 'Organization', '@id': f'{SITE}/#organisation', 'name': 'Devizo', 'url': f'{SITE}/',
-    'logo': f'{SITE}/img/logo-512.png', 'email': 'devizocontact@gmail.com',
+    'logo': f'{SITE}/img/logo-512.png', 'email': 'contact@devizo-app.fr',
 }
 
 
@@ -268,9 +268,8 @@ def page_metier(m):
 
 def page_guide(g):
     titre = f'{g["titre"]} | Devizo'
-    fil_html, fil_ld = fil([('Accueil', 'index.html'), ('Guides', None if g['fichier'] == GUIDES[0]['fichier'] else GUIDES[0]['fichier']), (g['court'], None)])
-    if g['fichier'] == GUIDES[0]['fichier']:
-        fil_html, fil_ld = fil([('Accueil', 'index.html'), (g['court'], None)])
+    # Pas de page qui regroupe les guides : le fil d'Ariane va directement de l'accueil au guide.
+    fil_html, fil_ld = fil([('Accueil', 'index.html'), (g['court'], None)])
     article = {'@type': 'Article', 'headline': g['titre'], 'description': g['description'], 'inLanguage': 'fr',
                'datePublished': g['date'], 'dateModified': AUJOURDHUI, 'image': OG,
                'author': {'@id': f'{SITE}/#organisation'}, 'publisher': {'@id': f'{SITE}/#organisation'},

@@ -58,7 +58,7 @@
           <tbody>${(c.lignes || []).map((l) => `
             <tr><td>${esc(l.description)}</td><td class="num">${esc(tauxFr(l.quantite))} ${esc(l.unite)}</td>
               <td class="num">${euro(l.prixUnitaire)}</td>${c.franchise ? '' : `<td class="num">${esc(tauxFr(l.tva))} %</td>`}
-              <td class="num">${euro(l.quantite * l.prixUnitaire)}</td></tr>`).join('')}</tbody>
+              <td class="num">${euro(Math.sign(l.quantite * l.prixUnitaire) * Math.round(Number((Math.abs(l.quantite * l.prixUnitaire) * 100).toFixed(6))) / 100)}</td></tr>`).join('')}</tbody>
         </table></div>
         <div class="totals" style="margin-top:16px">${totaux}
           ${acompte > 0 ? `<div class="acompte"><span>Acompte à la commande (${tauxFr(acompte)} %)</span><span>${euro(((c.franchise ? t.ht : t.ttc) * acompte) / 100)}</span></div>` : ''}</div>

@@ -42,7 +42,7 @@ function isoDate(d) {
 }
 
 function depenseHT(dep) {
-  return (Number(dep.montantTTC) || 0) / (1 + (Number(dep.tva) || 0) / 100);
+  return lireNombre(dep.montantTTC) / (1 + (Number(dep.tva) || 0) / 100);
 }
 
 // Factures payées, moins les avoirs remboursés ou déduits (un avoir qui annule
@@ -347,7 +347,7 @@ function pageDashboard() {
             ${parts.filter((x) => x.val > 0).map((x) => `<span style="flex:${x.val / totalParts};background:${x.color}" data-tip="${esc(x.nom + '\n' + euro(x.val) + ' · ' + Math.round((x.val / totalParts) * 100) + ' %')}"></span>`).join('')}
           </div>
           <ul class="legend">
-            <li><span class="key key-none"></span>Chiffre d'affaires encaissé HT<strong>${euro(actuel.caHT)}</strong></li>
+            <li class="legend-total">Chiffre d'affaires encaissé HT<strong>${euro(actuel.caHT)}</strong></li>
             ${parts.map((x) => `<li><span class="key" style="background:${x.color}"></span>${x.nom}<strong>${x.nom === 'Il vous reste' ? '' : '− '}${euro(x.val)}</strong></li>`).join('')}
           </ul>
           ${actuel.reste < 0 ? `<p class="status bad">⚠ Vos dépenses et charges dépassent votre chiffre d'affaires de ${euro(-actuel.reste)} sur cette période.</p>` : ''}
@@ -425,7 +425,7 @@ function pageDashboard() {
     <section class="card">
       <div class="page-head" style="margin-bottom:8px">
         <h2 style="margin:0">5 derniers documents</h2>
-        ${data.documents.length > 5 ? `<a href="#/documents">Voir tout (${data.documents.length}) →</a>` : ''}
+        ${data.documents.length > 5 ? `<a class="lien-action" href="#/documents">Voir tout (${data.documents.length}) →</a>` : ''}
       </div>
       ${documentsTable(data.documents.slice().sort((a, b2) => b2.creeLe - a.creeLe).slice(0, 5))}
     </section>
@@ -562,7 +562,7 @@ function pageDepenses(params) {
         <div><label for="dep-fournisseur">Fournisseur</label><input id="dep-fournisseur" name="fournisseur" list="dep-fournisseurs" autocomplete="off" value="${esc(dep.fournisseur)}" placeholder="Ex : Point P, Total, Leroy Merlin"></div>
         <div><label for="dep-categorie">Catégorie</label>
           <select id="dep-categorie" name="categorie">${CATEGORIES_DEPENSES.map((c) => `<option ${c === dep.categorie ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
-        <div><label for="dep-montant">Montant TTC payé (€) *</label><input id="dep-montant" name="montantTTC" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(dep.montantTTC)}" required></div>
+        <div><label for="dep-montant">Montant TTC payé (€) *</label><input id="dep-montant" name="montantTTC" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(saisieNombre(dep.montantTTC))}" required></div>
         <div><label for="dep-tva">TVA sur la facture</label>
           <select id="dep-tva" name="tva">${[20, 10, 5.5, 2.1, 0].map((t) => `<option value="${t}" ${Number(dep.tva) === t ? 'selected' : ''}>${tauxFr(t)} %</option>`).join('')}</select>
           <small class="hint" id="dep-ht"></small></div>
@@ -582,12 +582,12 @@ function pageDepenses(params) {
     ${cats.length ? `<section class="card"><h2>Par catégorie · ${annee}</h2>${barList(cats, 'var(--s2)')}</section>` : ''}
 
     <section class="card">
-      ${liste.length ? `<div class="table-wrap"><table>
+      ${liste.length ? `<div class="table-wrap"><table class="liste-fiches">
         <thead><tr><th>Date</th><th>Fournisseur</th><th>Catégorie</th><th class="num">HT</th><th class="num">TTC</th><th class="num">Actions</th></tr></thead>
         <tbody>${liste.map((d) => `<tr>
           <td>${dateFr(d.date)}</td><td>${esc(d.fournisseur || '—')}${d.note ? `<br><small>${esc(d.note)}</small>` : ''}</td><td>${esc(d.categorie)}</td>
-          <td class="num">${euro(depenseHT(d))}</td><td class="num">${euro(Number(d.montantTTC) || 0)}</td>
-          <td><div class="row-actions"><a class="btn btn-sm" href="#/depenses?modifier=${esc(d.id)}">Modifier</a>
+          <td class="num" data-label="HT">${euro(depenseHT(d))}</td><td class="num fiche-total" data-label="TTC">${euro(lireNombre(d.montantTTC))}</td>
+          <td class="fiche-actions"><div class="row-actions"><a class="btn btn-sm" href="#/depenses?modifier=${esc(d.id)}">Modifier</a>
             <button class="btn btn-sm btn-danger" data-suppr-dep="${esc(d.id)}">Supprimer</button></div></td>
         </tr>`).join('')}</tbody></table></div>`
         : '<p class="empty">Aucune dépense enregistrée. Ajoutez vos achats de matériel, carburant, assurance… pour connaître votre vrai bénéfice.</p>'}
@@ -597,7 +597,7 @@ function pageDepenses(params) {
   const form = document.getElementById('dep-form');
   const majHT = () => {
     const ht = depenseHT({ montantTTC: form.montantTTC.value, tva: form.tva.value });
-    document.getElementById('dep-ht').textContent = form.montantTTC.value ? `Soit ${euro(ht)} HT et ${euro(Number(form.montantTTC.value) - ht)} de TVA` : '';
+    document.getElementById('dep-ht').textContent = form.montantTTC.value ? `Soit ${euro(ht)} HT et ${euro(lireNombre(form.montantTTC.value) - ht)} de TVA` : '';
   };
   form.addEventListener('input', majHT);
   majHT();
@@ -617,14 +617,17 @@ function pageDepenses(params) {
   document.getElementById('dep-ajout').addEventListener('click', () => go('#/depenses?ajout=1'));
   if (ouvert) setTimeout(() => form.montantTTC.focus(), 50);
 
+  let envoiEnCours = false;
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const v = Object.fromEntries(new FormData(form));
-    if (!v.date || !(Number(v.montantTTC) > 0)) {
+    if (envoiEnCours) return; // double clic : une seule dépense
+    if (!v.date || !(lireNombre(v.montantTTC) > 0)) {
       await ask('Indiquez au moins la date et le montant TTC de la dépense.', "D'accord", false);
       return;
     }
-    const valeurs = { ...v, montantTTC: Number(v.montantTTC), tva: Number(v.tva) };
+    envoiEnCours = true;
+    const valeurs = { ...v, montantTTC: lireNombre(v.montantTTC), tva: Number(v.tva) };
     if (enEdition) Object.assign(enEdition, valeurs);
     else data.depenses.push({ id: newId(), ...valeurs });
     saveData();
