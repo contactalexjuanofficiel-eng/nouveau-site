@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devizo · Charte graphique</title>
+  <meta name="robots" content="noindex">
+  <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css?v=90">
+  <link rel="stylesheet" href="css/style.css?v=90">
+  <style>
+    /* Mise en page de cette page uniquement : tout le reste vient de tokens.css et style.css. */
+    .ch { max-width: var(--w-content); margin: 0 auto; padding: var(--sp-10) var(--sp-4) var(--sp-20); }
+    .ch h1 { font-family: var(--font-display); font-size: var(--fs-4xl); margin: 0 0 var(--sp-2); }
+    .ch > p { color: var(--text-2); margin: 0 0 var(--sp-8); }
+    .ch section { margin-bottom: var(--sp-8); }
+    .ch h2 { font-size: var(--fs-xl); margin: 0 0 var(--sp-4); }
+    .ch-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
+    .ch-couleur { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--card); }
+    .ch-couleur div { height: 64px; }
+    .ch-couleur code { display: block; padding: var(--sp-2) var(--sp-3); font-size: var(--fs-xs); color: var(--text-2); }
+    .ch-ligne { display: flex; align-items: baseline; gap: var(--sp-4); padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+    .ch-ligne code { flex: none; width: 110px; font-size: var(--fs-xs); color: var(--muted); }
+    .ch-esp { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-1) 0; }
+    .ch-esp code { width: 110px; font-size: var(--fs-xs); color: var(--muted); }
+    .ch-esp span { height: 12px; background: var(--primary); border-radius: var(--r-xs); }
+    .ch-rayons { display: flex; flex-wrap: wrap; gap: var(--sp-4); }
+    .ch-rayons div { width: 88px; height: 64px; background: var(--primary-soft); border: 1px solid var(--primary); display: grid; place-items: center; font-size: var(--fs-xs); }
+    .ch-ombres { display: flex; flex-wrap: wrap; gap: var(--sp-5); }
+    .ch-ombres div { width: 120px; height: 80px; background: var(--card); border-radius: var(--r-lg); display: grid; place-items: center; font-size: var(--fs-xs); }
+    .ch .actions { flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <main class="ch">
+    <h1>Charte graphique</h1>
+    <p>Les règles visuelles de Devizo. Toutes les valeurs viennent de <code>css/tokens.css</code> : on n'écrit jamais une taille, un espacement ou une couleur en dur.</p>
+
+    <section>
+      <h2>Couleurs</h2>
+      <div class="ch-grille">
+        <div class="ch-couleur"><div style="background:var(--primary)"></div><code>--primary</code></div>
+        <div class="ch-couleur"><div style="background:var(--primary-soft)"></div><code>--primary-soft</code></div>
+        <div class="ch-couleur"><div style="background:var(--text)"></div><code>--text</code></div>
+        <div class="ch-couleur"><div style="background:var(--text-2)"></div><code>--text-2</code></div>
+        <div class="ch-couleur"><div style="background:var(--muted)"></div><code>--muted</code></div>
+        <div class="ch-couleur"><div style="background:var(--bg)"></div><code>--bg</code></div>
+        <div class="ch-couleur"><div style="background:var(--card)"></div><code>--card</code></div>
+        <div class="ch-couleur"><div style="background:var(--border)"></div><code>--border</code></div>
+        <div class="ch-couleur"><div style="background:var(--success)"></div><code>--success</code></div>
+        <div class="ch-couleur"><div style="background:var(--warning)"></div><code>--warning</code></div>
+        <div class="ch-couleur"><div style="background:var(--danger)"></div><code>--danger</code></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Polices</h2>
+      <div class="ch-ligne"><code>--font-display</code><span style="font-family:var(--font-display);font-size:var(--fs-3xl);font-weight:800">Bricolage Grotesque</span></div>
+      <div class="ch-ligne"><code>--font-sans</code><span style="font-size:var(--fs-xl)">Inter, pour tout le reste</span></div>
+      <div class="ch-ligne"><code>--fs-4xl</code><span style="font-size:var(--fs-4xl);font-weight:700">36 px</span></div>
+      <div class="ch-ligne"><code>--fs-3xl</code><span style="font-size:var(--fs-3xl);font-weight:700">30 px</span></div>
+      <div class="ch-ligne"><code>--fs-2xl</code><span style="font-size:var(--fs-2xl);font-weight:700">24 px · titre de page</span></div>
+      <div class="ch-ligne"><code>--fs-xl</code><span style="font-size:var(--fs-xl);font-weight:600">20 px · titre de carte</span></div>
+      <div class="ch-ligne"><code>--fs-lg</code><span style="font-size:var(--fs-lg)">17 px</span></div>
+      <div class="ch-ligne"><code>--fs-base</code><span style="font-size:var(--fs-base)">15 px · texte courant</span></div>
+      <div class="ch-ligne"><code>--fs-md</code><span style="font-size:var(--fs-md)">14 px · boutons, champs</span></div>
+      <div class="ch-ligne"><code>--fs-sm</code><span style="font-size:var(--fs-sm)">13 px · étiquettes</span></div>
+      <div class="ch-ligne"><code>--fs-xs</code><span style="font-size:var(--fs-xs)">12 px · légendes</span></div>
+    </section>
+
+    <section>
+      <h2>Espacements (grille de 4 px)</h2>
+      <div class="ch-esp"><code>--sp-1 · 4</code><span style="width:var(--sp-1)"></span></div>
+      <div class="ch-esp"><code>--sp-2 · 8</code><span style="width:var(--sp-2)"></span></div>
+      <div class="ch-esp"><code>--sp-3 · 12</code><span style="width:var(--sp-3)"></span></div>
+      <div class="ch-esp"><code>--sp-4 · 16</code><span style="width:var(--sp-4)"></span></div>
+      <div class="ch-esp"><code>--sp-5 · 20</code><span style="width:var(--sp-5)"></span></div>
+      <div class="ch-esp"><code>--sp-6 · 24</code><span style="width:var(--sp-6)"></span></div>
+      <div class="ch-esp"><code>--sp-8 · 32</code><span style="width:var(--sp-8)"></span></div>
+      <div class="ch-esp"><code>--sp-10 · 40</code><span style="width:var(--sp-10)"></span></div>
+      <div class="ch-esp"><code>--sp-12 · 48</code><span style="width:var(--sp-12)"></span></div>
+      <div class="ch-esp"><code>--sp-16 · 64</code><span style="width:var(--sp-16)"></span></div>
+    </section>
+
+    <section>
+      <h2>Arrondis et ombres</h2>
+      <div class="ch-rayons">
+        <div style="border-radius:var(--r-sm)">--r-sm</div>
+        <div style="border-radius:var(--r-md)">--r-md</div>
+        <div style="border-radius:var(--r-lg)">--r-lg</div>
+        <div style="border-radius:var(--r-xl)">--r-xl</div>
+        <div style="border-radius:var(--r-2xl)">--r-2xl</div>
+      </div>
+      <div class="ch-ombres" style="margin-top:var(--sp-6)">
+        <div style="box-shadow:var(--sh-xs)">--sh-xs</div>
+        <div style="box-shadow:var(--sh-sm)">--sh-sm</div>
+        <div style="box-shadow:var(--sh-md)">--sh-md</div>
+        <div style="box-shadow:var(--sh-lg)">--sh-lg</div>
+        <div style="box-shadow:var(--sh-xl)">--sh-xl</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Boutons (hauteurs : 34, 40, 48 px)</h2>
+      <div class="actions">
+        <button class="btn btn-primary btn-lg">Grand principal</button>
+        <button class="btn btn-primary">Principal</button>
+        <button class="btn">Secondaire</button>
+        <button class="btn btn-sm">Petit</button>
+        <button class="btn btn-danger">Supprimer</button>
+        <button class="btn btn-ok">Valider</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Champs (40 px, 44 px sur téléphone)</h2>
+      <div class="card">
+        <div class="grid-2">
+          <div><label for="c1">Nom du client</label><input id="c1" placeholder="Mme Martin"></div>
+          <div><label for="c2">Statut</label><select id="c2"><option>Envoyé</option><option>Accepté</option></select></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Étiquettes de statut</h2>
+      <div class="actions">
+        <span class="badge badge-brouillon">Brouillon</span>
+        <span class="badge badge-envoye">Envoyé</span>
+        <span class="badge badge-payee">Payée</span>
+        <span class="badge badge-a-payer">À payer</span>
+        <span class="badge badge-retard">En retard</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Carte et tableau</h2>
+      <div class="card">
+        <h2>5 derniers documents</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Numéro</th><th>Client</th><th class="num">Total TTC</th></tr></thead>
+          <tbody>
+            <tr><td>F-2026-031</td><td>M. Bernard</td><td class="num">517,00 €</td></tr>
+            <tr><td>D-2026-014</td><td>Mme Martin</td><td class="num">1 582,90 €</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

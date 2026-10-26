@@ -32,7 +32,7 @@
       position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 60;
       width: min(400px, calc(100vw - 32px)); padding: 18px 18px 16px; border-radius: 14px;
       background: #ffffff; color: #1c2333; border: 1px solid #e2e6ee; box-shadow: 0 18px 40px rgba(15, 27, 61, .18);
-      font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; animation: cookies-in .3s ease;
+      font: 15px/1.5 var(--font-sans, system-ui, sans-serif); animation: cookies-in .3s ease;
     }
     [dir="rtl"] .cookies { left: auto; right: 16px; }
     .cookies-titre { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-weight: 700; font-size: 1rem; }

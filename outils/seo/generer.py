@@ -61,9 +61,8 @@ def tete(titre, description, chemin, ld, type_og='website'):
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="img/logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/logo-180.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+  <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/tokens.css?v={VERSION}">
   <link rel="stylesheet" href="css/style.css?v={VERSION}">
   <link rel="stylesheet" href="css/landing.css?v={VERSION}">
   <link rel="stylesheet" href="css/seo.css?v={VERSION}">

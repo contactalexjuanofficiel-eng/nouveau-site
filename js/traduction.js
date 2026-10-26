@@ -21,7 +21,7 @@ const TradApp = (() => {
   // Zones jamais traduites. Le contenu d'un champ textarea non plus (seul son placeholder l'est).
   const IGNORER = '.doc, [data-no-trad], script, style, code, [contenteditable]';
   const IGNORER_TEXTE = IGNORER + ', textarea';
-  const ATTRIBUTS = ['placeholder', 'title', 'aria-label'];
+  const ATTRIBUTS = ['placeholder', 'title', 'aria-label', 'data-label'];
 
   function choixInitial() {
     try {

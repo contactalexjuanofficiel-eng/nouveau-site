@@ -1,0 +1,218 @@
+/*
+ * Charte graphique Devizo : les « jetons » de design.
+ * Toutes les pages (appli, site, admin, signature) s'appuient sur ces valeurs.
+ * Règle : ne jamais écrire une taille, un espacement, un rayon ou une couleur
+ * « en dur » dans un autre fichier CSS ; utiliser la variable correspondante.
+ * Voir la page charte.html pour l'aperçu de chaque élément.
+ */
+
+/* ---------- Polices (hébergées sur le site : rapide, hors ligne, sans Google) ---------- */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../fonts/inter-latin.woff2") format("woff2-variations"), url("../fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../fonts/inter-latin-ext.woff2") format("woff2-variations"), url("../fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("../fonts/bricolage-latin.woff2") format("woff2-variations"), url("../fonts/bricolage-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("../fonts/bricolage-latin-ext.woff2") format("woff2-variations"), url("../fonts/bricolage-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  /* ---------- Typographie ---------- */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Échelle des tailles (base 16 px) */
+  --fs-2xs: .6875rem;  /* 11 px : mentions très secondaires */
+  --fs-xs: .75rem;     /* 12 px : étiquettes, en-têtes de tableau */
+  --fs-sm: .8125rem;   /* 13 px : aides, textes secondaires */
+  --fs-md: .875rem;    /* 14 px : interface dense (tableaux, menus) */
+  --fs-base: .9375rem; /* 15 px : texte courant de l'appli */
+  --fs-lg: 1.0625rem;  /* 17 px : texte mis en avant */
+  --fs-xl: 1.25rem;    /* 20 px : titres de carte */
+  --fs-2xl: 1.5rem;    /* 24 px : titres de page (téléphone) */
+  --fs-3xl: 1.875rem;  /* 30 px : titres de page (ordinateur) */
+  --fs-4xl: 2.25rem;   /* 36 px : grands chiffres */
+  --fs-5xl: 3rem;      /* 48 px : chiffre clé du tableau de bord */
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.65;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
+
+  --tracking-tight: -.02em;
+  --tracking-snug: -.01em;
+  --tracking-wide: .04em;
+
+  /* ---------- Espacements (grille de 4 px) ---------- */
+  --sp-0: 0;
+  --sp-px: 1px;
+  --sp-0-5: 2px;
+  --sp-1: 4px;
+  --sp-1-5: 6px;
+  --sp-2: 8px;
+  --sp-2-5: 10px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+
+  /* ---------- Rayons ---------- */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-full: 999px;
+
+  /* ---------- Hauteurs des éléments cliquables ---------- */
+  --h-xs: 28px;
+  --h-sm: 34px;
+  --h-md: 40px;   /* boutons et champs par défaut */
+  --h-lg: 48px;   /* boutons principaux, cibles tactiles */
+  --h-xl: 56px;
+  --touch: 44px;  /* minimum recommandé pour le doigt */
+
+  /* ---------- Largeurs ---------- */
+  --w-sidebar: 252px;
+  --w-rail: 76px;
+  --w-page: 1180px;     /* contenu de l'appli */
+  --w-content: 960px;
+  --w-narrow: 720px;    /* textes longs */
+  --w-form: 560px;      /* formulaires seuls */
+  --w-dialog: 480px;
+  --w-dialog-lg: 600px;
+  --h-topbar: 60px;
+  --h-tabbar: 64px;
+
+  /* ---------- Ombres (douces, en couches) ---------- */
+  --sh-xs: 0 1px 2px rgba(16, 24, 40, .05);
+  --sh-sm: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+  --sh-md: 0 4px 10px -2px rgba(16, 24, 40, .08), 0 2px 4px -2px rgba(16, 24, 40, .05);
+  --sh-lg: 0 12px 24px -6px rgba(16, 24, 40, .12), 0 4px 8px -4px rgba(16, 24, 40, .05);
+  --sh-xl: 0 24px 48px -12px rgba(16, 24, 40, .22);
+
+  /* ---------- Mouvement ---------- */
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-in-out: cubic-bezier(.4, 0, .2, 1);
+
+  /* ---------- Superpositions ---------- */
+  --z-base: 1;
+  --z-sticky: 20;
+  --z-dropdown: 30;
+  --z-nav: 40;
+  --z-overlay: 50;
+  --z-dialog: 60;
+  --z-toast: 70;
+
+  /* ---------- Couleurs : palettes ---------- */
+  --blue-50: #eef3ff; --blue-100: #dfe8ff; --blue-200: #c4d4ff; --blue-300: #9cb6ff; --blue-400: #6d90ff;
+  --blue-500: #4572ff; --blue-600: #1f5eff; --blue-700: #1748d8; --blue-800: #163bac; --blue-900: #162f80;
+  --gray-25: #fcfcfd; --gray-50: #f7f8fb; --gray-100: #f0f2f7; --gray-200: #e3e7ef; --gray-300: #cfd5e1;
+  --gray-400: #98a1b3; --gray-500: #6b7385; --gray-600: #4a5366; --gray-700: #343b4d; --gray-800: #212736; --gray-900: #141a28;
+  --green-50: #ecfbf2; --green-100: #d3f5e1; --green-500: #22b366; --green-600: #1e9e5a; --green-700: #157a45;
+  --amber-50: #fff7eb; --amber-100: #fdecc9; --amber-500: #f0a020; --amber-600: #d98a1a; --amber-700: #a86412;
+  --red-50: #fef1f1; --red-100: #fcdcdc; --red-500: #ec5252; --red-600: #d93a3a; --red-700: #b02727;
+
+  /* ---------- Couleurs : rôles (ce que les composants utilisent) ---------- */
+  --primary: var(--blue-600);
+  --primary-dark: var(--blue-700);
+  --primary-soft: var(--blue-50);
+  --primary-soft-2: var(--blue-100);
+  --on-primary: #ffffff;
+  --text: var(--gray-900);
+  --text-2: var(--gray-600);   /* texte secondaire */
+  --muted: var(--gray-500);    /* aides, légendes */
+  --faint: var(--gray-400);
+  --bg: var(--gray-50);        /* fond de l'appli */
+  --bg-2: var(--gray-100);     /* zones en retrait, survols */
+  --card: #ffffff;
+  --field: #ffffff;
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --success: var(--green-600);
+  --success-soft: var(--green-50);
+  --warning: var(--amber-600);
+  --warning-soft: var(--amber-50);
+  --danger: var(--red-600);
+  --danger-soft: var(--red-50);
+  --alert-bg: var(--amber-50);
+  --alert-border: var(--amber-100);
+  --shadow: rgba(16, 24, 40, .22);
+  --overlay: rgba(10, 15, 30, .45);
+  --ring: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent);
+  --ring-danger: 0 0 0 4px color-mix(in srgb, var(--danger) 20%, transparent);
+  --sidebar: #ffffff;
+  /* Graphiques */
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  color-scheme: light;
+}
+
+/* ---------- Mode sombre ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary: #6f97ff; --primary-dark: #8eadff; --primary-soft: #1b2643; --primary-soft-2: #22305a; --on-primary: #0b1020;
+    --text: #e8ebf3; --text-2: #b4bccd; --muted: #8f98ab; --faint: #697286;
+    --bg: #0f131c; --bg-2: #171c27; --card: #161b26; --field: #11151e; --sidebar: #12161f;
+    --border: #262d3c; --border-strong: #343c4e;
+    --success: #4fcf8a; --success-soft: #13291d; --warning: #f0b25a; --warning-soft: #2c2312;
+    --danger: #f07474; --danger-soft: #331a1c; --alert-bg: #2a2416; --alert-border: #4d3f22;
+    --shadow: rgba(0, 0, 0, .55); --overlay: rgba(0, 0, 0, .6);
+    --sh-xs: 0 1px 2px rgba(0, 0, 0, .3); --sh-sm: 0 1px 3px rgba(0, 0, 0, .4); --sh-md: 0 4px 12px rgba(0, 0, 0, .4);
+    --sh-lg: 0 12px 28px rgba(0, 0, 0, .5); --sh-xl: 0 24px 48px rgba(0, 0, 0, .6);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --primary: #6f97ff; --primary-dark: #8eadff; --primary-soft: #1b2643; --primary-soft-2: #22305a; --on-primary: #0b1020;
+  --text: #e8ebf3; --text-2: #b4bccd; --muted: #8f98ab; --faint: #697286;
+  --bg: #0f131c; --bg-2: #171c27; --card: #161b26; --field: #11151e; --sidebar: #12161f;
+  --border: #262d3c; --border-strong: #343c4e;
+  --success: #4fcf8a; --success-soft: #13291d; --warning: #f0b25a; --warning-soft: #2c2312;
+  --danger: #f07474; --danger-soft: #331a1c; --alert-bg: #2a2416; --alert-border: #4d3f22;
+  --shadow: rgba(0, 0, 0, .55); --overlay: rgba(0, 0, 0, .6);
+  --sh-xs: 0 1px 2px rgba(0, 0, 0, .3); --sh-sm: 0 1px 3px rgba(0, 0, 0, .4); --sh-md: 0 4px 12px rgba(0, 0, 0, .4);
+  --sh-lg: 0 12px 28px rgba(0, 0, 0, .5); --sh-xl: 0 24px 48px rgba(0, 0, 0, .6);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  color-scheme: dark;
+}

@@ -955,18 +955,18 @@ function pageEdit(id) {
   function renderLines() {
     linesEl.innerHTML = doc.lignes.map((l, i) => `
       <tr data-i="${i}">
-        <td><input data-field="description" value="${esc(l.description)}" placeholder="Ex : Pose d'un lavabo"></td>
-        <td><input data-field="quantite" type="number" step="any" min="0" value="${esc(l.quantite)}"></td>
-        <td><select data-field="unite">
+        <td class="l-desc"><input data-field="description" value="${esc(l.description)}" placeholder="Ex : Pose d'un lavabo"></td>
+        <td data-label="Qté"><input data-field="quantite" type="number" step="any" min="0" value="${esc(l.quantite)}"></td>
+        <td data-label="Unité"><select data-field="unite">
           ${['u', 'h', 'jour', 'm²', 'm', 'ml', 'forfait', 'kg', 'lot'].map((u) => `<option ${u === l.unite ? 'selected' : ''}>${u}</option>`).join('')}
         </select></td>
-        <td><input data-field="prixUnitaire" type="number" step="0.01" min="0" value="${esc(l.prixUnitaire)}"></td>
-        ${franchise ? '' : `<td><select data-field="tva">
+        <td data-label="Prix unit. HT"><input data-field="prixUnitaire" type="number" step="0.01" min="0" value="${esc(l.prixUnitaire)}"></td>
+        ${franchise ? '' : `<td data-label="TVA %"><select data-field="tva">
           ${tauxProposes(l.tva).map((t) => `<option value="${t}" ${Number(l.tva) === t ? 'selected' : ''}>${tauxFr(t)}</option>`).join('')}
         </select></td>`}
-        <td class="num line-total">${euro(l.quantite * l.prixUnitaire)}</td>
-        <td>${etoileLigne(l, i)}</td>
-        <td><button type="button" class="btn btn-sm btn-danger" data-remove="${i}" title="Supprimer la ligne">✕</button></td>
+        <td class="num line-total" data-label="Total HT">${euro(l.quantite * l.prixUnitaire)}</td>
+        <td class="l-act">${etoileLigne(l, i)}</td>
+        <td class="l-act"><button type="button" class="btn btn-sm btn-danger" data-remove="${i}" title="Supprimer la ligne">✕</button></td>
       </tr>`).join('');
     renderTotals();
   }
@@ -2008,13 +2008,24 @@ function pageSettings(champ) {
 function majPastille() {
   const nb = profilManquant().length;
   const lien = document.querySelector('.nav a[href="#/parametres"]');
-  if (lien) lien.innerHTML = 'Mon entreprise' + (nb ? ` <span class="pill">${nb}</span>` : '');
+  if (lien) {
+    let pastille = lien.querySelector('.pill');
+    if (nb && !pastille) {
+      pastille = document.createElement('span');
+      pastille.className = 'pill';
+      lien.appendChild(pastille);
+    }
+    if (pastille) {
+      if (nb) pastille.textContent = nb;
+      else pastille.remove();
+    }
+  }
   document.getElementById('burger')?.classList.toggle('alerte', nb > 0);
   const navParrain = document.getElementById('nav-parrainage');
   if (navParrain) navParrain.hidden = !(typeof Compte !== 'undefined' && Compte.actif && Compte.connecte());
   // Les autres pages sont verrouillées tant que le profil est incomplet (sauf pour un administrateur).
   const libre = typeof Compte !== 'undefined' && Compte.estAdmin?.();
-  document.querySelectorAll('.nav a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"]):not([href="#/parrainage"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
+  document.querySelectorAll(':is(.nav, .tabbar) a:not([href="#/parametres"]):not([href="#/compte"]):not([href="#/assistance"]):not([href="#/parrainage"])').forEach((a) => a.classList.toggle('locked', nb > 0 && !libre));
 }
 
 function pageNotFound() {
@@ -2048,7 +2059,7 @@ function render() {
   const params = new URLSearchParams(query);
   const parts = path.split('/').filter(Boolean);
 
-  document.querySelectorAll('.nav a').forEach((a) => {
+  document.querySelectorAll('.nav a, .tabbar a').forEach((a) => {
     const target = a.getAttribute('href').slice(1);
     a.classList.toggle('active', target === '/' ? parts.length === 0 : path.startsWith(target));
   });
@@ -2136,6 +2147,7 @@ const burger = document.getElementById('burger');
 const topbar = document.querySelector('.topbar');
 function menuOuvert(ouvert) {
   topbar.classList.toggle('menu-open', ouvert);
+  document.body.classList.toggle('menu-ouvert', ouvert);
   burger.setAttribute('aria-expanded', String(ouvert));
   burger.setAttribute('aria-label', ouvert ? 'Fermer le menu' : 'Ouvrir le menu');
 }
@@ -2144,7 +2156,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') menuOuvert(false);
 });
 document.addEventListener('click', (e) => {
-  if (topbar.classList.contains('menu-open') && !topbar.contains(e.target)) menuOuvert(false);
+  if (topbar.classList.contains('menu-open') && !topbar.contains(e.target) && !burger?.contains(e.target)) menuOuvert(false);
 });
 
 window.addEventListener('hashchange', () => {

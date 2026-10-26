@@ -1,6 +1,8 @@
 // Compléments de traduction de l'appli (textes ajoutés après la première traduction).
 window.DEVIZO_TRAD_APP_PLUS = {
   en: {
+    // Navigation (refonte)
+    "Activité": "Activity", "Réglages": "Settings", "Accueil": "Home", "Plus": "More", "Menu principal": "Main menu", "Navigation rapide": "Quick navigation",
     'Devis & factures': 'Quotes & invoices',
     'Payée le {0}': 'Paid on {0}', 'remis en brouillon': 'set back to draft', Email: 'Email', '14 chiffres': '14 digits',
     '15 jours': '15 days', '30 jours': '30 days', '45 jours': '45 days', 'sur {0} facture{1}': 'across {0} invoice(s){1}',
@@ -58,6 +60,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Signing in with Google…",
   },
   es: {
+    // Navigation (refonte)
+    "Activité": "Actividad", "Réglages": "Ajustes", "Accueil": "Inicio", "Plus": "Más", "Menu principal": "Menú principal", "Navigation rapide": "Navegación rápida",
     'Devis & factures': 'Presupuestos y facturas',
     'Payée le {0}': 'Pagada el {0}', 'remis en brouillon': 'devuelto a borrador', Email: 'Correo electrónico', '14 chiffres': '14 cifras',
     '15 jours': '15 días', '30 jours': '30 días', '45 jours': '45 días', 'sur {0} facture{1}': 'en {0} factura(s){1}',
@@ -115,6 +119,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectando con Google…",
   },
   pt: {
+    // Navigation (refonte)
+    "Activité": "Atividade", "Réglages": "Definições", "Accueil": "Início", "Plus": "Mais", "Menu principal": "Menu principal", "Navigation rapide": "Navegação rápida",
     'Devis & factures': 'Orçamentos e faturas',
     'Payée le {0}': 'Paga em {0}', 'remis en brouillon': 'devolvido a rascunho', Email: 'E-mail', '14 chiffres': '14 dígitos',
     '15 jours': '15 dias', '30 jours': '30 dias', '45 jours': '45 dias', 'sur {0} facture{1}': 'em {0} fatura(s){1}',
@@ -172,6 +178,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "A ligar com o Google…",
   },
   it: {
+    // Navigation (refonte)
+    "Activité": "Attività", "Réglages": "Impostazioni", "Accueil": "Home", "Plus": "Altro", "Menu principal": "Menu principale", "Navigation rapide": "Navigazione rapida",
     'Devis & factures': 'Preventivi e fatture',
     'Payée le {0}': 'Pagata il {0}', 'remis en brouillon': 'riportato in bozza', Email: 'E-mail', '14 chiffres': '14 cifre',
     '15 jours': '15 giorni', '30 jours': '30 giorni', '45 jours': '45 giorni', 'sur {0} facture{1}': 'su {0} fattura/e{1}',
@@ -229,6 +237,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Accesso con Google…",
   },
   de: {
+    // Navigation (refonte)
+    "Activité": "Aktivität", "Réglages": "Einstellungen", "Accueil": "Start", "Plus": "Mehr", "Menu principal": "Hauptmenü", "Navigation rapide": "Schnellnavigation",
     'Devis & factures': 'Angebote & Rechnungen',
     'Payée le {0}': 'Bezahlt am {0}', 'remis en brouillon': 'wieder als Entwurf', Email: 'E-Mail', '14 chiffres': '14 Ziffern',
     '15 jours': '15 Tage', '30 jours': '30 Tage', '45 jours': '45 Tage', 'sur {0} facture{1}': 'aus {0} Rechnung(en){1}',
@@ -286,6 +296,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Anmeldung mit Google…",
   },
   ar: {
+    // Navigation (refonte)
+    "Activité": "النشاط", "Réglages": "الإعدادات", "Accueil": "الرئيسية", "Plus": "المزيد", "Menu principal": "القائمة الرئيسية", "Navigation rapide": "تنقل سريع",
     'Devis & factures': 'عروض الأسعار والفواتير',
     'Payée le {0}': 'مدفوعة في {0}', 'remis en brouillon': 'أُعيد إلى مسودة', Email: 'البريد الإلكتروني', '14 chiffres': '14 رقمًا',
     '15 jours': '15 يومًا', '30 jours': '30 يومًا', '45 jours': '45 يومًا', 'sur {0} facture{1}': 'من {0} فاتورة{1}',
@@ -343,6 +355,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "جارٍ تسجيل الدخول باستخدام Google…",
   },
   tr: {
+    // Navigation (refonte)
+    "Activité": "Etkinlik", "Réglages": "Ayarlar", "Accueil": "Ana sayfa", "Plus": "Daha fazla", "Menu principal": "Ana menü", "Navigation rapide": "Hızlı gezinme",
     'Devis & factures': 'Teklifler ve faturalar',
     'Payée le {0}': '{0} tarihinde ödendi', 'remis en brouillon': 'taslağa geri alındı', Email: 'E-posta', '14 chiffres': '14 hane',
     '15 jours': '15 gün', '30 jours': '30 gün', '45 jours': '45 gün', 'sur {0} facture{1}': '{0} faturada{1}',
@@ -400,6 +414,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Google ile giriş yapılıyor…",
   },
   ro: {
+    // Navigation (refonte)
+    "Activité": "Activitate", "Réglages": "Setări", "Accueil": "Acasă", "Plus": "Mai mult", "Menu principal": "Meniu principal", "Navigation rapide": "Navigare rapidă",
     'Devis & factures': 'Devize și facturi',
     'Payée le {0}': 'Plătită pe {0}', 'remis en brouillon': 'readus la ciornă', Email: 'E-mail', '14 chiffres': '14 cifre',
     '15 jours': '15 zile', '30 jours': '30 de zile', '45 jours': '45 de zile', 'sur {0} facture{1}': 'din {0} factură/facturi{1}',
@@ -457,6 +473,8 @@ window.DEVIZO_TRAD_APP_PLUS = {
     "Connexion avec Google…": "Conectare cu Google…",
   },
   pl: {
+    // Navigation (refonte)
+    "Activité": "Aktywność", "Réglages": "Ustawienia", "Accueil": "Start", "Plus": "Więcej", "Menu principal": "Menu główne", "Navigation rapide": "Szybka nawigacja",
     'Devis & factures': 'Kosztorysy i faktury',
     'Payée le {0}': 'Opłacona {0}', 'remis en brouillon': 'przywrócono do szkicu', Email: 'E-mail', '14 chiffres': '14 cyfr',
     '15 jours': '15 dni', '30 jours': '30 dni', '45 jours': '45 dni', 'sur {0} facture{1}': 'z {0} faktur(y){1}',

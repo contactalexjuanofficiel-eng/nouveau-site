@@ -1,7 +1,7 @@
 /* Page d'accueil : un devis dans l'accroche, parcouru par une souris
    qui explique les fonctionnalités, puis sections empilées. */
 :root {
-  --display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: var(--font-display);
   --paper: #ffffff;
   --paper-ink: #1c2333;
   --paper-muted: #6b7385;
@@ -225,7 +225,7 @@
 .plan-for { color: var(--muted); margin: 4px 0 16px; }
 .price { margin: 0 0 4px; font-size: 1.2rem; font-weight: 700; }
 .price .amount { font-size: 3rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-.price .per { font-family: system-ui, sans-serif; font-weight: 400; color: var(--muted); font-size: .9rem; }
+.price .per { font-family: var(--font-sans); font-weight: 400; color: var(--muted); font-size: .9rem; }
 .plan ul { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 10px; flex: 1; align-content: start; }
 .plan li { padding-inline-start: 24px; position: relative; }
 .plan li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--success); font-weight: 700; }
