@@ -126,11 +126,12 @@
 .gen-non { display: block; margin: 14px auto 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; }
 .seo-gratuit-texte { padding-bottom: 32px; }
 .seo-tableau { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.seo-tableau th, .seo-tableau td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
 @media (max-width: 600px) {
   .seo-tableau { font-size: var(--fs-sm); }
   .seo-tableau th, .seo-tableau td { padding: var(--sp-2) var(--sp-1-5); }
+  .seo-tableau th { white-space: normal; }
 }
-.seo-tableau th, .seo-tableau td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
 .seo-tableau td:not(:first-child), .seo-tableau th:not(:first-child) { text-align: center; }
 .seo-tableau thead th:last-child { color: var(--primary); }
 @media (max-width: 760px) {

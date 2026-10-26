@@ -54,7 +54,12 @@
   const euro = (n) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n || 0);
   const dateFr = (iso) => (iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR') : '');
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const nombre = (v) => Number(String(v ?? '').replace(/\s/g, '').replace(',', '.')) || 0;
+  // Montant saisi à la française : « 1 234,56 », « 1.234,56 €» ou « 1234.56 ».
+  const nombre = (v) => {
+    let t = String(v ?? '').replace(/[\s\u00a0\u202f€]/g, '');
+    if (t.includes(',') && t.includes('.')) t = t.replace(/\./g, '');
+    return Number(t.replace(',', '.')) || 0;
+  };
   const tauxFr = (t) => String(t).replace('.', ',');
 
   const VIDE = () => ({
@@ -268,7 +273,8 @@
     if (!etat.client.nom.trim()) manque.push('le nom du client');
     if (!etat.devis.lignes.some((l) => l.description.trim() && nombre(l.prixUnitaire) > 0)) manque.push('au moins une ligne avec un prix');
     else if (totaux().ttc <= 0) manque.push('un total supérieur à 0 €');
-    if (etat.devis.echeance && etat.devis.date && etat.devis.echeance < etat.devis.date) manque.push('une date de validité après la date du devis');
+    if (!etat.devis.date) manque.push('la date du devis');
+    else if (etat.devis.echeance && etat.devis.echeance < etat.devis.date) manque.push('une date de validité après la date du devis');
     return manque;
   }
 
@@ -443,7 +449,7 @@
     const zoneErreur = zone.querySelector('.gen-erreur');
     const manque = erreurs();
     if (manque.length) {
-      zoneErreur.textContent = 'Il manque ' + manque.join(', ') + '.';
+      zoneErreur.textContent = 'Avant de télécharger, il faut : ' + manque.join(' ; ') + '.';
       zoneErreur.hidden = false;
       return;
     }

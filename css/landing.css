@@ -34,7 +34,8 @@
 }
 .l-header-inner { display: flex; align-items: center; gap: 40px; padding-block: 14px; }
 /* Le bandeau occupe toute la largeur de l'écran, comme sur les grands sites. */
-.l-header .l-wrap { max-width: none; padding-inline: clamp(20px, 3.5vw, 64px); }
+.l-header { --marge-bandeau: clamp(20px, 3.5vw, 64px); }
+.l-header .l-wrap { max-width: none; padding-inline: var(--marge-bandeau); }
 .l-header .logo { color: var(--primary-dark); font-size: 1.6rem; font-weight: 800; text-decoration: none; letter-spacing: -.01em; }
 .l-nav { display: flex; gap: 24px; }
 .l-nav a { color: var(--bandeau-ink); text-decoration: none; font-weight: 500; }
@@ -59,12 +60,17 @@
   .l-header-inner { flex-wrap: wrap; row-gap: 0; }
   .l-nav {
     order: 3; flex: 1 1 100%; gap: 6px; overflow-x: auto; scrollbar-width: none;
-    margin-inline: calc(clamp(20px, 3.5vw, 64px) * -1); padding: 8px clamp(20px, 3.5vw, 64px) 0;
+    margin-inline: calc(var(--marge-bandeau) * -1); padding: 8px var(--marge-bandeau) 0;
   }
   .l-nav::-webkit-scrollbar { display: none; }
   .l-nav a { flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px;
     background: color-mix(in srgb, var(--bandeau-ink) 7%, transparent); font-size: .92rem; white-space: nowrap; }
   .l-header-inner { padding-block: 10px; }
+  /* Sur la 2e ligne qui défile, tous les liens restent visibles. */
+  .l-nav a[href="#pilotage"], .l-nav a[href="#faq"] { display: inline-flex !important; }
+  /* Le bandeau ne suit plus le défilement : il ne mange pas l'écran du téléphone
+     (la barre « Essai gratuit » du bas reste toujours accessible). */
+  .l-header { position: relative; }
 }
 @media (max-width: 360px) { .l-header .logo-texte { display: none; } }
 .l-pill-court { display: none; }
@@ -77,7 +83,7 @@
   .l-pill { padding: 8px 12px; font-size: .9rem; }
 }
 @media (max-width: 380px) {
-  .l-header .l-wrap { padding-inline: 12px; }
+  .l-header { --marge-bandeau: 12px; }
   .l-header-inner, .l-actions { gap: 6px; }
   .l-header .logo { font-size: 1.15rem; }
   .l-header .l-login { font-size: .85rem; }
@@ -345,7 +351,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .l-langue summary::-webkit-details-marker { display: none; }
 .l-langue summary:hover, .l-langue[open] summary { background: color-mix(in srgb, var(--bandeau-ink) 10%, transparent); }
 .l-header:has(.l-langue[open]) { z-index: 80; } /* au-dessus du bandeau cookies */
-.l-langue summary { min-height: 44px; min-width: 44px; justify-content: center; }
+.l-langue summary { min-height: 44px; justify-content: center; }
 .l-langue-liste {
   position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 20;
   list-style: none; margin: 0; padding: 6px; min-width: 180px;
@@ -464,3 +470,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   .l-langue-liste { top: 100%; inset-inline: 12px; min-width: 0; max-height: 70vh; overflow-y: auto; }
   .l-langue-liste button { min-height: 44px; }
 }
+
+/* Lien vers une section : le titre n'est pas caché sous le bandeau du haut. */
+.landing section[id] { scroll-margin-top: 90px; }
+@media (max-width: 960px) { .landing section[id] { scroll-margin-top: 12px; } }
+@media (max-width: 420px) { .l-header { --marge-bandeau: 16px; } }

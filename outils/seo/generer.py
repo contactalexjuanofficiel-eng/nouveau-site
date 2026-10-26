@@ -327,7 +327,7 @@ FAQ_GRATUIT = [
     ("Le générateur de devis est-il vraiment gratuit ?",
      "Oui, jusqu'à 3 devis par mois. Vous remplissez le devis et vous téléchargez le PDF sans payer et sans créer de compte. Une petite mention « Devis réalisé gratuitement avec Devizo » apparaît en bas du document. Pour faire plus de devis, et des factures, créez un compte Devizo : 14 jours gratuits, sans carte bancaire."),
     ("Mes informations sont-elles enregistrées ?",
-     "Non. Rien n'est envoyé sur nos serveurs : le devis reste dans votre navigateur le temps de l'onglet. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."),
+     "Non. Rien n'est envoyé sur nos serveurs : le devis reste uniquement sur votre appareil, dans votre navigateur. Si vous voulez retrouver vos devis plus tard, créez un compte Devizo : le devis que vous venez de faire y est repris automatiquement."),
     ("Le devis est-il conforme à la loi ?",
      "Le PDF contient les mentions principales d'un devis d'artisan : vos coordonnées et votre SIRET, celles du client, la date et la durée de validité, le détail des prestations avec les prix unitaires HT, la TVA ou la mention « TVA non applicable, art. 293 B du CGI », l'assurance décennale et la zone « Bon pour accord ». Selon votre métier, d'autres mentions peuvent être nécessaires : consultez notre guide des mentions obligatoires."),
     ("Puis-je faire une facture avec ce générateur ?",
