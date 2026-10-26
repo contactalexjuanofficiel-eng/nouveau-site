@@ -84,7 +84,7 @@ def tete(titre, description, chemin, ld, type_og='website'):
         <a class="l-pill l-pill-plein l-pill-long" href="app.html#inscription">Essai gratuit 14 jours</a>
         <a class="l-pill l-pill-plein l-pill-court" href="app.html#inscription">Essai gratuit</a>
         <button type="button" class="l-burger" aria-expanded="false" aria-controls="l-nav" aria-label="Menu">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path class="b1" d="M4 7h16"/><path class="b2" d="M4 12h16"/><path class="b3" d="M4 17h16"/></svg>
         </button>
       </div>
     </div>
