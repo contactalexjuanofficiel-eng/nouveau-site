@@ -1,0 +1,7 @@
+# Cloudflare Pages : les fichiers de travail du dépôt ne sont pas servis sur le site.
+/CLAUDE.md /404.html 404
+/README.md /404.html 404
+/.claude/* /404.html 404
+/outils/* /404.html 404
+/supabase/* /404.html 404
+/captures/* /404.html 404
